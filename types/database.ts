@@ -100,6 +100,58 @@ export interface Database {
                     note?: string | null
                     created_at?: string
                 }
+            },
+            orders: {
+                Row: {
+                    id: string
+                    user_id: string
+                    total_price: number
+                    status: string
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    user_id: string
+                    total_price?: number
+                    status?: string
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    user_id?: string
+                    total_price?: number
+                    status?: string
+                    created_at?: string
+                }
+            },
+            order_items: {
+                Row: {
+                    id: string
+                    order_id: string
+                    drug_id: string
+                    quantity: number
+                    unit_price: number
+                    note: string | null
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    order_id: string
+                    drug_id: string
+                    quantity?: number
+                    unit_price?: number
+                    note?: string | null
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    order_id?: string
+                    drug_id?: string
+                    quantity?: number
+                    unit_price?: number
+                    note?: string | null
+                    created_at?: string
+                }
             }
         }
     }
