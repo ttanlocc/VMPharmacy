@@ -80,7 +80,7 @@ export async function POST(request: Request) {
         .from('customers')
         .select('id')
         .eq('phone', phone)
-        .single();
+        .maybeSingle();
 
     if (existing) {
         return NextResponse.json({ error: 'Phone number already exists' }, { status: 409 });

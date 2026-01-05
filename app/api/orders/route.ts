@@ -32,8 +32,12 @@ async function createClient() {
     );
 }
 
-export async function GET() {
+export async function GET(request: Request) {
     const supabase = await createClient();
+    const { searchParams } = new URL(request.url);
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
+    const search = searchParams.get('search');
 
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -41,10 +45,11 @@ export async function GET() {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data, error } = await supabase
+    let query = supabase
         .from('orders')
         .select(`
       *,
+      customers (name, phone),
       order_items (
         *,
         drugs (name, unit, image_url)
@@ -52,6 +57,38 @@ export async function GET() {
     `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
+
+    if (dateFrom) {
+        query = query.gte('created_at', `${dateFrom}T00:00:00.000Z`);
+    }
+    if (dateTo) {
+        query = query.lte('created_at', `${dateTo}T23:59:59.999Z`);
+    }
+    // Search by customer name or phone is complex with joined tables in simple queries.
+    // We will do basic filtering on the customer_id if provided, 
+    // OR rely on client-side filtering for complex text search if strict RLS allows.
+    // For now, let's support direct customer_id matching if passed, or rely on fetching all.
+
+    // However, if 'search' is passed, we might want to filter customers.
+    // Supabase supports !inner join filtering.
+    if (search) {
+        // This requires the join to be !inner to filter out orders where customer doesn't match
+        query = supabase
+            .from('orders')
+            .select(`
+              *,
+              customers!inner (name, phone),
+              order_items (
+                *,
+                drugs (name, unit, image_url)
+              )
+            `)
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .or(`name.ilike.%${search}%,phone.ilike.%${search}%`, { foreignTable: 'customers' });
+    }
+
+    const { data, error } = await query;
 
     if (error) {
         console.error("API GET /api/orders Error:", error);

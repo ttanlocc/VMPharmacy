@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Home, ClipboardList, Pill, Settings, LogOut } from 'lucide-react';
+import { Home, ClipboardList, Pill, Settings, LogOut, Calendar } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 const navItems = [
     { href: '/', label: 'Sảnh', icon: Home },
     { href: '/templates', label: 'Đơn mẫu', icon: ClipboardList },
+    { href: '/history', label: 'Lịch sử', icon: Calendar },
     { href: '/drugs', label: 'Kho thuốc', icon: Pill },
     { href: '/settings', label: 'Cài đặt', icon: Settings },
 ];
