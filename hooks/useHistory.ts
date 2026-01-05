@@ -3,7 +3,7 @@ import { Database } from '@/types/database';
 import toast from 'react-hot-toast';
 
 export type OrderWithDetails = Database['public']['Tables']['orders']['Row'] & {
-    customers: { name: string; phone: string } | null;
+    customers: { name: string; phone: string; medical_history: string | null } | null;
     order_items: (Database['public']['Tables']['order_items']['Row'] & {
         drugs: {
             name: string;

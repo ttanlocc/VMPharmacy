@@ -49,7 +49,7 @@ export async function GET(request: Request) {
         .from('orders')
         .select(`
       *,
-      customers (name, phone),
+      customers (name, phone, medical_history),
       order_items (
         *,
         drugs (name, unit, image_url)
@@ -77,7 +77,7 @@ export async function GET(request: Request) {
             .from('orders')
             .select(`
               *,
-              customers!inner (name, phone),
+              customers!inner (name, phone, medical_history),
               order_items (
                 *,
                 drugs (name, unit, image_url)
