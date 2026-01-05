@@ -1,7 +1,7 @@
 'use client';
 
 import AuthGuard from '@/components/AuthGuard';
-import BottomNav from '@/components/BottomNav';
+import Navbar from '@/components/Navbar';
 
 export default function DashboardLayout({
     children,
@@ -13,7 +13,7 @@ export default function DashboardLayout({
             <div className="pb-20 min-h-screen bg-slate-50">
                 {children}
             </div>
-            <BottomNav />
+            <Navbar />
         </AuthGuard>
     );
 }

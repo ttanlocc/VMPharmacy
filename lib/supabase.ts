@@ -1,6 +1,11 @@
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
+import { Database } from '@/types/database'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Client-side Supabase client with cookie support for SSR
+export const supabase = createBrowserClient<Database>(
+  supabaseUrl,
+  supabaseAnonKey
+)

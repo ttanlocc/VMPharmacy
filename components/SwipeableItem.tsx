@@ -1,73 +1,86 @@
-import React, { useState } from 'react';
-import { useSwipeable } from 'react-swipeable';
-import { Trash2, Edit } from 'lucide-react';
+'use client';
+
+import { motion, useMotionValue, useTransform, useAnimation } from 'framer-motion';
+import { Trash2, Edit2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface SwipeableItemProps {
     children: React.ReactNode;
-    onSwipeLeft?: () => void;
-    onSwipeRight?: () => void;
+    onDelete?: () => void;
+    onEdit?: () => void;
     className?: string;
 }
 
 export default function SwipeableItem({
     children,
-    onSwipeLeft,
-    onSwipeRight,
-    className = ''
+    onDelete,
+    onEdit,
+    className
 }: SwipeableItemProps) {
-    const [offset, setOffset] = useState(0);
+    const x = useMotionValue(0);
+    const controls = useAnimation();
 
-    const handlers = useSwipeable({
-        onSwiping: (eventData) => {
-            setOffset(eventData.deltaX);
-        },
-        onSwipedLeft: () => {
-            if (offset < -100 && onSwipeLeft) {
-                onSwipeLeft();
-            }
-            setOffset(0);
-        },
-        onSwipedRight: () => {
-            if (offset > 100 && onSwipeRight) {
-                onSwipeRight();
-            }
-            setOffset(0);
-        },
-        onSwiped: () => {
-            setOffset(0);
-        },
-        trackMouse: true,
-        delta: 10,
-    });
+    // Drag threshold for action
+    const threshold = 70;
 
-    const getBackground = () => {
-        if (offset < 0) return 'bg-red-500'; // Left swipe (Delete)
-        if (offset > 0) return 'bg-amber-500'; // Right swipe (Edit)
-        return 'bg-white';
+    // Opacity and scale transforms based on drag
+    const deleteOpacity = useTransform(x, [-threshold, -20], [1, 0]);
+    const editOpacity = useTransform(x, [20, threshold], [0, 1]);
+
+    const deleteScale = useTransform(x, [-threshold, -20], [1, 0.5]);
+    const editScale = useTransform(x, [20, threshold], [0.5, 1]);
+
+    const handleDragEnd = async (_: any, info: any) => {
+        const dragX = info.offset.x;
+
+        if (dragX < -threshold) {
+            if (onDelete) onDelete();
+            controls.start({ x: 0 });
+        } else if (dragX > threshold) {
+            if (onEdit) onEdit();
+            controls.start({ x: 0 });
+        } else {
+            controls.start({ x: 0 });
+        }
     };
 
     return (
-        <div className={`relative overflow-hidden rounded-xl ${className}`}>
-            {/* Background Actions layer */}
-            <div className={`absolute inset-0 flex items-center justify-between px-6 ${getBackground()} text-white transition-colors duration-200`}>
-                <div className={`flex items-center gap-2 ${offset > 0 ? 'opacity-100' : 'opacity-0'}`}>
-                    <Edit size={24} />
-                    <span className="font-bold">Edit</span>
-                </div>
-                <div className={`flex items-center gap-2 ${offset < 0 ? 'opacity-100' : 'opacity-0'}`}>
-                    <span className="font-bold">Delete</span>
-                    <Trash2 size={24} />
-                </div>
+        <div className={cn("relative overflow-hidden group touch-pan-y", className)}>
+            {/* Action Backgrounds */}
+            <div className="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
+                <motion.div
+                    style={{ opacity: editOpacity, scale: editScale }}
+                    className="flex items-center gap-2 text-primary font-bold"
+                >
+                    <div className="p-2 bg-primary/10 rounded-full">
+                        <Edit2 size={20} />
+                    </div>
+                    <span>Sửa</span>
+                </motion.div>
+
+                <motion.div
+                    style={{ opacity: deleteOpacity, scale: deleteScale }}
+                    className="flex items-center gap-2 text-danger font-bold"
+                >
+                    <span>Xóa</span>
+                    <div className="p-2 bg-danger/10 rounded-full">
+                        <Trash2 size={20} />
+                    </div>
+                </motion.div>
             </div>
 
-            {/* Foreground Content layer */}
-            <div
-                {...handlers}
-                className="relative bg-white transition-transform duration-75 ease-out shadow-sm border border-slate-100 rounded-xl"
-                style={{ transform: `translateX(${offset}px)` }}
+            {/* Content */}
+            <motion.div
+                drag="x"
+                dragConstraints={{ left: -100, right: 100 }}
+                dragElastic={0.2}
+                onDragEnd={handleDragEnd}
+                animate={controls}
+                style={{ x }}
+                className="relative z-10 bg-white"
             >
                 {children}
-            </div>
+            </motion.div>
         </div>
     );
 }

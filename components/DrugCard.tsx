@@ -1,54 +1,45 @@
-import Image from 'next/image';
-import { Plus } from 'lucide-react';
+'use client';
 
-interface Drug {
-    id: string;
-    name: string;
-    unit: string;
-    unit_price: number;
-    image_url: string | null;
-}
+import Image from 'next/image';
+import { Database } from '@/types/database';
+import { formatCurrency } from '@/lib/utils';
+import { Pill } from 'lucide-react';
+
+type Drug = Database['public']['Tables']['drugs']['Row'];
 
 interface DrugCardProps {
     drug: Drug;
-    onSelect?: (drug: Drug) => void;
+    onClick?: () => void;
+    className?: string;
 }
 
-export default function DrugCard({ drug, onSelect }: DrugCardProps) {
+export default function DrugCard({ drug, onClick, className }: DrugCardProps) {
     return (
         <div
-            onClick={() => onSelect?.(drug)}
-            className="flex flex-col bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden active:scale-95 transition-transform duration-100"
+            onClick={onClick}
+            className={`flex flex-col bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm active:scale-95 transition-transform cursor-pointer ${className}`}
         >
-            <div className="relative w-full aspect-square bg-slate-50">
+            <div className="relative aspect-square w-full bg-slate-50 flex items-center justify-center overflow-hidden">
                 {drug.image_url ? (
                     <Image
                         src={drug.image_url}
                         alt={drug.name}
                         fill
                         className="object-cover"
-                        sizes="(max-width: 768px) 50vw, 33vw"
+                        sizes="(max-width: 768px) 33vw, 150px"
                     />
                 ) : (
-                    <div className="flex items-center justify-center w-full h-full text-slate-300">
-                        <span className="text-4xl">💊</span>
-                    </div>
+                    <Pill size={32} className="text-slate-300" />
                 )}
-                <button className="absolute bottom-2 right-2 bg-sky-500 text-white p-1.5 rounded-full shadow-lg">
-                    <Plus size={16} strokeWidth={2.5} />
-                </button>
             </div>
-
             <div className="p-3">
-                <h3 className="font-semibold text-slate-900 leading-tight line-clamp-2 h-10 mb-1">
-                    {drug.name}
-                </h3>
-                <div className="flex items-baseline justify-between">
-                    <span className="text-xs text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                <h4 className="text-sm font-bold text-slate-900 line-clamp-1">{drug.name}</h4>
+                <div className="flex justify-between items-center mt-1">
+                    <span className="text-[10px] text-slate-500 font-medium px-2 py-0.5 bg-slate-100 rounded-full">
                         {drug.unit}
                     </span>
-                    <span className="font-bold text-sky-600">
-                        {new Intl.NumberFormat('vi-VN').format(drug.unit_price)}
+                    <span className="text-xs font-bold text-primary">
+                        {formatCurrency(drug.unit_price)}
                     </span>
                 </div>
             </div>

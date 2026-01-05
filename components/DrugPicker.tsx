@@ -1,122 +1,90 @@
-import { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
-import DrugCard from './DrugCard';
-import { useCart } from './CartProvider';
+'use client';
 
-// Using the same interface as DrugCard
-interface Drug {
-    id: string;
-    name: string;
-    unit: string;
-    unit_price: number;
-    image_url: string | null;
-    group_id?: string;
-}
+import { useState } from 'react';
+import { useDrugs } from '@/hooks/useDrugs';
+import DrugCard from './DrugCard';
+import LoadingSpinner from './LoadingSpinner';
+import { Search, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Database } from '@/types/database';
+
+type Drug = Database['public']['Tables']['drugs']['Row'];
 
 interface DrugPickerProps {
-    onSelect?: (drug: Drug) => void;
-    apiBaseUrl?: string; // Optional for SWR/Fetch
+    isOpen: boolean;
+    onClose: () => void;
+    onSelect: (drug: Drug) => void;
 }
 
-export default function DrugPicker({ onSelect }: DrugPickerProps) {
-    const { addItem } = useCart();
-    const [selectedGroup, setSelectedGroup] = useState<string>('all');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [drugs, setDrugs] = useState<Drug[]>([]);
-    const [groups, setGroups] = useState<{ id: string, name: string }[]>([]);
-    const [loading, setLoading] = useState(true);
+export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProps) {
+    const { drugs, loading } = useDrugs();
+    const [search, setSearch] = useState('');
 
-    // Fetch drugs and groups on mount
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                // In a real app, verify these endpoints exist or use SWR
-                const [drugsRes, groupsRes] = await Promise.all([
-                    fetch('/api/drugs').then(res => res.ok ? res.json() : []),
-                    // fetch('/api/groups').then(res => res.json()) // We haven't created this API yet, so we mock or use empty
-                    Promise.resolve([{ id: 'g1', name: 'Antibiotics' }, { id: 'g2', name: 'Vitamins' }, { id: 'g3', name: 'Analgesics' }])
-                ]);
+    const filteredDrugs = drugs.filter(d =>
+        d.name.toLowerCase().includes(search.toLowerCase())
+    );
 
-                setDrugs(drugsRes);
-                setGroups(groupsRes);
-            } catch (error) {
-                console.error('Failed to fetch data', error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchData();
-    }, []);
-
-    const filteredDrugs = drugs.filter(drug => {
-        const matchesGroup = selectedGroup === 'all' || drug.group_id === selectedGroup;
-        const matchesSearch = drug.name.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchesGroup && matchesSearch;
-    });
+    if (!isOpen) return null;
 
     return (
-        <div className="flex flex-col h-full bg-slate-50">
-            {/* Search Bar */}
-            <div className="p-4 bg-white border-b sticky top-0 z-10">
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                    <input
-                        type="text"
-                        placeholder="Search drugs..."
-                        className="w-full pl-10 pr-4 py-3 bg-slate-100 rounded-xl border-none focus:ring-2 focus:ring-sky-500 outline-none text-slate-900"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
-
-                {/* Horizontal Scrollable Groups */}
-                <div className="flex gap-2 mt-3 overflow-x-auto pb-1 scrollbar-hide">
-                    <button
-                        onClick={() => setSelectedGroup('all')}
-                        className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${selectedGroup === 'all'
-                            ? 'bg-sky-500 text-white shadow-md shadow-sky-200'
-                            : 'bg-white text-slate-600 border border-slate-200'
-                            }`}
-                    >
-                        All
-                    </button>
-                    {groups.map(group => (
-                        <button
-                            key={group.id}
-                            onClick={() => setSelectedGroup(group.id)}
-                            className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${selectedGroup === group.id
-                                ? 'bg-sky-500 text-white shadow-md shadow-sky-200'
-                                : 'bg-white text-slate-600 border border-slate-200'
-                                }`}
-                        >
-                            {group.name}
+        <AnimatePresence>
+            <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
+                <motion.div
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    exit={{ y: "100%" }}
+                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                    className="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl h-[85vh] sm:h-[80vh] flex flex-col overflow-hidden"
+                >
+                    {/* Header */}
+                    <div className="p-6 border-b border-slate-100 flex items-center justify-between shrink-0">
+                        <h3 className="text-xl font-bold text-slate-900">Chọn thuốc</h3>
+                        <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600">
+                            <X size={24} />
                         </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Drug Grid */}
-            <div className="flex-1 overflow-y-auto p-4">
-                {loading ? (
-                    <div className="flex justify-center p-8 text-slate-400">Loading...</div>
-                ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 pb-20">
-                        {filteredDrugs.map(drug => (
-                            <DrugCard
-                                key={drug.id}
-                                drug={drug}
-                                onSelect={(d) => {
-                                    if (onSelect) onSelect(d);
-                                    else {
-                                        addItem(d);
-                                        // Optional: Visual feedback toast
-                                    }
-                                }}
-                            />
-                        ))}
                     </div>
-                )}
+
+                    {/* Search */}
+                    <div className="px-6 py-4 shrink-0">
+                        <div className="relative">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                            <input
+                                type="text"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                placeholder="Tìm tên thuốc..."
+                                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Grid */}
+                    <div className="flex-1 overflow-y-auto px-6 pb-6">
+                        {loading ? (
+                            <LoadingSpinner className="mt-20" label="Đang tải danh mục thuốc..." />
+                        ) : (
+                            <div className="grid grid-cols-2 gap-4">
+                                {filteredDrugs.length > 0 ? (
+                                    filteredDrugs.map(drug => (
+                                        <DrugCard
+                                            key={drug.id}
+                                            drug={drug}
+                                            onClick={() => {
+                                                onSelect(drug);
+                                                onClose();
+                                            }}
+                                        />
+                                    ))
+                                ) : (
+                                    <div className="col-span-2 text-center py-20 text-slate-400">
+                                        Không tìm thấy thuốc nào khớp với "{search}"
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </motion.div>
             </div>
-        </div>
+        </AnimatePresence>
     );
 }

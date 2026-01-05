@@ -3,43 +3,54 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import LoadingSpinner from './LoadingSpinner';
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
-    const [authenticated, setAuthenticated] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
         const checkUser = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    router.push('/login');
+                } else {
+                    setIsAuthenticated(true);
+                }
+            } catch (error) {
+                console.error('Auth verification failed:', error);
                 router.push('/login');
-            } else {
-                setAuthenticated(true);
+            } finally {
+                setIsLoading(false);
             }
-            setLoading(false);
         };
 
         checkUser();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             if (!session) {
-                setAuthenticated(false);
+                setIsAuthenticated(false);
                 router.push('/login');
             } else {
-                setAuthenticated(true);
+                setIsAuthenticated(true);
             }
         });
 
         return () => subscription.unsubscribe();
     }, [router]);
 
-    if (loading) {
-        return <div className="flex h-screen items-center justify-center p-4">Loading...</div>;
+    if (isLoading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <LoadingSpinner size={32} label="Đang xác thực..." />
+            </div>
+        );
     }
 
-    if (!authenticated) {
-        return null; // or a loading spinner while redirecting
+    if (!isAuthenticated) {
+        return null;
     }
 
     return <>{children}</>;
