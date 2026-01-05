@@ -30,12 +30,12 @@ export function useOrders() {
         }
     };
 
-    const createOrder = async (items: any[], totalPrice: number) => {
+    const createOrder = async (items: any[], totalPrice: number, customerId?: string | null) => {
         try {
             const response = await fetch('/api/orders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ items, total_price: totalPrice }),
+                body: JSON.stringify({ items, total_price: totalPrice, customer_id: customerId }),
             });
 
             if (!response.ok) {

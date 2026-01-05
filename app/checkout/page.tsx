@@ -5,14 +5,19 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { supabase } from '@/lib/supabase';
-import { ArrowLeft, Plus, ShoppingBag, Trash2, Edit3, Pill, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Plus, ShoppingBag, Trash2, Edit3, Pill, CheckCircle2, FileText } from 'lucide-react';
 import Container from '@/components/Container';
 import SwipeableItem from '@/components/SwipeableItem';
 import DrugPicker from '@/components/DrugPicker';
+import CustomerPicker from '@/components/CustomerPicker';
+import TemplatePicker from '@/components/TemplatePicker';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { formatCurrency } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOrders } from '@/hooks/useOrders';
+import { Database } from '@/types/database';
+
+type Customer = Database['public']['Tables']['customers']['Row'];
 
 function CheckoutContent() {
     const searchParams = useSearchParams();
@@ -23,6 +28,8 @@ function CheckoutContent() {
     const [items, setItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [isPickerOpen, setIsPickerOpen] = useState(false);
+    const [isTemplatePickerOpen, setIsTemplatePickerOpen] = useState(false);
+    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [isSuccess, setIsSuccess] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -91,7 +98,7 @@ function CheckoutContent() {
 
         setIsSubmitting(true);
         try {
-            await createOrder(items, total);
+            await createOrder(items, total, selectedCustomer?.id);
             setIsSuccess(true);
             setTimeout(() => {
                 router.push('/');
@@ -101,6 +108,10 @@ function CheckoutContent() {
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleAddTemplateItems = (newItems: any[]) => {
+        setItems(prev => [...prev, ...newItems]);
     };
 
     if (isSuccess) {
@@ -124,6 +135,12 @@ function CheckoutContent() {
     return (
         <Container className="bg-slate-50 min-h-screen">
             <div className="flex flex-col gap-6">
+                {/* Customer Picker */}
+                <CustomerPicker
+                    selectedCustomer={selectedCustomer}
+                    onSelect={setSelectedCustomer}
+                />
+
                 {/* Header */}
                 <div className="flex items-center gap-4">
                     <button onClick={() => router.back()} className="p-3 bg-white shadow-sm border border-slate-100 rounded-2xl text-slate-600 active:scale-90 transition-transform">
@@ -186,12 +203,20 @@ function CheckoutContent() {
                             ))}
                         </AnimatePresence>
 
-                        <button
-                            onClick={() => setIsPickerOpen(true)}
-                            className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center gap-2 text-slate-400 font-bold hover:bg-white hover:border-primary hover:text-primary transition-all active:scale-[0.98]"
-                        >
-                            <Plus size={20} /> Thêm thuốc khác
-                        </button>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                onClick={() => setIsPickerOpen(true)}
+                                className="py-4 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center gap-2 text-slate-400 font-bold hover:bg-white hover:border-primary hover:text-primary transition-all active:scale-[0.98]"
+                            >
+                                <Plus size={20} /> Thêm thuốc
+                            </button>
+                            <button
+                                onClick={() => setIsTemplatePickerOpen(true)}
+                                className="py-4 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center gap-2 text-slate-400 font-bold hover:bg-white hover:border-sky-500 hover:text-sky-500 transition-all active:scale-[0.98]"
+                            >
+                                <FileText size={20} /> Đơn mẫu
+                            </button>
+                        </div>
                     </div>
                 )}
 
@@ -226,6 +251,12 @@ function CheckoutContent() {
                 isOpen={isPickerOpen}
                 onClose={() => setIsPickerOpen(false)}
                 onSelect={handleAddDrug}
+            />
+
+            <TemplatePicker
+                isOpen={isTemplatePickerOpen}
+                onClose={() => setIsTemplatePickerOpen(false)}
+                onSelect={handleAddTemplateItems}
             />
         </Container>
     );

@@ -114,4 +114,27 @@ insert into storage.buckets (id, name, public) values ('drug-images', 'drug-imag
 
 -- Storage Policy
 create policy "Public Access" on storage.objects for select using ( bucket_id = 'drug-images' );
+-- Existing lines...
 create policy "Authenticated users can upload" on storage.objects for insert with check ( bucket_id = 'drug-images' and auth.role() = 'authenticated' );
+
+-- Create customers table
+create table public.customers (
+  id uuid primary key default uuid_generate_v4(),
+  name text not null,
+  phone text unique not null,
+  birth_year integer,
+  medical_history text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Add customer_id to orders
+alter table public.orders add column customer_id uuid references public.customers(id);
+
+-- Enable RLS for customers
+alter table public.customers enable row level security;
+
+-- Policies for customers (Read/Write for authenticated)
+create policy "Enable read access for authenticated users" on public.customers for select using (auth.role() = 'authenticated');
+create policy "Enable insert for authenticated users" on public.customers for insert with check (auth.role() = 'authenticated');
+create policy "Enable update for authenticated users" on public.customers for update using (auth.role() = 'authenticated');
+

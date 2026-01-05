@@ -101,10 +101,37 @@ export interface Database {
                     created_at?: string
                 }
             },
+            customers: {
+                Row: {
+                    id: string
+                    name: string
+                    phone: string
+                    birth_year: number | null
+                    medical_history: string | null
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    name: string
+                    phone: string
+                    birth_year?: number | null
+                    medical_history?: string | null
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    name?: string
+                    phone?: string
+                    birth_year?: number | null
+                    medical_history?: string | null
+                    created_at?: string
+                }
+            },
             orders: {
                 Row: {
                     id: string
                     user_id: string
+                    customer_id: string | null
                     total_price: number
                     status: string
                     created_at: string
@@ -112,6 +139,7 @@ export interface Database {
                 Insert: {
                     id?: string
                     user_id: string
+                    customer_id?: string | null
                     total_price?: number
                     status?: string
                     created_at?: string
@@ -119,6 +147,7 @@ export interface Database {
                 Update: {
                     id?: string
                     user_id?: string
+                    customer_id?: string | null
                     total_price?: number
                     status?: string
                     created_at?: string

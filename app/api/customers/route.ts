@@ -17,14 +17,14 @@ async function createClient() {
                     try {
                         cookieStore.set({ name, value, ...options });
                     } catch (error) {
-                        // Ignored in Server Components
+                        // Ignored
                     }
                 },
                 remove(name: string, options: CookieOptions) {
                     try {
                         cookieStore.set({ name, value: '', ...options });
                     } catch (error) {
-                        // Ignored in Server Components
+                        // Ignored
                     }
                 },
             },
@@ -32,8 +32,10 @@ async function createClient() {
     );
 }
 
-export async function GET() {
+export async function GET(request: Request) {
     const supabase = await createClient();
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get('search');
 
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -41,20 +43,17 @@ export async function GET() {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data, error } = await supabase
-        .from('orders')
-        .select(`
-      *,
-      order_items (
-        *,
-        drugs (name, unit, image_url)
-      )
-    `)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+    let query = supabase.from('customers').select('*').order('created_at', { ascending: false });
+
+    if (search) {
+        // Search by name (case-insensitive) or phone (exact or partial)
+        // Using ilike for name and phone
+        query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%`);
+    }
+
+    const { data, error } = await query.limit(20);
 
     if (error) {
-        console.error("API GET /api/orders Error:", error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -63,7 +62,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
     const supabase = await createClient();
-    const { total_price, items, customer_id } = await request.json();
+    const body = await request.json();
+    const { name, phone, birth_year, medical_history } = body;
 
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -71,41 +71,35 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 1. Create Order
-    const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert([{
-            user_id: user.id,
-            total_price,
-            status: 'completed',
-            customer_id: customer_id || null
-        }])
+    if (!name || !phone) {
+        return NextResponse.json({ error: 'Name and Phone are required' }, { status: 400 });
+    }
+
+    // Check if phone already exists
+    const { data: existing } = await supabase
+        .from('customers')
+        .select('id')
+        .eq('phone', phone)
+        .single();
+
+    if (existing) {
+        return NextResponse.json({ error: 'Phone number already exists' }, { status: 409 });
+    }
+
+    const { data, error } = await supabase
+        .from('customers')
+        .insert({
+            name,
+            phone,
+            birth_year,
+            medical_history
+        })
         .select()
         .single();
 
-    if (orderError) {
-        console.error("API POST /api/orders (create order) Error:", orderError);
-        return NextResponse.json({ error: orderError.message }, { status: 500 });
+    if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // 2. Create Order Items
-    const orderItems = items.map((item: any) => ({
-        order_id: order.id,
-        drug_id: item.drug_id,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        note: item.note
-    }));
-
-    const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-
-    if (itemsError) {
-        // In a real app we might want to rollback the order here
-        console.error("API POST /api/orders (create items) Error:", itemsError);
-        return NextResponse.json({ error: itemsError.message }, { status: 500 });
-    }
-
-    return NextResponse.json(order);
+    return NextResponse.json(data);
 }
