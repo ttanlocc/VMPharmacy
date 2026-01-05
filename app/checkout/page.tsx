@@ -11,16 +11,19 @@ import DrugPicker from '@/components/DrugPicker';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { formatCurrency } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useOrders } from '@/hooks/useOrders';
 
 function CheckoutContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const templateId = searchParams.get('templateId');
+    const { createOrder } = useOrders();
 
     const [items, setItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (templateId) {
@@ -82,12 +85,21 @@ function CheckoutContent() {
 
     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-    const handleCheckout = () => {
+    const handleCheckout = async () => {
         if (items.length === 0) return;
-        setIsSuccess(true);
-        setTimeout(() => {
-            router.push('/');
-        }, 2500);
+
+        setIsSubmitting(true);
+        try {
+            await createOrder(items, total);
+            setIsSuccess(true);
+            setTimeout(() => {
+                router.push('/');
+            }, 2500);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (isSuccess) {
@@ -102,7 +114,7 @@ function CheckoutContent() {
                         <CheckCircle2 size={48} strokeWidth={3} />
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 mb-2 uppercase tracking-tight">Thanh toán xong!</h2>
-                    <p className="text-slate-500 font-medium">Đơn hàng đã được lưu vào hệ thống.<br />Đang quay lại sảnh...</p>
+                    <p className="text-slate-500 font-medium">Đơn hàng đã được lưu.<br />Đang quay lại sảnh...</p>
                 </motion.div>
             </div>
         );
@@ -193,12 +205,18 @@ function CheckoutContent() {
                         <span className="text-2xl font-black text-primary leading-none">{formatCurrency(total)}</span>
                     </div>
                     <button
-                        disabled={items.length === 0}
+                        disabled={items.length === 0 || isSubmitting}
                         onClick={handleCheckout}
                         className="flex-1 h-16 bg-primary text-white rounded-[1.5rem] font-black text-lg shadow-xl shadow-sky-100 hover:bg-sky-600 active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:grayscale"
                     >
-                        <ShoppingBag size={22} strokeWidth={3} />
-                        BÁN HÀNG
+                        {isSubmitting ? (
+                            <LoadingSpinner size={24} label="" className="p-0 text-white" />
+                        ) : (
+                            <>
+                                <ShoppingBag size={22} strokeWidth={3} />
+                                BÁN HÀNG
+                            </>
+                        )}
                     </button>
                 </div>
             </div>

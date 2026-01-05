@@ -37,11 +37,33 @@ create table public.template_items (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Create orders table
+create table public.orders (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references auth.users(id) not null,
+  total_price numeric not null DEFAULT 0,
+  status text not null default 'completed',
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Create order_items table
+create table public.order_items (
+  id uuid primary key default uuid_generate_v4(),
+  order_id uuid references public.orders(id) on delete cascade not null,
+  drug_id uuid references public.drugs(id) not null,
+  quantity integer not null default 1,
+  unit_price numeric not null DEFAULT 0,
+  note text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
 -- Enable RLS
 alter table public.drug_groups enable row level security;
 alter table public.drugs enable row level security;
 alter table public.templates enable row level security;
 alter table public.template_items enable row level security;
+alter table public.orders enable row level security;
+alter table public.order_items enable row level security;
 
 -- Policies for drug_groups (Read public, Write authenticated)
 create policy "Enable read access for all users" on public.drug_groups for select using (true);
@@ -73,6 +95,18 @@ create policy "Users can update items of their templates" on public.template_ite
 );
 create policy "Users can delete items of their templates" on public.template_items for delete using (
   exists ( select 1 from public.templates where id = template_items.template_id and user_id = auth.uid() )
+);
+
+-- Policies for orders (CRUD for owner)
+create policy "Users can view their own orders" on public.orders for select using (auth.uid() = user_id);
+create policy "Users can create their own orders" on public.orders for insert with check (auth.uid() = user_id);
+
+-- Policies for order_items (Access via order)
+create policy "Users can view items of their orders" on public.order_items for select using (
+  exists ( select 1 from public.orders where id = order_items.order_id and user_id = auth.uid() )
+);
+create policy "Users can insert items to their orders" on public.order_items for insert with check (
+  exists ( select 1 from public.orders where id = order_items.order_id and user_id = auth.uid() )
 );
 
 -- Create Storage Bucket for drug images

@@ -2,22 +2,22 @@
 
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { useDrugs } from '@/hooks/useDrugs';
-import { Plus, Search, Image as ImageIcon, X, Trash2 } from 'lucide-react';
+import { useDrugs, Drug } from '@/hooks/useDrugs';
+import { useDrugGroups } from '@/hooks/useDrugGroups';
+import { Plus, Search, Image as ImageIcon, X, Trash2, FolderPlus } from 'lucide-react';
 import Container from '@/components/Container';
 import DrugCard from '@/components/DrugCard';
 import SwipeableItem from '@/components/SwipeableItem';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { Database } from '@/types/database';
+import { DrugGroupManager } from '@/components/DrugGroupManager';
 import { uploadDrugImage } from '@/lib/upload';
 import { cn } from '@/lib/utils';
 import { DRUG_UNITS } from '@/lib/constants';
 
-type Drug = Database['public']['Tables']['drugs']['Row'];
-
 export default function DrugsPage() {
     const { drugs, loading, addDrug, updateDrug, deleteDrug } = useDrugs();
+    const { groups } = useDrugGroups();
     const [search, setSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingDrug, setEditingDrug] = useState<Drug | null>(null);
@@ -28,6 +28,7 @@ export default function DrugsPage() {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [unit, setUnit] = useState(DRUG_UNITS[0]);
+    const [groupId, setGroupId] = useState<string>('');
     const [imageUrl, setImageUrl] = useState('');
 
     const filteredDrugs = drugs.filter(d =>
@@ -38,6 +39,7 @@ export default function DrugsPage() {
         setName('');
         setPrice('');
         setUnit(DRUG_UNITS[0]);
+        setGroupId('');
         setImageUrl('');
         setEditingDrug(null);
     };
@@ -52,6 +54,7 @@ export default function DrugsPage() {
         setName(drug.name);
         setPrice(drug.unit_price.toString());
         setUnit(drug.unit);
+        setGroupId(drug.group_id || '');
         setImageUrl(drug.image_url || '');
         setIsModalOpen(true);
     };
@@ -79,6 +82,7 @@ export default function DrugsPage() {
             name,
             unit,
             unit_price: parseFloat(price),
+            group_id: groupId || null,
             image_url: imageUrl,
         };
 
@@ -107,12 +111,15 @@ export default function DrugsPage() {
                         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Kho thuốc</h1>
                         <p className="text-slate-500 text-sm font-medium">Quản lý danh mục thuốc của bạn</p>
                     </div>
-                    <button
-                        onClick={openAddModal}
-                        className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg active:scale-95 transition-transform"
-                    >
-                        <Plus size={24} />
-                    </button>
+                    <div className="flex gap-2">
+                        <DrugGroupManager />
+                        <button
+                            onClick={openAddModal}
+                            className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg active:scale-95 transition-transform"
+                        >
+                            <Plus size={24} />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Search */}
@@ -228,6 +235,22 @@ export default function DrugsPage() {
                                         placeholder="VD: Panadol Extra"
                                         className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all"
                                     />
+                                </div>
+
+                                <div className="flex gap-4">
+                                    <div className="flex-1">
+                                        <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Nhóm thuốc</label>
+                                        <select
+                                            value={groupId}
+                                            onChange={(e) => setGroupId(e.target.value)}
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all appearance-none"
+                                        >
+                                            <option value="">Chọn nhóm...</option>
+                                            {groups.map(g => (
+                                                <option key={g.id} value={g.id}>{g.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <div className="flex gap-4">

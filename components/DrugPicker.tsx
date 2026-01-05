@@ -1,14 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { useDrugs } from '@/hooks/useDrugs';
+import { useDrugs, Drug } from '@/hooks/useDrugs';
+import { useDrugGroups } from '@/hooks/useDrugGroups';
 import DrugCard from './DrugCard';
 import LoadingSpinner from './LoadingSpinner';
 import { Search, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Database } from '@/types/database';
+import { cn } from '@/lib/utils';
 
-type Drug = Database['public']['Tables']['drugs']['Row'];
+
 
 interface DrugPickerProps {
     isOpen: boolean;
@@ -18,11 +19,15 @@ interface DrugPickerProps {
 
 export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProps) {
     const { drugs, loading } = useDrugs();
+    const { groups } = useDrugGroups();
     const [search, setSearch] = useState('');
+    const [selectedGroup, setSelectedGroup] = useState<string>('all');
 
-    const filteredDrugs = drugs.filter(d =>
-        d.name.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredDrugs = drugs.filter(d => {
+        const matchesSearch = d.name.toLowerCase().includes(search.toLowerCase());
+        const matchesGroup = selectedGroup === 'all' || d.group_id === selectedGroup;
+        return matchesSearch && matchesGroup;
+    });
 
     if (!isOpen) return null;
 
@@ -45,7 +50,7 @@ export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProp
                     </div>
 
                     {/* Search */}
-                    <div className="px-6 py-4 shrink-0">
+                    <div className="px-6 py-4 shrink-0 space-y-3">
                         <div className="relative">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                             <input
@@ -55,6 +60,35 @@ export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProp
                                 placeholder="Tìm tên thuốc..."
                                 className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all"
                             />
+                        </div>
+
+                        {/* Category Filter */}
+                        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                            <button
+                                onClick={() => setSelectedGroup('all')}
+                                className={cn(
+                                    "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
+                                    selectedGroup === 'all'
+                                        ? "bg-primary text-white"
+                                        : "bg-slate-50 text-slate-600 hover:bg-slate-100"
+                                )}
+                            >
+                                Tất cả
+                            </button>
+                            {groups.map(group => (
+                                <button
+                                    key={group.id}
+                                    onClick={() => setSelectedGroup(group.id)}
+                                    className={cn(
+                                        "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
+                                        selectedGroup === group.id
+                                            ? "bg-primary text-white"
+                                            : "bg-slate-50 text-slate-600 hover:bg-slate-100"
+                                    )}
+                                >
+                                    {group.name}
+                                </button>
+                            ))}
                         </div>
                     </div>
 

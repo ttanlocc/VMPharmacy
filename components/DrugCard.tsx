@@ -1,11 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import { Database } from '@/types/database';
 import { formatCurrency } from '@/lib/utils';
 import { Pill } from 'lucide-react';
-
-type Drug = Database['public']['Tables']['drugs']['Row'];
+import { Drug } from '@/hooks/useDrugs';
 
 interface DrugCardProps {
     drug: Drug;
@@ -20,6 +18,11 @@ export default function DrugCard({ drug, onClick, className }: DrugCardProps) {
             className={`flex flex-col bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm active:scale-95 transition-transform cursor-pointer ${className}`}
         >
             <div className="relative aspect-square w-full bg-slate-50 flex items-center justify-center overflow-hidden">
+                {drug.drug_groups?.name && (
+                    <span className="absolute top-2 left-2 z-10 px-2 py-0.5 text-[10px] font-bold text-white bg-black/40 backdrop-blur-md rounded-full shadow-sm">
+                        {drug.drug_groups.name}
+                    </span>
+                )}
                 {drug.image_url ? (
                     <Image
                         src={drug.image_url}

@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Database } from '@/types/database';
 
-type Drug = Database['public']['Tables']['drugs']['Row'];
+export type Drug = Database['public']['Tables']['drugs']['Row'] & {
+    drug_groups?: { name: string } | null;
+};
 
 export function useDrugs() {
     const [drugs, setDrugs] = useState<Drug[]>([]);
