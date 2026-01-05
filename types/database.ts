@@ -82,6 +82,7 @@ export interface Database {
                     drug_id: string
                     quantity: number
                     note: string | null
+                    custom_price: number | null
                     created_at: string
                 }
                 Insert: {
@@ -90,6 +91,7 @@ export interface Database {
                     drug_id: string
                     quantity?: number
                     note?: string | null
+                    custom_price?: number | null
                     created_at?: string
                 }
                 Update: {
@@ -98,6 +100,7 @@ export interface Database {
                     drug_id?: string
                     quantity?: number
                     note?: string | null
+                    custom_price?: number | null
                     created_at?: string
                 }
             },
@@ -108,6 +111,7 @@ export interface Database {
                     phone: string
                     birth_year: number | null
                     medical_history: string | null
+                    note: string | null
                     created_at: string
                 }
                 Insert: {
@@ -116,6 +120,7 @@ export interface Database {
                     phone: string
                     birth_year?: number | null
                     medical_history?: string | null
+                    note?: string | null
                     created_at?: string
                 }
                 Update: {
@@ -124,6 +129,7 @@ export interface Database {
                     phone?: string
                     birth_year?: number | null
                     medical_history?: string | null
+                    note?: string | null
                     created_at?: string
                 }
             },
@@ -132,6 +138,7 @@ export interface Database {
                     id: string
                     user_id: string
                     customer_id: string | null
+                    template_id: string | null
                     total_price: number
                     status: string
                     created_at: string
@@ -140,6 +147,7 @@ export interface Database {
                     id?: string
                     user_id: string
                     customer_id?: string | null
+                    template_id?: string | null
                     total_price?: number
                     status?: string
                     created_at?: string
@@ -148,6 +156,7 @@ export interface Database {
                     id?: string
                     user_id?: string
                     customer_id?: string | null
+                    template_id?: string | null
                     total_price?: number
                     status?: string
                     created_at?: string

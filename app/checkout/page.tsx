@@ -33,6 +33,10 @@ function CheckoutContent() {
     const [isSuccess, setIsSuccess] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Price Edit Modal State
+    const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
+    const [editPriceValue, setEditPriceValue] = useState<string>('');
+
     useEffect(() => {
         if (templateId) {
             loadTemplate(templateId);
@@ -54,7 +58,7 @@ function CheckoutContent() {
                 drug_id: item.drug_id,
                 name: item.drugs?.name || '',
                 unit: item.drugs?.unit || '',
-                price: item.drugs?.unit_price || 0,
+                price: item.custom_price || item.drugs?.unit_price || 0,
                 image: item.drugs?.image_url || null,
                 quantity: item.quantity,
                 note: item.note
@@ -91,6 +95,24 @@ function CheckoutContent() {
         setItems(items.filter((_, i) => i !== index));
     };
 
+    const openPriceEditor = (index: number) => {
+        setEditingItemIndex(index);
+        setEditPriceValue(items[index].price.toString());
+    };
+
+    const savePrice = () => {
+        if (editingItemIndex !== null) {
+            const newPrice = parseFloat(editPriceValue);
+            if (!isNaN(newPrice) && newPrice >= 0) {
+                setItems(items.map((item, i) =>
+                    i === editingItemIndex ? { ...item, price: newPrice } : item
+                ));
+            }
+            setEditingItemIndex(null);
+            setEditPriceValue('');
+        }
+    };
+
     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
     const handleCheckout = async () => {
@@ -98,7 +120,14 @@ function CheckoutContent() {
 
         setIsSubmitting(true);
         try {
-            await createOrder(items, total, selectedCustomer?.id);
+            // Pass templateId if we are using a template (searchParams)
+            // Note: If we just added items from template picker, it's not strictly 'from a template' layout, 
+            // but the requirement is flexible. Let's use the one from URL if available.
+            // Or if user wants to track specific template, we need to store it. 
+            // For now, use URL param as primary source for 'Order from Template'.
+            const currentTemplateId = templateId || null;
+
+            await createOrder(items, total, selectedCustomer?.id, currentTemplateId);
             setIsSuccess(true);
             setTimeout(() => {
                 router.push('/');
@@ -111,6 +140,8 @@ function CheckoutContent() {
     };
 
     const handleAddTemplateItems = (newItems: any[]) => {
+        // When adding form picker, we also need to respect custom_price if picker provides it (it likely does if it queries API)
+        // Assuming newItems comes with correct structure.
         setItems(prev => [...prev, ...newItems]);
     };
 
@@ -168,7 +199,7 @@ function CheckoutContent() {
                                 >
                                     <SwipeableItem
                                         onDelete={() => handleRemoveItem(index)}
-                                        onEdit={() => {/* Inline edit handled below */ }}
+                                        onEdit={() => openPriceEditor(index)}
                                         className="rounded-2xl"
                                     >
                                         <div className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl">
@@ -181,7 +212,16 @@ function CheckoutContent() {
                                             </div>
                                             <div className="flex-1">
                                                 <h3 className="font-bold text-slate-800 text-sm">{item.name}</h3>
-                                                <p className="text-xs font-bold text-primary mt-0.5">{formatCurrency(item.price)} / {item.unit}</p>
+                                                <div className="flex items-center gap-2 mt-0.5">
+                                                    <p className="text-xs font-bold text-primary">{formatCurrency(item.price)}</p>
+                                                    <span className="text-xs text-slate-400">/ {item.unit}</span>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); openPriceEditor(index); }}
+                                                        className="p-1 text-slate-300 hover:text-sky-500 transition-colors"
+                                                    >
+                                                        <Edit3 size={12} />
+                                                    </button>
+                                                </div>
                                             </div>
                                             <div className="flex flex-col items-end gap-2">
                                                 <div className="flex items-center bg-slate-50 rounded-xl border border-slate-100 px-1 py-1">
@@ -220,6 +260,7 @@ function CheckoutContent() {
                     </div>
                 )}
 
+
                 <div className="h-40" /> {/* Spacer */}
             </div>
 
@@ -246,6 +287,50 @@ function CheckoutContent() {
                     </button>
                 </div>
             </div>
+
+            {/* Price Edit Modal */}
+            <AnimatePresence>
+                {editingItemIndex !== null && (
+                    <div className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center">
+                        <motion.div
+                            initial={{ y: "100%" }}
+                            animate={{ y: 0 }}
+                            exit={{ y: "100%" }}
+                            className="bg-white w-full max-w-md rounded-t-[2rem] sm:rounded-2xl p-6 shadow-2xl"
+                        >
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-xl font-black text-slate-900">Sửa giá bán</h3>
+                                <button
+                                    onClick={() => setEditingItemIndex(null)}
+                                    className="p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200"
+                                >
+                                    <Trash2 size={20} className="rotate-45" /> {/* Use rotate to simulate close X if needed, or import X */}
+                                </button>
+                            </div>
+
+                            <div className="mb-6">
+                                <p className="text-sm font-bold text-slate-500 mb-2">Giá mới (VNĐ)</p>
+                                <input
+                                    type="number"
+                                    value={editPriceValue}
+                                    onChange={(e) => setEditPriceValue(e.target.value)}
+                                    className="w-full text-3xl font-black text-primary border-b-2 border-primary/20 focus:border-primary outline-none py-2 bg-transparent"
+                                    placeholder="0"
+                                    autoFocus
+                                />
+                                <p className="text-xs text-slate-400 mt-2">Giá gốc: {formatCurrency(editingItemIndex !== null ? items[editingItemIndex].drug_id ? items[editingItemIndex].price : 0 : 0)}</p>
+                            </div>
+
+                            <button
+                                onClick={savePrice}
+                                className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg shadow-lg shadow-sky-200 active:scale-95 transition-all"
+                            >
+                                Xác nhận
+                            </button>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
 
             <DrugPicker
                 isOpen={isPickerOpen}

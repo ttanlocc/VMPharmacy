@@ -100,7 +100,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
     const supabase = await createClient();
-    const { total_price, items, customer_id } = await request.json();
+    const { total_price, items, customer_id, template_id } = await request.json();
 
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -115,7 +115,8 @@ export async function POST(request: Request) {
             user_id: user.id,
             total_price,
             status: 'completed',
-            customer_id: customer_id || null
+            customer_id: customer_id || null,
+            template_id: template_id || null
         }])
         .select()
         .single();
@@ -130,7 +131,7 @@ export async function POST(request: Request) {
         order_id: order.id,
         drug_id: item.drug_id,
         quantity: item.quantity,
-        unit_price: item.unit_price,
+        unit_price: item.unit_price, // Saved as snapshot
         note: item.note
     }));
 

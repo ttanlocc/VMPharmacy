@@ -1,6 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Database } from '@/types/database';
-import toast from 'react-hot-toast';
 
 type Customer = Database['public']['Tables']['customers']['Row'];
 type NewCustomer = Database['public']['Tables']['customers']['Insert'];
@@ -8,48 +7,48 @@ type NewCustomer = Database['public']['Tables']['customers']['Insert'];
 export function useCustomers() {
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const searchCustomers = useCallback(async (query: string) => {
-        if (!query.trim()) {
-            setCustomers([]);
-            return;
-        }
-
+    const fetchCustomers = useCallback(async (search?: string) => {
         setLoading(true);
+        setError(null);
         try {
-            const res = await fetch(`/api/customers?search=${encodeURIComponent(query)}`);
+            const params = new URLSearchParams();
+            if (search) params.append('search', search);
+
+            const res = await fetch(`/api/customers?${params.toString()}`);
+            if (!res.ok) throw new Error('Failed to fetch customers');
+
             const data = await res.json();
-            if (res.ok) {
-                setCustomers(data);
-            } else {
-                throw new Error(data.error);
-            }
-        } catch (error) {
-            console.error('Search error:', error);
-            // toast.error('Lỗi tìm kiếm khách hàng');
+            setCustomers(data);
+        } catch (err: any) {
+            setError(err.message);
         } finally {
             setLoading(false);
         }
     }, []);
 
-    const createCustomer = async (customer: NewCustomer): Promise<Customer | null> => {
+    const createCustomer = async (newCustomer: NewCustomer) => {
         setLoading(true);
         try {
             const res = await fetch('/api/customers', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(customer),
+                body: JSON.stringify(newCustomer),
             });
-            const data = await res.json();
-            if (res.ok) {
-                return data;
-            } else {
-                throw new Error(data.error);
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || 'Failed to create customer');
             }
-        } catch (error: any) {
-            console.error('Create customer error:', error);
-            toast.error(error.message || 'Lỗi tạo khách hàng');
-            return null;
+
+            const data = await res.json();
+            // Optimistically update list or refetch
+            setCustomers(prev => [data, ...prev]);
+            return data;
+        } catch (err: any) {
+            setError(err.message);
+            throw err;
         } finally {
             setLoading(false);
         }
@@ -58,7 +57,8 @@ export function useCustomers() {
     return {
         customers,
         loading,
-        searchCustomers,
-        createCustomer
+        error,
+        searchCustomers: fetchCustomers,
+        createCustomer,
     };
 }

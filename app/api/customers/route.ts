@@ -1,11 +1,11 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { Database } from '@/types/database';
 
-async function createClient() {
+export async function GET(request: Request) {
     const cookieStore = await cookies();
-
-    return createServerClient(
+    const supabase = createServerClient<Database>(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
@@ -13,27 +13,10 @@ async function createClient() {
                 get(name: string) {
                     return cookieStore.get(name)?.value;
                 },
-                set(name: string, value: string, options: CookieOptions) {
-                    try {
-                        cookieStore.set({ name, value, ...options });
-                    } catch (error) {
-                        // Ignored
-                    }
-                },
-                remove(name: string, options: CookieOptions) {
-                    try {
-                        cookieStore.set({ name, value: '', ...options });
-                    } catch (error) {
-                        // Ignored
-                    }
-                },
             },
         }
     );
-}
 
-export async function GET(request: Request) {
-    const supabase = await createClient();
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
 
@@ -43,15 +26,17 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    let query = supabase.from('customers').select('*').order('created_at', { ascending: false });
+    let query = supabase
+        .from('customers')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(20);
 
     if (search) {
-        // Search by name (case-insensitive) or phone (exact or partial)
-        // Using ilike for name and phone
         query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%`);
     }
 
-    const { data, error } = await query.limit(20);
+    const { data, error } = await query;
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -61,9 +46,18 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-    const supabase = await createClient();
-    const body = await request.json();
-    const { name, phone, birth_year, medical_history } = body;
+    const cookieStore = await cookies();
+    const supabase = createServerClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                get(name: string) {
+                    return cookieStore.get(name)?.value;
+                },
+            },
+        }
+    );
 
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -71,19 +65,11 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const body = await request.json();
+    const { name, phone, birth_year, medical_history, note } = body;
+
     if (!name || !phone) {
-        return NextResponse.json({ error: 'Name and Phone are required' }, { status: 400 });
-    }
-
-    // Check if phone already exists
-    const { data: existing } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('phone', phone)
-        .maybeSingle();
-
-    if (existing) {
-        return NextResponse.json({ error: 'Phone number already exists' }, { status: 409 });
+        return NextResponse.json({ error: 'Name and phone are required' }, { status: 400 });
     }
 
     const { data, error } = await supabase
@@ -91,13 +77,18 @@ export async function POST(request: Request) {
         .insert({
             name,
             phone,
-            birth_year,
-            medical_history
-        })
+            birth_year: birth_year || null,
+            medical_history: medical_history || null,
+            note: note || null
+        } as any)
         .select()
         .single();
 
     if (error) {
+        // Handle unique constraint violation for phone
+        if (error.code === '23505') {
+            return NextResponse.json({ error: 'Số điện thoại này đã tồn tại' }, { status: 409 });
+        }
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
