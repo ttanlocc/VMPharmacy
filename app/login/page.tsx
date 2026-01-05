@@ -20,24 +20,18 @@ export default function LoginPage() {
         setError(null);
 
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const { error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });
 
             if (error) throw error;
 
-            // Wait for session to be properly set in cookies
-            if (data.session) {
-                // Force a refresh to ensure cookies are set
-                await new Promise(resolve => setTimeout(resolve, 100));
-                window.location.href = '/';
-            } else {
-                router.push('/');
-                router.refresh();
-            }
+            router.push('/');
+            router.refresh();
         } catch (err: any) {
             setError(err.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại.');
+        } finally {
             setLoading(false);
         }
     };
