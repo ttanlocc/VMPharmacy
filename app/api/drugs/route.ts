@@ -1,11 +1,11 @@
-import { createClient } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const groupId = searchParams.get('group_id');
 
-    let query = createClient().from('drugs').select('*');
+    let query = supabase.from('drugs').select('*');
 
     if (groupId) {
         query = query.eq('group_id', groupId);
@@ -22,7 +22,6 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
     const body = await request.json();
-    const supabase = createClient();
 
     const { data, error } = await supabase
         .from('drugs')
