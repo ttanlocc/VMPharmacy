@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import { supabase } from '@/lib/supabase';
 import { ArrowLeft, Plus, ShoppingBag, Trash2, Edit3, Pill, CheckCircle2 } from 'lucide-react';
 import Container from '@/components/Container';
@@ -49,9 +50,9 @@ function CheckoutContent() {
             }));
 
             setItems(formattedItems);
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            alert('Không thể tải đơn mẫu');
+            toast.error(err.message || 'Không thể tải đơn mẫu');
         } finally {
             setLoading(false);
         }

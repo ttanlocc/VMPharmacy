@@ -52,6 +52,7 @@ export default function Register() {
                             <input
                                 type="email"
                                 required
+                                autoComplete="email"
                                 className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
                                 placeholder="you@example.com"
                                 value={email}
@@ -67,6 +68,7 @@ export default function Register() {
                             <input
                                 type="password"
                                 required
+                                autoComplete="new-password"
                                 className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
                                 placeholder="••••••••"
                                 value={password}

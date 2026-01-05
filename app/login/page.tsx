@@ -20,18 +20,24 @@ export default function LoginPage() {
         setError(null);
 
         try {
-            const { error } = await supabase.auth.signInWithPassword({
+            const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });
 
             if (error) throw error;
 
-            router.push('/');
-            router.refresh();
+            // Wait for session to be properly set in cookies
+            if (data.session) {
+                // Force a refresh to ensure cookies are set
+                await new Promise(resolve => setTimeout(resolve, 100));
+                window.location.href = '/';
+            } else {
+                router.push('/');
+                router.refresh();
+            }
         } catch (err: any) {
             setError(err.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại.');
-        } finally {
             setLoading(false);
         }
     };
@@ -76,6 +82,7 @@ export default function LoginPage() {
                                         required
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
+                                        autoComplete="email"
                                         className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
                                         placeholder="pharmacist@example.com"
                                     />
@@ -95,6 +102,7 @@ export default function LoginPage() {
                                         required
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
+                                        autoComplete="current-password"
                                         className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
                                         placeholder="••••••••"
                                     />

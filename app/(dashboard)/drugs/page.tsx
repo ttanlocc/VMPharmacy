@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useDrugs } from '@/hooks/useDrugs';
 import { Plus, Search, Image as ImageIcon, X, Trash2 } from 'lucide-react';
 import Container from '@/components/Container';
@@ -63,8 +64,9 @@ export default function DrugsPage() {
         try {
             const url = await uploadDrugImage(file);
             setImageUrl(url);
-        } catch (error) {
-            alert('Upload ảnh thất bại');
+            toast.success('Upload ảnh thành công');
+        } catch (error: any) {
+            toast.error(error.message || 'Upload ảnh thất bại');
             console.error(error);
         } finally {
             setUploading(false);
@@ -83,13 +85,15 @@ export default function DrugsPage() {
         try {
             if (editingDrug) {
                 await updateDrug(editingDrug.id, payload);
+                toast.success('Cập nhật thuốc thành công');
             } else {
                 await addDrug(payload);
+                toast.success('Thêm thuốc thành công');
             }
             setIsModalOpen(false);
             resetForm();
-        } catch (error) {
-            alert('Thao tác thất bại');
+        } catch (error: any) {
+            toast.error(error.message || 'Thao tác thất bại');
             console.error(error);
         }
     };

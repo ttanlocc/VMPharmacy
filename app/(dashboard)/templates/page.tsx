@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTemplates } from '@/hooks/useTemplates';
 import { Plus, ClipboardList, ChevronRight, X, Trash2, Pill } from 'lucide-react';
 import Container from '@/components/Container';
@@ -48,16 +49,17 @@ export default function TemplatesPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (selectedItems.length === 0) {
-            alert('Vui lòng chọn ít nhất một loại thuốc');
+            toast.error('Vui lòng chọn ít nhất một loại thuốc');
             return;
         }
 
         try {
             await addTemplate(name, selectedItems);
+            toast.success('Tạo đơn mẫu thành công');
             setIsModalOpen(false);
             resetForm();
-        } catch (error) {
-            alert('Tạo đơn mẫu thất bại');
+        } catch (error: any) {
+            toast.error(error.message || 'Tạo đơn mẫu thất bại');
             console.error(error);
         }
     };
