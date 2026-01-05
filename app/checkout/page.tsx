@@ -38,13 +38,13 @@ function CheckoutContent() {
 
             if (error) throw error;
 
-            const formattedItems = data.map(item => ({
+            const formattedItems = ((data as any) || []).map((item: any) => ({
                 id: item.id,
                 drug_id: item.drug_id,
-                name: item.drugs.name,
-                unit: item.drugs.unit,
-                price: item.drugs.unit_price,
-                image: item.drugs.image_url,
+                name: item.drugs?.name || '',
+                unit: item.drugs?.unit || '',
+                price: item.drugs?.unit_price || 0,
+                image: item.drugs?.image_url || null,
                 quantity: item.quantity,
                 note: item.note
             }));

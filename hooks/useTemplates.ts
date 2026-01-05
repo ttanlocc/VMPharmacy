@@ -46,9 +46,8 @@ export function useTemplates() {
         const { data: { user } } = await supabase.auth.getUser();
 
         // 1. Create template
-        const { data: template, error: tError } = await supabase
-            .from('templates')
-            .insert({ name, user_id: user?.id })
+        const { data: template, error: tError } = await (supabase.from('templates') as any)
+            .insert({ name, user_id: user?.id } as any)
             .select()
             .single();
 
@@ -63,8 +62,7 @@ export function useTemplates() {
                 note: item.note
             }));
 
-            const { error: iError } = await supabase
-                .from('template_items')
+            const { error: iError } = await (supabase.from('template_items') as any)
                 .insert(itemsToInsert);
 
             if (iError) throw iError;

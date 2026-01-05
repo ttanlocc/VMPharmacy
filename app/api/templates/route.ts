@@ -1,7 +1,8 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase-server';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
+    const supabase = await createClient();
 
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -23,6 +24,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+    const supabase = await createClient();
 
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -35,18 +37,18 @@ export async function POST(request: Request) {
     // 1. Create Template
     const { data: template, error: templateError } = await supabase
         .from('templates')
-        .insert({ name, user_id: user.id })
+        .insert({ name, user_id: user.id } as any)
         .select()
         .single();
 
-    if (templateError) {
-        return NextResponse.json({ error: templateError.message }, { status: 500 });
+    if (templateError || !template) {
+        return NextResponse.json({ error: templateError?.message || 'Failed to create template' }, { status: 500 });
     }
 
     // 2. Create Template Items
     if (items && items.length > 0) {
         const templateItems = items.map((item: any) => ({
-            template_id: template.id,
+            template_id: (template as any).id,
             drug_id: item.drug_id,
             quantity: item.quantity,
             note: item.note
@@ -54,7 +56,7 @@ export async function POST(request: Request) {
 
         const { error: itemsError } = await supabase
             .from('template_items')
-            .insert(templateItems);
+            .insert(templateItems as any);
 
         if (itemsError) {
             return NextResponse.json({ error: itemsError.message }, { status: 500 });

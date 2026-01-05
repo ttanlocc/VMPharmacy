@@ -33,17 +33,17 @@ export function useDrugs() {
     }, []);
 
     const addDrug = async (drug: Database['public']['Tables']['drugs']['Insert']) => {
-        const { data, error } = await supabase.from('drugs').insert(drug).select();
+        const { data, error } = await (supabase.from('drugs') as any).insert(drug).select();
         if (error) throw error;
-        setDrugs([...drugs, data[0]]);
-        return data[0];
+        setDrugs([...drugs, (data as any)[0]]);
+        return (data as any)[0];
     };
 
     const updateDrug = async (id: string, updates: Database['public']['Tables']['drugs']['Update']) => {
-        const { data, error } = await supabase.from('drugs').update(updates).eq('id', id).select();
+        const { data, error } = await (supabase.from('drugs') as any).update(updates).eq('id', id).select();
         if (error) throw error;
-        setDrugs(drugs.map(d => d.id === id ? data[0] : d));
-        return data[0];
+        setDrugs(drugs.map(d => d.id === id ? (data as any)[0] : d));
+        return (data as any)[0];
     };
 
     const deleteDrug = async (id: string) => {
