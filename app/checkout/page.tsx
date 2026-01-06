@@ -280,9 +280,14 @@ function CheckoutContent() {
                                     <div className={`flex flex-col sm:flex-row gap-4 p-4 ${item.type === 'template' ? 'bg-indigo-50/50 border-indigo-100' : 'bg-white border-slate-100'} border rounded-2xl relative overflow-hidden`}>
                                         {/* Item Content */}
                                         <div className="flex items-center gap-4 w-full">
-                                            <div className="h-20 w-20 bg-white rounded-xl flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-slate-100">
+                                            <div className="h-20 w-20 bg-white rounded-xl flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-slate-100 relative">
                                                 {item.image || item.image_url ? (
-                                                    <img src={item.image || item.image_url || ''} className="h-full w-full object-cover" />
+                                                    <img
+                                                        src={item.image || item.image_url || ''}
+                                                        className="h-full w-full object-cover"
+                                                        alt={item.name}
+                                                        loading="lazy"
+                                                    />
                                                 ) : (
                                                     item.type === 'template' ? <ClipboardList size={32} className="text-indigo-400" /> : <Pill size={32} className="text-slate-300" />
                                                 )}

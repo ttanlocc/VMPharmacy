@@ -234,7 +234,10 @@ export default function TemplatesPage() {
                                                             <ClipboardList className="text-indigo-200" size={48} />
                                                         </div>
                                                     )}
-                                                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-lg text-xs font-bold text-slate-600 shadow-sm border border-slate-100 flex items-center gap-1">
+                                                    <div
+                                                        className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-lg text-xs font-bold text-slate-600 shadow-sm border border-slate-100 flex items-center gap-1"
+                                                        aria-label={`${template.items?.length || 0} loại thuốc`}
+                                                    >
                                                         <Pill size={12} className="text-indigo-500" />
                                                         {(template.items?.length || 0)}
                                                     </div>

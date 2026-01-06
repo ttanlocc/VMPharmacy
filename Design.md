@@ -78,8 +78,8 @@ Home
 
 | Action | Gesture |
 |--------|---------|
-| Xoá thuốc | Swipe left + confirm |
-| Sửa số lượng | Swipe right → modal |
+| Xoá thuốc | Swipe left + confirm / Long press → Xoá |
+| Sửa số lượng | Swipe right → modal / Long press → Sửa |
 | Thêm thuốc | Tap + → picker modal |
 | Hoàn tất | Tap "BÁN" |
 
