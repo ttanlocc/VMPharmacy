@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Toaster } from 'react-hot-toast';
 import { Outfit } from "next/font/google";
 import './globals.css';
+import { CheckoutProvider } from './context/CheckoutContext';
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -47,7 +48,9 @@ export default function RootLayout({
             },
           }}
         />
-        {children}
+        <CheckoutProvider>
+          {children}
+        </CheckoutProvider>
       </body>
     </html>
   );

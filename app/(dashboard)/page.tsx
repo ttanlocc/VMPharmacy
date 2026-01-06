@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Container from '@/components/Container';
 import TodayStats from '@/components/home/TodayStats';
-import QuickSaleButton from '@/components/home/QuickSaleButton';
+import HomeActions from '@/components/home/HomeActions';
 import RecentTemplates from '@/components/home/RecentTemplates';
 
 export default function Home() {
@@ -15,7 +15,7 @@ export default function Home() {
                 className="mb-6 flex items-center justify-between"
             >
                 <div>
-                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Sảnh đợi</h1>
+                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Nhà thuốc Văn Minh</h1>
                     <p className="text-slate-500 text-sm font-medium">Chào buổi sáng, Dược sĩ!</p>
                 </div>
                 <div className="h-12 w-12 overflow-hidden rounded-2xl bg-white/50 backdrop-blur-sm border border-white/60 p-1 shadow-sm">
@@ -33,7 +33,7 @@ export default function Home() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1 }}
             >
-                <QuickSaleButton />
+                <HomeActions />
             </motion.div>
 
             {/* Stats */}
