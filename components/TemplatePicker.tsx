@@ -8,7 +8,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 interface TemplatePickerProps {
     isOpen: boolean;
     onClose: () => void;
-    onSelect: (items: any[]) => void;
+    onSelect: (items: any[], template: any) => void;
 }
 
 export default function TemplatePicker({ isOpen, onClose, onSelect }: TemplatePickerProps) {
@@ -31,7 +31,7 @@ export default function TemplatePicker({ isOpen, onClose, onSelect }: TemplatePi
             note: item.note
         })) || [];
 
-        onSelect(items);
+        onSelect(items, template);
         onClose();
     };
 

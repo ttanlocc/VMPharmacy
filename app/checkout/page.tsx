@@ -4,7 +4,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Plus, ShoppingBag, Trash2, Edit3, Pill, CheckCircle2, FileText, User, UserPlus, X } from 'lucide-react';
+import { ArrowLeft, Plus, ShoppingBag, Trash2, Edit3, Pill, CheckCircle2, FileText, User, UserPlus, X, ClipboardList } from 'lucide-react';
 import Container from '@/components/Container';
 import SwipeableItem from '@/components/SwipeableItem';
 import DrugPicker from '@/components/DrugPicker';
@@ -33,8 +33,7 @@ function CheckoutContent() {
         addItems,
         removeItem,
         updateItem,
-        clearCheckout,
-        addTemplateId
+        clearCheckout
     } = useCheckout();
 
     const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -60,7 +59,7 @@ function CheckoutContent() {
                         .eq('template_id', templateIdParam);
 
                     if (data) {
-                        const formattedItems = data.map((item: any) => ({
+                        const formattedItems: CheckoutItem[] = data.map((item: any) => ({
                             drug_id: item.drug_id,
                             name: item.drugs?.name || '',
                             unit: item.drugs?.unit || '',
@@ -68,11 +67,11 @@ function CheckoutContent() {
                             image: item.drugs?.image_url || null,
                             quantity: item.quantity,
                             note: item.note,
-                            source: 'template' as const,
-                            templatePrice: item.custom_price || undefined
+                            type: 'template',
+                            template_id: templateIdParam,
+                            image_url: null // Legacy load doesn't fetch template image potentially
                         }));
                         addItems(formattedItems);
-                        addTemplateId(templateIdParam);
                     }
                 }
             }
@@ -93,7 +92,7 @@ function CheckoutContent() {
             image: drug.image_url,
             quantity: 1,
             note: '',
-            source: 'manual'
+            type: 'drug'
         });
     };
 
@@ -126,20 +125,50 @@ function CheckoutContent() {
 
         setIsSubmitting(true);
         try {
-            // Note: We might want to track templateIds involved, but database schema currently stores single template_id
-            // For now, we omit template_id or pick the first one if strict tracking needed, 
-            // OR we just rely on the order items being created correctly.
-            // The requirement was "Allow manual price overrides... template_id correctly passed".
-            // Since we merged items, passing a single template_id might be misleading if mixed.
-            // Let's pass the first templateId found in context if any, or null.
-            // A better approach for 'custom_price' is that `sale_items` will store the actual price sold.
+            // Flatten items for the API
+            // The API expects a list of DRUGS with quantities.
+            // If we have a 'template' item, we need to expand it into its drugs.
+            // The API also expects 'total_price' which it uses for distribution.
+            // If we have mixed items (Template + Drugs), the API logic (assuming Single Template) will be weird.
+            // But we will send the hierarchy.
 
-            // If we strictly need to link to A template, we can check searchParams or context.
-            // Ideally schema supports many-to-many or we just log it.
-            // Given existing schema: `template_id` in orders table is single nullable UUID.
-            const primaryTemplateId = templateIdParam || null;
+            // To support the "Distribute Manual Price" logic correctly:
+            // The API takes `total_price` and `items`.
 
-            await createOrder(items, total, customer?.id, primaryTemplateId);
+            // Strategy: 
+            // 1. Expand template items into individual drug lines.
+            // 2. Pass the template_id of the first template item (as per limitation).
+            // 3. The `total_price` passed is `total`.
+
+            const flattenedItems = items.flatMap(item => {
+                if (item.type === 'template' && item.items) {
+                    // For a template item with Quantity Q:
+                    // It contains Drugs [d1, d2] each with q1, q2.
+                    // The result should include [d1, d2] repeated Q times? 
+                    // No, multiply their quantities by Q.
+                    return item.items.map(subItem => ({
+                        drug_id: subItem.drug_id,
+                        quantity: subItem.quantity * item.quantity,
+                        note: '', // Propagate note?
+                        // We do NOT send unit_price here because the API will calculate it based on total_price distribution?
+                        // BUT: If we have mixed items...
+                        // If we don't send unit_price, API fetches standard price.
+                        // If we are strictly creating a TEMPLATE order, this works.
+                    }));
+                } else {
+                    return [{
+                        drug_id: item.drug_id,
+                        quantity: item.quantity,
+                        note: item.note,
+                        // unit_price: item.price // API might ignore this if distribution kicks in
+                    }];
+                }
+            });
+
+            const templateItem = items.find(i => i.type === 'template');
+            const primaryTemplateId = templateItem?.template_id || templateIdParam || null;
+
+            await createOrder(flattenedItems, total, customer?.id, primaryTemplateId);
             setIsSuccess(true);
             clearCheckout();
             setTimeout(() => {
@@ -152,20 +181,28 @@ function CheckoutContent() {
         }
     };
 
-    const handleAddTemplateItems = (newItems: any[]) => {
-        // Transform picker items to CheckoutItem
-        const formatted: CheckoutItem[] = newItems.map(item => ({
-            drug_id: item.drug_id,
-            name: item.name,
-            unit: item.unit,
-            price: item.price, // Uses custom price if picker logic provides it
-            image: item.image,
-            quantity: item.quantity,
-            note: item.note,
-            source: 'template',
-            templatePrice: item.price // Assuming picker returns the correct price to use
-        }));
-        addItems(formatted);
+    const handleAddTemplateItems = (newItems: any[], template: any) => {
+        // Create a single "Template Item"
+        // Calculate the initial total price for the template (either manual override or sum of parts)
+        const templateTotal = template.total_price !== null ? Number(template.total_price) : newItems.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+
+        const templateItem: CheckoutItem = {
+            name: template.name,
+            price: templateTotal,
+            quantity: 1,
+            type: 'template',
+            template_id: template.id,
+            image_url: template.image_url,
+            // Store the raw items so we can expand them later or show them
+            items: newItems.map(i => ({
+                drug_id: i.drug_id,
+                name: i.name,
+                quantity: i.quantity,
+                unit: i.unit
+            }))
+        };
+
+        addItem(templateItem);
     };
 
     if (isSuccess) {
@@ -227,7 +264,7 @@ function CheckoutContent() {
                     <AnimatePresence mode="popLayout">
                         {items.map((item, index) => (
                             <motion.div
-                                key={`${item.drug_id}-${item.price}-${index}`}
+                                key={`${item.type}-${item.drug_id || item.template_id}-${index}`}
                                 layout
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
@@ -235,56 +272,64 @@ function CheckoutContent() {
                             >
                                 <SwipeableItem
                                     onDelete={() => removeItem(index)}
+                                    // Enable edit for both, but for template it edits the TOTAL
                                     onEdit={() => openPriceEditor(index)}
                                     className="rounded-2xl"
                                 >
-                                    <div className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl relative overflow-hidden">
-                                        {/* Price Indicator Stripe */}
-                                        {item.source === 'template' && (
-                                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-sky-400" />
-                                        )}
-                                        {item.price !== (item.templatePrice || 0) && item.source === 'template' && (
-                                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-orange-400" />
-                                        )}
+                                    <div className={`flex flex-col sm:flex-row gap-4 p-4 ${item.type === 'template' ? 'bg-indigo-50/50 border-indigo-100' : 'bg-white border-slate-100'} border rounded-2xl relative overflow-hidden`}>
+                                        {/* Item Content */}
+                                        <div className="flex items-center gap-4 w-full">
+                                            <div className="h-14 w-14 bg-white rounded-xl flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+                                                {item.image || item.image_url ? (
+                                                    <img src={item.image || item.image_url || ''} className="h-full w-full object-cover" />
+                                                ) : (
+                                                    item.type === 'template' ? <ClipboardList size={20} className="text-indigo-400" /> : <Pill size={20} className="text-slate-300" />
+                                                )}
+                                            </div>
+                                            <div className="flex-1">
+                                                <h3 className={`font-bold ${item.type === 'template' ? 'text-indigo-900' : 'text-slate-800'} text-sm`}>{item.name}</h3>
+                                                <div className="flex items-center gap-2 mt-0.5">
+                                                    <p className="text-xs font-bold text-primary flex items-center gap-1">
+                                                        {formatCurrency(item.price)}
+                                                    </p>
+                                                    <span className="text-xs text-slate-400">/ {item.type === 'template' ? 'đơn' : item.unit}</span>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); openPriceEditor(index); }}
+                                                        className="p-1 text-slate-300 hover:text-sky-500 transition-colors"
+                                                    >
+                                                        <Edit3 size={12} />
+                                                    </button>
+                                                </div>
 
-                                        <div className="h-14 w-14 bg-slate-50 rounded-xl flex items-center justify-center shrink-0 overflow-hidden ml-2">
-                                            {item.image ? (
-                                                <img src={item.image} className="h-full w-full object-cover" />
-                                            ) : (
-                                                <Pill size={20} className="text-slate-300" />
-                                            )}
-                                        </div>
-                                        <div className="flex-1">
-                                            <h3 className="font-bold text-slate-800 text-sm">{item.name}</h3>
-                                            <div className="flex items-center gap-2 mt-0.5">
-                                                <p className="text-xs font-bold text-primary flex items-center gap-1">
-                                                    {formatCurrency(item.price)}
-                                                    {item.source === 'template' && item.price !== item.templatePrice && (
-                                                        <span className="text-[10px] text-orange-500 font-normal line-through ml-1">{formatCurrency(item.templatePrice || 0)}</span>
-                                                    )}
-                                                </p>
-                                                <span className="text-xs text-slate-400">/ {item.unit}</span>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); openPriceEditor(index); }}
-                                                    className="p-1 text-slate-300 hover:text-sky-500 transition-colors"
-                                                >
-                                                    <Edit3 size={12} />
-                                                </button>
+                                                {/* Template Sub-items List (Requested: Show list only, no individual prices) */}
+                                                {item.type === 'template' && item.items && (
+                                                    <div className="mt-2 pl-3 border-l-2 border-indigo-200">
+                                                        <p className="text-[10px] font-bold text-indigo-400 uppercase mb-1">Gồm {item.items.length} loại thuốc:</p>
+                                                        <ul className="text-xs text-slate-600 space-y-0.5">
+                                                            {item.items.map((sub, i) => (
+                                                                <li key={i} className="flex justify-between">
+                                                                    <span>• {sub.name}</span>
+                                                                    <span className="font-bold text-slate-400">x{sub.quantity} {sub.unit}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
                                             </div>
-                                        </div>
-                                        <div className="flex flex-col items-end gap-2">
-                                            <div className="flex items-center bg-slate-50 rounded-xl border border-slate-100 px-1 py-1">
-                                                <button
-                                                    onClick={() => handleUpdateQuantity(index, -1)}
-                                                    className="w-8 h-8 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600"
-                                                >-</button>
-                                                <span className="w-8 text-center font-black text-sm text-slate-900">{item.quantity}</span>
-                                                <button
-                                                    onClick={() => handleUpdateQuantity(index, 1)}
-                                                    className="w-8 h-8 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600"
-                                                >+</button>
+                                            <div className="flex flex-col items-end gap-2 shrink-0">
+                                                <div className="flex items-center bg-white rounded-xl border border-slate-200 px-1 py-1 shadow-sm">
+                                                    <button
+                                                        onClick={() => handleUpdateQuantity(index, -1)}
+                                                        className="w-8 h-8 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600"
+                                                    >-</button>
+                                                    <span className="w-8 text-center font-black text-sm text-slate-900">{item.quantity}</span>
+                                                    <button
+                                                        onClick={() => handleUpdateQuantity(index, 1)}
+                                                        className="w-8 h-8 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600"
+                                                    >+</button>
+                                                </div>
+                                                <span className="text-sm font-black text-slate-900">{formatCurrency(item.price * item.quantity)}</span>
                                             </div>
-                                            <span className="text-sm font-black text-slate-900">{formatCurrency(item.price * item.quantity)}</span>
                                         </div>
                                     </div>
                                 </SwipeableItem>

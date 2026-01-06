@@ -32,12 +32,17 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, items } = await request.json();
+    const { name, items, image_url, total_price } = await request.json();
 
     // 1. Create Template
     const { data: template, error: templateError } = await supabase
         .from('templates')
-        .insert({ name, user_id: user.id } as any)
+        .insert({
+            name,
+            user_id: user.id,
+            image_url: image_url || null,
+            total_price: total_price || null
+        } as any)
         .select()
         .single();
 
@@ -51,8 +56,7 @@ export async function POST(request: Request) {
             template_id: (template as any).id,
             drug_id: item.drug_id,
             quantity: item.quantity,
-            note: item.note,
-            custom_price: item.custom_price || null
+            note: item.note
         }));
 
         const { error: itemsError } = await supabase

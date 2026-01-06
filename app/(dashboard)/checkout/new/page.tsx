@@ -22,7 +22,7 @@ function TemplateSelectionContent() {
     const type = searchParams.get('type');
 
     const { templates, loading: templatesLoading } = useTemplates();
-    const { clearCheckout, setCustomer, addItems, addTemplateId } = useCheckout();
+    const { clearCheckout, setCustomer, addItem } = useCheckout();
 
     const [customer, setCustomerData] = useState<Customer | null>(null);
     const [loadingCustomer, setLoadingCustomer] = useState(false);
@@ -59,21 +59,28 @@ function TemplateSelectionContent() {
         clearCheckout();
         if (customer) setCustomer(customer);
 
-        // Transform template items to CheckoutItems
-        const checkoutItems = (template.items || []).map((item: any) => ({
-            drug_id: item.drug_id,
-            name: item.drugs?.name || '',
-            unit: item.drugs?.unit || '',
-            price: item.custom_price || item.drugs?.unit_price || 0,
-            image: item.drugs?.image_url || null,
-            quantity: item.quantity,
-            note: item.note,
-            source: 'template' as const,
-            templatePrice: item.custom_price || undefined
-        }));
+        // Transform to single atomic Template Item
+        // Calculate initial price (use manual total_price if exists, else sum of parts)
+        const templateTotal = template.total_price !== null ? Number(template.total_price) : (template.items?.reduce((sum: number, item: any) => sum + ((item.custom_price || item.drugs?.unit_price || 0) * item.quantity), 0) || 0);
 
-        addItems(checkoutItems);
-        addTemplateId(template.id);
+        const templateItem = {
+            name: template.name,
+            unit: 'đơn', // Generic unit for template
+            price: templateTotal,
+            quantity: 1,
+            image_url: template.image_url,
+            note: '',
+            type: 'template' as const,
+            template_id: template.id,
+            items: (template.items || []).map((item: any) => ({
+                drug_id: item.drug_id,
+                name: item.drugs?.name || '',
+                unit: item.drugs?.unit || '',
+                quantity: item.quantity
+            }))
+        };
+
+        addItem(templateItem);
         router.push('/checkout');
     };
 

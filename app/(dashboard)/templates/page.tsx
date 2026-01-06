@@ -23,10 +23,14 @@ export default function TemplatesPage() {
 
     // Form state
     const [name, setName] = useState('');
+    const [manualPrice, setManualPrice] = useState<number | undefined>(undefined);
+    const [imageUrl, setImageUrl] = useState('');
     const [selectedItems, setSelectedItems] = useState<any[]>([]);
 
     const resetForm = () => {
         setName('');
+        setManualPrice(undefined);
+        setImageUrl('');
         setSelectedItems([]);
     };
 
@@ -57,7 +61,7 @@ export default function TemplatesPage() {
         }
 
         try {
-            await addTemplate(name, selectedItems);
+            await addTemplate(name, selectedItems, manualPrice, imageUrl);
             toast.success('Tạo đơn mẫu thành công');
             setIsModalOpen(false);
             resetForm();
@@ -209,6 +213,42 @@ export default function TemplatesPage() {
                                         placeholder="VD: Đơn đau dạ dày"
                                         className="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-sky-100 focus:border-sky-300 transition-all text-lg font-bold placeholder:font-medium"
                                     />
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-2">Giá tiền (Tùy chọn)</label>
+                                        <div className="relative">
+                                            <input
+                                                type="number"
+                                                value={manualPrice || ''}
+                                                onChange={(e) => setManualPrice(e.target.value ? Number(e.target.value) : undefined)}
+                                                placeholder="Để trống = Tự cộng"
+                                                className="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-sky-100 focus:border-sky-300 transition-all font-bold placeholder:font-medium"
+                                            />
+                                            {selectedItems.length > 0 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const sum = selectedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+                                                        setManualPrice(sum);
+                                                    }}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-sky-600 bg-sky-50 px-2 py-1 rounded-lg hover:bg-sky-100"
+                                                >
+                                                    Auto
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-2">Ảnh đại diện (URL)</label>
+                                        <input
+                                            value={imageUrl}
+                                            onChange={(e) => setImageUrl(e.target.value)}
+                                            placeholder="https://..."
+                                            className="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-sky-100 focus:border-sky-300 transition-all font-medium placeholder:font-medium"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="space-y-4">

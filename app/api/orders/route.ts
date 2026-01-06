@@ -100,7 +100,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
     const supabase = await createClient();
-    const { total_price, items, customer_id, template_id } = await request.json();
+    const { total_price: requestTotalPrice, items, customer_id, template_id } = await request.json();
 
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -108,12 +108,77 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    let finalTotalPrice = requestTotalPrice;
+    let finalItems = [...items];
+
+    // Handle Template Pricing Distribution
+    if (template_id) {
+        // 1. Fetch template is still useful if we want to validte existence or get other metadata, 
+        // but for price, we now respect the request's total_price (allowing per-order override).
+
+        // We still need to fetch drugs to get standard prices for ratio calculation
+        const drugIds = items.map((i: any) => i.drug_id);
+        const { data: drugs } = await supabase
+            .from('drugs')
+            .select('id, unit_price')
+            .in('id', drugIds);
+
+        const drugPriceMap = new Map(drugs?.map((d: any) => [d.id, Number(d.unit_price)]) || []);
+
+        // 2. Use the requested total_price as the manual price to distribute
+        // This covers both "Template Default Price" (sent by client) and "Manual Override" (sent by client)
+        const manualPrice = Number(finalTotalPrice);
+
+        // Calculate Standard Sum
+        let standardSum = 0;
+        finalItems.forEach((item: any) => {
+            const standardPrice = drugPriceMap.get(item.drug_id) || 0;
+            standardSum += standardPrice * item.quantity;
+        });
+
+        // Distribute
+        let distributedSum = 0;
+        finalItems = finalItems.map((item: any, index: number) => {
+            const standardPrice = drugPriceMap.get(item.drug_id) || 0;
+            const itemTotalStandard = standardPrice * item.quantity;
+
+            let ratio = 0;
+            if (standardSum > 0) {
+                ratio = itemTotalStandard / standardSum;
+            } else {
+                // If all drugs are free, distribute evenly
+                ratio = 1 / finalItems.length;
+            }
+
+            // Calculate subtotal for this line item (unit_price * quantity)
+            // We need unit_price, so: (ratio * manualPrice) / quantity
+            let lineTotal = Math.round(ratio * manualPrice);
+
+            // Adjustment for last item to handle rounding errors
+            if (index === finalItems.length - 1) {
+                lineTotal = manualPrice - distributedSum;
+            } else {
+                distributedSum += lineTotal;
+            }
+
+            // Set new unit price (approximate, preserving lineTotal)
+            const newUnitPrice = lineTotal / item.quantity;
+
+            return {
+                ...item,
+                unit_price: newUnitPrice
+            };
+        });
+    }
+
+
+
     // 1. Create Order
     const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert([{
             user_id: user.id,
-            total_price,
+            total_price: finalTotalPrice,
             status: 'completed',
             customer_id: customer_id || null,
             template_id: template_id || null
@@ -127,12 +192,13 @@ export async function POST(request: Request) {
     }
 
     // 2. Create Order Items
-    const orderItems = items.map((item: any) => ({
+    const orderItems = finalItems.map((item: any) => ({
         order_id: order.id,
         drug_id: item.drug_id,
         quantity: item.quantity,
-        unit_price: item.unit_price, // Saved as snapshot
-        note: item.note
+        unit_price: item.unit_price, // Saved as snapshot (distributed if template)
+        note: item.note,
+        template_id: template_id || null // Store template_id on items too per plan
     }));
 
     const { error: itemsError } = await supabase

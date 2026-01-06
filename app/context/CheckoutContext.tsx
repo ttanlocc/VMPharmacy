@@ -6,21 +6,34 @@ import { Database } from '@/types/database';
 type Customer = Database['public']['Tables']['customers']['Row'];
 
 export interface CheckoutItem {
-    drug_id: string;
+    // Shared
     name: string;
-    unit: string;
     price: number;
-    image: string | null;
     quantity: number;
     note?: string;
-    source: 'template' | 'manual';
-    templatePrice?: number; // The price defined in the template
+
+    // Type differentiation
+    type: 'drug' | 'template';
+
+    // For Drug
+    drug_id?: string;
+    unit?: string;
+    image?: string | null;
+
+    // For Template
+    template_id?: string;
+    image_url?: string | null;
+    items?: { // Flattened items content for display/processing
+        drug_id: string;
+        name: string;
+        quantity: number;
+        unit: string;
+    }[];
 }
 
 interface CheckoutState {
     items: CheckoutItem[];
     customer: Customer | null;
-    templateIds: string[];
 }
 
 interface CheckoutContextType extends CheckoutState {
@@ -29,8 +42,6 @@ interface CheckoutContextType extends CheckoutState {
     removeItem: (index: number) => void;
     updateItem: (index: number, updates: Partial<CheckoutItem>) => void;
     setCustomer: (customer: Customer | null) => void;
-    addTemplateId: (id: string) => void;
-    removeTemplateId: (id: string) => void; // Removes template ID and associated items? For now just ID.
     clearCheckout: () => void;
 }
 
@@ -41,7 +52,6 @@ const STORAGE_KEY = 'vmp_checkout_state';
 export function CheckoutProvider({ children }: { children: React.ReactNode }) {
     const [items, setItems] = useState<CheckoutItem[]>([]);
     const [customer, setCustomer] = useState<Customer | null>(null);
-    const [templateIds, setTemplateIds] = useState<string[]>([]);
     const [isLoaded, setIsLoaded] = useState(false);
 
     // Load from localStorage on mount
@@ -52,7 +62,6 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
                 const parsed = JSON.parse(saved);
                 setItems(parsed.items || []);
                 setCustomer(parsed.customer || null);
-                setTemplateIds(parsed.templateIds || []);
             }
         } catch (error) {
             console.error('Failed to load checkout state:', error);
@@ -66,16 +75,28 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
         if (!isLoaded) return;
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
             items,
-            customer,
-            templateIds
+            customer
         }));
-    }, [items, customer, templateIds, isLoaded]);
+    }, [items, customer, isLoaded]);
 
     const addItem = (newItem: CheckoutItem) => {
         setItems(prev => {
-            // Check for duplicate drug with same price
+            // If it's a template, we treat it as a unique line item for now (or group if same template + same price)
+            if (newItem.type === 'template') {
+                const existingIndex = prev.findIndex(
+                    i => i.type === 'template' && i.template_id === newItem.template_id && i.price === newItem.price
+                );
+                if (existingIndex >= 0) {
+                    const updated = [...prev];
+                    updated[existingIndex].quantity += newItem.quantity;
+                    return updated;
+                }
+                return [...prev, newItem];
+            }
+
+            // For drugs, check for duplicate with same price
             const existingIndex = prev.findIndex(
-                i => i.drug_id === newItem.drug_id && i.price === newItem.price
+                i => i.type === 'drug' && i.drug_id === newItem.drug_id && i.price === newItem.price
             );
 
             if (existingIndex >= 0) {
@@ -87,22 +108,9 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
         });
     };
 
+    // addItems is mainly for legacy or bulk add - treating as individual adds
     const addItems = (newItems: CheckoutItem[]) => {
-        setItems(prev => {
-            let updated = [...prev];
-            newItems.forEach(newItem => {
-                const existingIndex = updated.findIndex(
-                    i => i.drug_id === newItem.drug_id && i.price === newItem.price
-                );
-
-                if (existingIndex >= 0) {
-                    updated[existingIndex].quantity += newItem.quantity;
-                } else {
-                    updated.push(newItem);
-                }
-            });
-            return updated;
-        });
+        newItems.forEach(item => addItem(item));
     };
 
     const removeItem = (index: number) => {
@@ -113,37 +121,25 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
         setItems(prev => prev.map((item, i) => i === index ? { ...item, ...updates } : item));
     };
 
-    const addTemplateId = (id: string) => {
-        setTemplateIds(prev => prev.includes(id) ? prev : [...prev, id]);
-    };
-
-    const removeTemplateId = (id: string) => {
-        setTemplateIds(prev => prev.filter(tid => tid !== id));
-    };
-
     const clearCheckout = () => {
         setItems([]);
         setCustomer(null);
-        setTemplateIds([]);
         localStorage.removeItem(STORAGE_KEY);
     };
 
     if (!isLoaded) {
-        return null; // Or a loading spinner if crucial
+        return null;
     }
 
     return (
         <CheckoutContext.Provider value={{
             items,
             customer,
-            templateIds,
             addItem,
             addItems,
             removeItem,
             updateItem,
             setCustomer,
-            addTemplateId,
-            removeTemplateId,
             clearCheckout
         }}>
             {children}

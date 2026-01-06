@@ -42,12 +42,17 @@ export function useTemplates() {
         fetchTemplates();
     }, []);
 
-    const addTemplate = async (name: string, items: any[]) => {
+    const addTemplate = async (name: string, items: any[], totalPrice?: number, imageUrl?: string) => {
         const { data: { user } } = await supabase.auth.getUser();
 
         // 1. Create template
         const { data: template, error: tError } = await (supabase.from('templates') as any)
-            .insert({ name, user_id: user?.id } as any)
+            .insert({
+                name,
+                user_id: user?.id,
+                total_price: totalPrice || null,
+                image_url: imageUrl || null
+            } as any)
             .select()
             .single();
 
