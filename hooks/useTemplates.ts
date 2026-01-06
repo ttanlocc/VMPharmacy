@@ -27,7 +27,8 @@ export function useTemplates() {
             drugs:drugs(*)
           )
         `)
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: false })
+                .is('deleted_at', null);
 
             if (error) throw error;
             setTemplates(data || []);
@@ -78,10 +79,54 @@ export function useTemplates() {
     };
 
     const deleteTemplate = async (id: string) => {
-        const { error } = await supabase.from('templates').delete().eq('id', id);
+        // Soft delete
+        const { error } = await (supabase.from('templates') as any)
+            .update({ deleted_at: new Date().toISOString() })
+            .eq('id', id);
+
         if (error) throw error;
         setTemplates(templates.filter(t => t.id !== id));
     };
 
-    return { templates, loading, error, refresh: fetchTemplates, addTemplate, deleteTemplate };
+    const updateTemplate = async (id: string, updates: { name?: string, items?: any[], total_price?: number, image_url?: string }) => {
+        const { error: tError } = await (supabase.from('templates') as any)
+            .update({
+                name: updates.name,
+                total_price: updates.total_price || null,
+                image_url: updates.image_url || null
+            } as any)
+            .eq('id', id);
+
+        if (tError) throw tError;
+
+        // If items are provided, replace them
+        if (updates.items) {
+            // Delete old items
+            const { error: dError } = await supabase
+                .from('template_items')
+                .delete()
+                .eq('template_id', id);
+
+            if (dError) throw dError;
+
+            // Insert new items
+            if (updates.items.length > 0) {
+                const itemsToInsert = updates.items.map(item => ({
+                    template_id: id,
+                    drug_id: item.drug_id,
+                    quantity: item.quantity,
+                    note: item.note
+                }));
+
+                const { error: iError } = await (supabase.from('template_items') as any)
+                    .insert(itemsToInsert);
+
+                if (iError) throw iError;
+            }
+        }
+
+        await fetchTemplates();
+    };
+
+    return { templates, loading, error, refresh: fetchTemplates, addTemplate, updateTemplate, deleteTemplate };
 }

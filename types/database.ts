@@ -60,18 +60,27 @@ export interface Database {
                     id: string
                     name: string
                     user_id: string | null
+                    total_price: number | null
+                    image_url: string | null
+                    deleted_at: string | null
                     created_at: string
                 }
                 Insert: {
                     id?: string
                     name: string
                     user_id?: string | null
+                    total_price?: number | null
+                    image_url?: string | null
+                    deleted_at?: string | null
                     created_at?: string
                 }
                 Update: {
                     id?: string
                     name?: string
                     user_id?: string | null
+                    total_price?: number | null
+                    image_url?: string | null
+                    deleted_at?: string | null
                     created_at?: string
                 }
             }
