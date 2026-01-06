@@ -9,13 +9,21 @@ type Customer = Database['public']['Tables']['customers']['Row'];
 interface CustomerPickerProps {
     onSelect: (customer: Customer | null) => void;
     selectedCustomer: Customer | null;
+    forceOpen?: boolean;
 }
 
-export default function CustomerPicker({ onSelect, selectedCustomer }: CustomerPickerProps) {
+export default function CustomerPicker({ onSelect, selectedCustomer, forceOpen }: CustomerPickerProps) {
     const { customers, loading, searchCustomers, createCustomer } = useCustomers();
     const [query, setQuery] = useState('');
     const [isCreating, setIsCreating] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
+
+    // Sync with external forceOpen prop
+    useEffect(() => {
+        if (forceOpen !== undefined) {
+            setIsOpen(forceOpen);
+        }
+    }, [forceOpen]);
 
     // New Customer Form
     const [newName, setNewName] = useState('');
@@ -75,7 +83,11 @@ export default function CustomerPicker({ onSelect, selectedCustomer }: CustomerP
             ) : (
                 <>
                     <button
-                        onClick={() => setIsOpen(!isOpen)}
+                        onClick={() => {
+                            if (forceOpen === undefined) {
+                                setIsOpen(!isOpen);
+                            }
+                        }}
                         className="w-full flex items-center gap-3 p-4 bg-white border border-slate-200 border-dashed rounded-2xl text-slate-500 hover:bg-sky-50 hover:border-sky-200 hover:text-sky-600 transition-all font-bold"
                     >
                         <div className="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center">

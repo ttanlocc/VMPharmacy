@@ -4,7 +4,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Plus, ShoppingBag, Trash2, Edit3, Pill, CheckCircle2, FileText, User, UserPlus } from 'lucide-react';
+import { ArrowLeft, Plus, ShoppingBag, Trash2, Edit3, Pill, CheckCircle2, FileText, User, UserPlus, X } from 'lucide-react';
 import Container from '@/components/Container';
 import SwipeableItem from '@/components/SwipeableItem';
 import DrugPicker from '@/components/DrugPicker';
@@ -197,19 +197,22 @@ function CheckoutContent() {
                     <div className="flex-1">
                         <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Thanh toán</h1>
                         {/* Customer Bar */}
-                        <div className="flex items-center gap-2 mt-1" onClick={() => setIsCustomerPickerOpen(true)}>
+                        <div className="flex items-center gap-2 mt-1">
                             {customer ? (
-                                <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg cursor-pointer hover:bg-indigo-100 transition-colors">
+                                <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg">
                                     <User size={14} className="fill-indigo-700" />
                                     <span className="text-sm font-bold">{customer.name}</span>
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 text-slate-500 rounded-lg cursor-pointer hover:bg-slate-200 transition-colors">
+                                <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 text-slate-500 rounded-lg">
                                     <User size={14} />
                                     <span className="text-sm font-bold">Khách lẻ</span>
                                 </div>
                             )}
-                            <button className="text-xs font-bold text-slate-400 hover:text-sky-500 underline decoration-dashed">
+                            <button
+                                onClick={() => setIsCustomerPickerOpen(true)}
+                                className="text-xs font-bold text-slate-400 hover:text-sky-500 underline decoration-dashed"
+                            >
                                 Đổi
                             </button>
                         </div>
@@ -395,26 +398,27 @@ function CheckoutContent() {
                 onSelect={handleAddTemplateItems}
             />
 
-            {/* In-place Customer Picker Modal if needed, or simple redirect. Requirement says "Change Customer" uses standard customer picker. 
-                We can reuse the CustomerPicker component but make it controlled?
-                Actually CustomerPicker component is designed as a standalone wrapper. 
-                Let's use a simple Modal wrapping the CustomerPicker CONTENT or adjust CustomerPicker to be controlled.
-                Checking CustomerPicker.tsx: it handles its own state. 
-                For simplicity in this step, I will skip re-implementing the full picker modal inside checkout and just rely on the fact that if they want to switch, they can go back or we add a basic "Clear" button.
-                Actually, I'll add a boolean prop `isOpen` to CustomerPicker to force it open if I could, but it seems to handle its own open state via a button trigger.
-                
-                Workaround: Render CustomerPicker but hidden trigger, and use `isCustomerPickerOpen` to mount it?
-                Actually, `CustomerPicker` returns a UI that *contains* the trigger button. 
-                I will allow the user to click the existing trigger implementation inside CustomerPicker if I render it. 
-                
-                But I replaced the logic in the main return with my own custom "Customer Bar".
-                
-                Let's simplify: When clicking "Change/User", show a modal that uses `useCustomers` search logic similar to `CustomerSelectPage`.
-                OR: Just accept that for now "Change" navigates to `/customers/select`.
-                Decided: Navigate to `/customers/select` is safest to preserve flow, BUT we need to make sure we don't lose items. Context handles that.
-            */}
-            {/* If user wants to change customer, we can just redirect to customer select page. 
-                 Since items are in context, they will persist. */}
+            {/* Customer Picker Modal */}
+            {isCustomerPickerOpen && (
+                <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                    <div className="w-full max-w-lg bg-white rounded-3xl p-2 relative">
+                        <button
+                            onClick={() => setIsCustomerPickerOpen(false)}
+                            className="absolute -top-12 right-0 text-white/50 hover:text-white p-2"
+                        >
+                            <X size={24} />
+                        </button>
+                        <CustomerPicker
+                            forceOpen={true}
+                            selectedCustomer={customer}
+                            onSelect={(c) => {
+                                setCustomer(c);
+                                setIsCustomerPickerOpen(false);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
         </Container>
     );
 }

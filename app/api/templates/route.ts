@@ -51,7 +51,8 @@ export async function POST(request: Request) {
             template_id: (template as any).id,
             drug_id: item.drug_id,
             quantity: item.quantity,
-            note: item.note
+            note: item.note,
+            custom_price: item.custom_price || null
         }));
 
         const { error: itemsError } = await supabase

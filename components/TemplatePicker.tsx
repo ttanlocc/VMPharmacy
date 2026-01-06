@@ -25,7 +25,7 @@ export default function TemplatePicker({ isOpen, onClose, onSelect }: TemplatePi
             drug_id: item.drug_id,
             name: item.drugs?.name || '',
             unit: item.drugs?.unit || '',
-            price: item.drugs?.unit_price || 0,
+            price: item.custom_price || item.drugs?.unit_price || 0,
             image: item.drugs?.image_url || null,
             quantity: item.quantity,
             note: item.note
