@@ -9,10 +9,11 @@ import RecentTemplates from '@/components/home/RecentTemplates';
 export default function Home() {
     return (
         <Container>
+            {/* Desktop: Header aligned left */}
             <motion.header
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-6 flex items-center justify-between"
+                className="mb-8 flex items-center justify-between"
             >
                 <div>
                     <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Nhà thuốc Văn Minh</h1>
@@ -27,23 +28,27 @@ export default function Home() {
                 </div>
             </motion.header>
 
-            {/* Quick Action - Primary CTA */}
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1 }}
-            >
-                <HomeActions />
-            </motion.div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8">
+                {/* Quick Action - Primary CTA */}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="w-full max-w-2xl"
+                >
+                    <HomeActions />
+                </motion.div>
 
-            {/* Stats */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-            >
-                <TodayStats />
-            </motion.div>
+                {/* Stats */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="w-full max-w-2xl"
+                >
+                    <TodayStats />
+                </motion.div>
+            </div>
 
             {/* Recent Templates */}
             <RecentTemplates />

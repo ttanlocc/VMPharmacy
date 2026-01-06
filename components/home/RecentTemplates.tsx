@@ -47,7 +47,7 @@ export default function RecentTemplates() {
                 variants={containerVariants}
                 initial="hidden"
                 animate="show"
-                className="grid grid-cols-2 gap-3"
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
             >
                 {templates.slice(0, 4).map((template: any) => ( // using any to bypass strict type complexity for now or we can type properly
                     <motion.div key={template.id} variants={itemVariants}>

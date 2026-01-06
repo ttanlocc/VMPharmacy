@@ -39,7 +39,7 @@ export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProp
                     animate={{ y: 0 }}
                     exit={{ y: "100%" }}
                     transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                    className="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl h-[85vh] sm:h-[80vh] flex flex-col overflow-hidden"
+                    className="w-full max-w-lg lg:max-w-5xl bg-white rounded-t-3xl sm:rounded-3xl h-[85vh] sm:h-[80vh] flex flex-col overflow-hidden"
                 >
                     {/* Header */}
                     <div className="p-6 border-b border-slate-100 flex items-center justify-between shrink-0">
@@ -97,7 +97,7 @@ export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProp
                         {loading ? (
                             <LoadingSpinner className="mt-20" label="Đang tải danh mục thuốc..." />
                         ) : (
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                                 {filteredDrugs.length > 0 ? (
                                     filteredDrugs.map(drug => (
                                         <DrugCard

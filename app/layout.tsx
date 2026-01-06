@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Toaster } from 'react-hot-toast';
-import { Outfit } from "next/font/google";
+import { Be_Vietnam_Pro } from "next/font/google"; // Changed to Be Vietnam Pro for better Vietnamese support
 import './globals.css';
 import { CheckoutProvider } from './context/CheckoutContext';
 
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
+const font = Be_Vietnam_Pro({
+  variable: "--font-main",
+  subsets: ["latin", "vietnamese"],
+  weight: ['300', '400', '500', '600', '700', '800', '900'],
   display: 'swap',
 });
 
@@ -33,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${outfit.variable} antialiased bg-gradient-to-br from-indigo-50 via-sky-50 to-emerald-50 min-h-screen`}
+        className={`${font.variable} antialiased bg-gradient-to-br from-indigo-50 via-sky-50 to-emerald-50 min-h-screen`}
       >
         <Toaster
           position="top-center"

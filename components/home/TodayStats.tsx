@@ -32,7 +32,7 @@ export default function TodayStats() {
     }
 
     return (
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-2 gap-4 w-full h-full">
             <GlassCard className="p-5 flex flex-col justify-between" noHover>
                 <div className="flex justify-between items-start mb-2">
                     <div className="p-2.5 bg-emerald-100/50 text-emerald-600 rounded-2xl backdrop-blur-md">

@@ -14,7 +14,7 @@ export default function Container({
     as: Component = 'div'
 }: ContainerProps) {
     return (
-        <Component className={cn("w-full max-w-lg mx-auto px-4 pb-20 pt-4", className)}>
+        <Component className={cn("w-full max-w-7xl mx-auto px-4 pb-20 pt-4", className)}>
             {children}
         </Component>
     );
