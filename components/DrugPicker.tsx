@@ -33,7 +33,7 @@ export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProp
 
     return (
         <AnimatePresence>
-            <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
                 <motion.div
                     initial={{ y: "100%" }}
                     animate={{ y: 0 }}
