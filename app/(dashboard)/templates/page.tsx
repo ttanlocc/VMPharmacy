@@ -234,8 +234,9 @@ export default function TemplatesPage() {
                                                             <ClipboardList className="text-indigo-200" size={48} />
                                                         </div>
                                                     )}
-                                                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-lg text-xs font-bold text-slate-600 shadow-sm border border-slate-100">
-                                                        {(template.items?.length || 0)} loại thuốc
+                                                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-lg text-xs font-bold text-slate-600 shadow-sm border border-slate-100 flex items-center gap-1">
+                                                        <Pill size={12} className="text-indigo-500" />
+                                                        {(template.items?.length || 0)}
                                                     </div>
                                                 </div>
 
@@ -351,7 +352,7 @@ export default function TemplatesPage() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">
-                                        Giá bán (đ) <span className="text-slate-400 font-normal">- Tùy chọn</span>
+                                        Giá bán (đ) <span className="text-slate-500 font-normal">- Tùy chọn</span>
                                     </label>
                                     <div className="relative">
                                         <input
@@ -493,17 +494,17 @@ export default function TemplatesPage() {
                                     Chi tiết thành phần
                                 </h4>
                                 {selectedTemplate.items?.map((item: any, i: number) => (
-                                    <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                        <div className="h-10 w-10 bg-white rounded-lg flex items-center justify-center border border-slate-100 shrink-0">
+                                    <div key={i} className="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                        <div className="h-16 w-16 bg-white rounded-lg flex items-center justify-center border border-slate-100 shrink-0 overflow-hidden">
                                             {item.drugs?.image_url ? (
-                                                <img src={item.drugs.image_url} className="h-full w-full object-cover rounded-lg" alt={item.drugs?.name} />
+                                                <img src={item.drugs.image_url} className="h-full w-full object-cover" alt={item.drugs?.name} />
                                             ) : (
-                                                <Pill size={16} className="text-slate-300" />
+                                                <Pill size={24} className="text-slate-300" />
                                             )}
                                         </div>
                                         <div className="flex-1">
-                                            <p className="font-bold text-slate-700 text-sm">{item.drugs?.name}</p>
-                                            <p className="text-xs text-slate-500">Số lượng: <span className="font-bold text-slate-900">{item.quantity} {item.drugs?.unit}</span></p>
+                                            <p className="font-bold text-slate-700 text-base">{item.drugs?.name}</p>
+                                            <p className="text-xs text-slate-500 font-medium">Số lượng: <span className="font-bold text-slate-900">{item.quantity} {item.drugs?.unit}</span></p>
                                         </div>
                                     </div>
                                 ))}

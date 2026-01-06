@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation } from 'framer-motion';
 import { Trash2, Edit2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -9,13 +10,15 @@ interface SwipeableItemProps {
     onDelete?: () => void;
     onEdit?: () => void;
     className?: string;
+    showHint?: boolean;
 }
 
 export default function SwipeableItem({
     children,
     onDelete,
     onEdit,
-    className
+    className,
+    showHint
 }: SwipeableItemProps) {
     const x = useMotionValue(0);
     const controls = useAnimation();
@@ -43,6 +46,22 @@ export default function SwipeableItem({
             controls.start({ x: 0 });
         }
     };
+
+    const hasShownHintKey = "hasShownSwipeHint";
+
+    useEffect(() => {
+        if (showHint) {
+            const hasShown = localStorage.getItem(hasShownHintKey);
+            if (!hasShown) {
+                // Shake animation
+                controls.start({
+                    x: [-20, 0, -10, 0],
+                    transition: { duration: 0.8, delay: 1, ease: 'easeInOut' }
+                });
+                localStorage.setItem(hasShownHintKey, 'true');
+            }
+        }
+    }, [showHint, controls]);
 
     return (
         <div className={cn("relative overflow-hidden group touch-pan-y", className)}>

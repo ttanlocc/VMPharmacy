@@ -275,41 +275,42 @@ function CheckoutContent() {
                                     // Enable edit for both, but for template it edits the TOTAL
                                     onEdit={() => openPriceEditor(index)}
                                     className="rounded-2xl"
+                                    showHint={index === 0}
                                 >
                                     <div className={`flex flex-col sm:flex-row gap-4 p-4 ${item.type === 'template' ? 'bg-indigo-50/50 border-indigo-100' : 'bg-white border-slate-100'} border rounded-2xl relative overflow-hidden`}>
                                         {/* Item Content */}
                                         <div className="flex items-center gap-4 w-full">
-                                            <div className="h-14 w-14 bg-white rounded-xl flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+                                            <div className="h-20 w-20 bg-white rounded-xl flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-slate-100">
                                                 {item.image || item.image_url ? (
                                                     <img src={item.image || item.image_url || ''} className="h-full w-full object-cover" />
                                                 ) : (
-                                                    item.type === 'template' ? <ClipboardList size={20} className="text-indigo-400" /> : <Pill size={20} className="text-slate-300" />
+                                                    item.type === 'template' ? <ClipboardList size={32} className="text-indigo-400" /> : <Pill size={32} className="text-slate-300" />
                                                 )}
                                             </div>
                                             <div className="flex-1">
-                                                <h3 className={`font-bold ${item.type === 'template' ? 'text-indigo-900' : 'text-slate-800'} text-sm`}>{item.name}</h3>
-                                                <div className="flex items-center gap-2 mt-0.5">
-                                                    <p className="text-xs font-bold text-primary flex items-center gap-1">
+                                                <h3 className={`font-bold ${item.type === 'template' ? 'text-indigo-900' : 'text-slate-800'} text-base`}>{item.name}</h3>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <p className="text-sm font-bold text-primary flex items-center gap-1">
                                                         {formatCurrency(item.price)}
                                                     </p>
-                                                    <span className="text-xs text-slate-400">/ {item.type === 'template' ? 'đơn' : item.unit}</span>
+                                                    <span className="text-xs text-slate-500 font-medium">/ {item.type === 'template' ? 'đơn' : item.unit}</span>
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); openPriceEditor(index); }}
-                                                        className="p-1 text-slate-300 hover:text-sky-500 transition-colors"
+                                                        className="p-1 text-slate-400 hover:text-sky-500 transition-colors"
                                                     >
-                                                        <Edit3 size={12} />
+                                                        <Edit3 size={16} />
                                                     </button>
                                                 </div>
 
                                                 {/* Template Sub-items List (Requested: Show list only, no individual prices) */}
                                                 {item.type === 'template' && item.items && (
                                                     <div className="mt-2 pl-3 border-l-2 border-indigo-200">
-                                                        <p className="text-[10px] font-bold text-indigo-400 uppercase mb-1">Gồm {item.items.length} loại thuốc:</p>
-                                                        <ul className="text-xs text-slate-600 space-y-0.5">
+                                                        <p className="text-[10px] font-bold text-indigo-500 uppercase mb-1">Gồm {item.items.length} loại thuốc:</p>
+                                                        <ul className="text-xs text-slate-600 font-medium space-y-1">
                                                             {item.items.map((sub, i) => (
                                                                 <li key={i} className="flex justify-between">
                                                                     <span>• {sub.name}</span>
-                                                                    <span className="font-bold text-slate-400">x{sub.quantity} {sub.unit}</span>
+                                                                    <span className="font-bold text-slate-500">x{sub.quantity} {sub.unit}</span>
                                                                 </li>
                                                             ))}
                                                         </ul>
@@ -320,12 +321,12 @@ function CheckoutContent() {
                                                 <div className="flex items-center bg-white rounded-xl border border-slate-200 px-1 py-1 shadow-sm">
                                                     <button
                                                         onClick={() => handleUpdateQuantity(index, -1)}
-                                                        className="w-8 h-8 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600"
+                                                        className="w-8 h-8 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600 transition-colors"
                                                     >-</button>
                                                     <span className="w-8 text-center font-black text-sm text-slate-900">{item.quantity}</span>
                                                     <button
                                                         onClick={() => handleUpdateQuantity(index, 1)}
-                                                        className="w-8 h-8 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600"
+                                                        className="w-8 h-8 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600 transition-colors"
                                                     >+</button>
                                                 </div>
                                                 <span className="text-sm font-black text-slate-900">{formatCurrency(item.price * item.quantity)}</span>
@@ -346,13 +347,13 @@ function CheckoutContent() {
                     <div className="grid grid-cols-2 gap-3">
                         <button
                             onClick={() => setIsPickerOpen(true)}
-                            className="py-4 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center gap-2 text-slate-400 font-bold hover:bg-white hover:border-primary hover:text-primary transition-all active:scale-[0.98]"
+                            className="py-4 border border-slate-200 bg-white rounded-2xl flex items-center justify-center gap-2 text-slate-500 font-bold hover:border-primary hover:text-primary transition-all active:scale-[0.98] shadow-sm"
                         >
                             <Plus size={20} /> Thêm thuốc
                         </button>
                         <button
                             onClick={() => setIsTemplatePickerOpen(true)}
-                            className="py-4 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center gap-2 text-slate-400 font-bold hover:bg-white hover:border-sky-500 hover:text-sky-500 transition-all active:scale-[0.98]"
+                            className="py-4 border border-slate-200 bg-white rounded-2xl flex items-center justify-center gap-2 text-slate-500 font-bold hover:border-sky-500 hover:text-sky-500 transition-all active:scale-[0.98] shadow-sm"
                         >
                             <FileText size={20} /> Đơn mẫu
                         </button>
