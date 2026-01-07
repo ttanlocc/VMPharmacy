@@ -241,11 +241,11 @@ export default function TemplatesPage() {
                     />
                 </div>
 
-                {/* Grid List */}
+                {/* List */}
                 {loading ? (
                     <LoadingSpinner label="Đang tải danh sách..." className="mt-20" />
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="space-y-3">
                         <AnimatePresence>
                             {filteredTemplates.length > 0 ? (
                                 filteredTemplates.map((template, idx) => {
@@ -263,7 +263,7 @@ export default function TemplatesPage() {
                                     );
                                 })
                             ) : (
-                                <div className="col-span-full text-center py-20">
+                                <div className="text-center py-20">
                                     <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <ClipboardList className="text-slate-300" size={40} />
                                     </div>
@@ -277,265 +277,269 @@ export default function TemplatesPage() {
             </div>
 
             {/* Create/Edit Modal */}
-            {isModalOpen && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-                    <div className="w-full max-w-2xl bg-white rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
-                        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h3 className="text-xl font-extrabold text-slate-900">{editingTemplateId ? 'Chỉnh Sửa Đơn Mẫu' : 'Tạo Đơn Mẫu Mới'}</h3>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-                                <X size={24} className="text-slate-400" />
-                            </button>
-                        </div>
-
-                        <div className="p-6 overflow-y-auto space-y-6 flex-1">
-                            {/* Image Upload */}
-                            <div className="flex justify-center">
-                                <div
-                                    className="relative w-full aspect-video sm:w-64 sm:h-40 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 hover:border-indigo-400 cursor-pointer overflow-hidden group transition-colors"
-                                    onClick={() => document.getElementById('template-upload')?.click()}
-                                >
-                                    {imageUrl ? (
-                                        <>
-                                            <img src={imageUrl} className="w-full h-full object-cover" alt="Template preview" />
-                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <div className="bg-white/20 backdrop-blur p-2 rounded-full">
-                                                    <Edit3 className="text-white" />
-                                                </div>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <div className="flex flex-col items-center justify-center h-full">
-                                            {isUploading ? (
-                                                <LoadingSpinner size={24} className="p-0" label="" />
-                                            ) : (
-                                                <>
-                                                    <ImageIcon className="text-slate-300 mb-2" size={32} />
-                                                    <span className="text-xs font-bold text-slate-400 uppercase">Tải ảnh lên</span>
-                                                </>
-                                            )}
-                                        </div>
-                                    )}
-                                    <input
-                                        type="file"
-                                        id="template-upload"
-                                        className="hidden"
-                                        accept="image/*"
-                                        onChange={handleImageUpload}
-                                    />
-                                </div>
+            {
+                isModalOpen && (
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+                        <div className="w-full max-w-2xl bg-white rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+                            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                <h3 className="text-xl font-extrabold text-slate-900">{editingTemplateId ? 'Chỉnh Sửa Đơn Mẫu' : 'Tạo Đơn Mẫu Mới'}</h3>
+                                <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                                    <X size={24} className="text-slate-400" />
+                                </button>
                             </div>
 
-                            {/* Name & Pricing */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Tên đơn mẫu</label>
-                                    <Input
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        placeholder="VD: Combo Cảm Cúm"
-                                    />
+                            <div className="p-6 overflow-y-auto space-y-6 flex-1">
+                                {/* Image Upload */}
+                                <div className="flex justify-center">
+                                    <div
+                                        className="relative w-full aspect-video sm:w-64 sm:h-40 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 hover:border-indigo-400 cursor-pointer overflow-hidden group transition-colors"
+                                        onClick={() => document.getElementById('template-upload')?.click()}
+                                    >
+                                        {imageUrl ? (
+                                            <>
+                                                <img src={imageUrl} className="w-full h-full object-cover" alt="Template preview" />
+                                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <div className="bg-white/20 backdrop-blur p-2 rounded-full">
+                                                        <Edit3 className="text-white" />
+                                                    </div>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center h-full">
+                                                {isUploading ? (
+                                                    <LoadingSpinner size={24} className="p-0" label="" />
+                                                ) : (
+                                                    <>
+                                                        <ImageIcon className="text-slate-300 mb-2" size={32} />
+                                                        <span className="text-xs font-bold text-slate-400 uppercase">Tải ảnh lên</span>
+                                                    </>
+                                                )}
+                                            </div>
+                                        )}
+                                        <input
+                                            type="file"
+                                            id="template-upload"
+                                            className="hidden"
+                                            accept="image/*"
+                                            onChange={handleImageUpload}
+                                        />
+                                    </div>
                                 </div>
+
+                                {/* Name & Pricing */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Tên đơn mẫu</label>
+                                        <Input
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            placeholder="VD: Combo Cảm Cúm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">
+                                            Giá bán (đ) <span className="text-slate-500 font-normal">- Tùy chọn</span>
+                                        </label>
+                                        <div className="relative">
+                                            <Input
+                                                type="number"
+                                                value={manualPrice === undefined ? '' : manualPrice}
+                                                onChange={(e) => setManualPrice(e.target.value ? Number(e.target.value) : undefined)}
+                                                placeholder={'Tổng: ' + formatCurrency(currentDrugsSum)}
+                                                className="font-bold text-indigo-600"
+                                            />
+                                            <button
+                                                onClick={() => setManualPrice(currentDrugsSum)}
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold bg-indigo-100 text-indigo-600 px-2 py-1 rounded-lg hover:bg-indigo-200 transition-colors z-10"
+                                            >
+                                                AUTO
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Note Field - NEW */}
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">
-                                        Giá bán (đ) <span className="text-slate-500 font-normal">- Tùy chọn</span>
+                                        Ghi chú <span className="text-slate-400 font-normal">(tùy chọn)</span>
                                     </label>
-                                    <div className="relative">
-                                        <Input
-                                            type="number"
-                                            value={manualPrice === undefined ? '' : manualPrice}
-                                            onChange={(e) => setManualPrice(e.target.value ? Number(e.target.value) : undefined)}
-                                            placeholder={'Tổng: ' + formatCurrency(currentDrugsSum)}
-                                            className="font-bold text-indigo-600"
-                                        />
+                                    <Textarea
+                                        value={note}
+                                        onChange={(e) => setNote(e.target.value)}
+                                        placeholder="VD: Hỏi dị ứng, không dùng cho bà bầu..."
+                                        rows={2}
+                                    />
+                                </div>
+
+                                {/* Drugs List */}
+                                <div>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <label className="block text-sm font-bold text-slate-700 ml-1">Danh sách thuốc</label>
                                         <button
-                                            onClick={() => setManualPrice(currentDrugsSum)}
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold bg-indigo-100 text-indigo-600 px-2 py-1 rounded-lg hover:bg-indigo-200 transition-colors z-10"
+                                            onClick={() => setIsPickerOpen(true)}
+                                            className="text-xs font-bold text-indigo-600 flex items-center hover:bg-indigo-50 px-2 py-1 rounded-lg transition-colors"
                                         >
-                                            AUTO
+                                            <Plus size={14} className="mr-1" />
+                                            Thêm thuốc
                                         </button>
                                     </div>
-                                </div>
-                            </div>
-
-                            {/* Note Field - NEW */}
-                            <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">
-                                    Ghi chú <span className="text-slate-400 font-normal">(tùy chọn)</span>
-                                </label>
-                                <Textarea
-                                    value={note}
-                                    onChange={(e) => setNote(e.target.value)}
-                                    placeholder="VD: Hỏi dị ứng, không dùng cho bà bầu..."
-                                    rows={2}
-                                />
-                            </div>
-
-                            {/* Drugs List */}
-                            <div>
-                                <div className="flex justify-between items-center mb-2">
-                                    <label className="block text-sm font-bold text-slate-700 ml-1">Danh sách thuốc</label>
-                                    <button
-                                        onClick={() => setIsPickerOpen(true)}
-                                        className="text-xs font-bold text-indigo-600 flex items-center hover:bg-indigo-50 px-2 py-1 rounded-lg transition-colors"
-                                    >
-                                        <Plus size={14} className="mr-1" />
-                                        Thêm thuốc
-                                    </button>
-                                </div>
-                                <div className="space-y-2">
-                                    {selectedDrugs.length > 0 ? (
-                                        selectedDrugs.map((selected, idx) => (
-                                            <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                                <div className="h-10 w-10 bg-white rounded-lg flex items-center justify-center shrink-0 border border-slate-100">
-                                                    {selected.image_url ? (
-                                                        <img src={selected.image_url} className="h-full w-full object-cover rounded-lg" alt={selected.name} />
-                                                    ) : (
-                                                        <Pill className="text-slate-300" size={16} />
-                                                    )}
+                                    <div className="space-y-2">
+                                        {selectedDrugs.length > 0 ? (
+                                            selectedDrugs.map((selected, idx) => (
+                                                <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                                    <div className="h-10 w-10 bg-white rounded-lg flex items-center justify-center shrink-0 border border-slate-100">
+                                                        {selected.image_url ? (
+                                                            <img src={selected.image_url} className="h-full w-full object-cover rounded-lg" alt={selected.name} />
+                                                        ) : (
+                                                            <Pill className="text-slate-300" size={16} />
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="font-bold text-slate-800 text-sm truncate">{selected.name}</p>
+                                                        <p className="text-xs text-slate-500">{formatCurrency(selected.price || selected.unit_price)} / {selected.unit}</p>
+                                                    </div>
+                                                    <div className="flex items-center gap-3">
+                                                        <input
+                                                            type="number"
+                                                            value={selected.quantity}
+                                                            onChange={(e) => {
+                                                                const newQty = parseInt(e.target.value) || 1;
+                                                                const updated = [...selectedDrugs];
+                                                                updated[idx].quantity = newQty;
+                                                                setSelectedDrugs(updated);
+                                                            }}
+                                                            className="w-16 px-2 py-1 text-center bg-white border border-slate-200 rounded-lg text-sm font-bold outline-none focus:border-indigo-500"
+                                                        />
+                                                        <button
+                                                            onClick={() => setSelectedDrugs(selectedDrugs.filter((_, i) => i !== idx))}
+                                                            className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="font-bold text-slate-800 text-sm truncate">{selected.name}</p>
-                                                    <p className="text-xs text-slate-500">{formatCurrency(selected.price || selected.unit_price)} / {selected.unit}</p>
-                                                </div>
-                                                <div className="flex items-center gap-3">
-                                                    <input
-                                                        type="number"
-                                                        value={selected.quantity}
-                                                        onChange={(e) => {
-                                                            const newQty = parseInt(e.target.value) || 1;
-                                                            const updated = [...selectedDrugs];
-                                                            updated[idx].quantity = newQty;
-                                                            setSelectedDrugs(updated);
-                                                        }}
-                                                        className="w-16 px-2 py-1 text-center bg-white border border-slate-200 rounded-lg text-sm font-bold outline-none focus:border-indigo-500"
-                                                    />
-                                                    <button
-                                                        onClick={() => setSelectedDrugs(selectedDrugs.filter((_, i) => i !== idx))}
-                                                        className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                                    >
-                                                        <Trash2 size={16} />
-                                                    </button>
-                                                </div>
+                                            ))
+                                        ) : (
+                                            <div
+                                                onClick={() => setIsPickerOpen(true)}
+                                                className="py-8 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400 cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/30 transition-all"
+                                            >
+                                                <ShoppingBag size={32} className="mb-2 opacity-50" />
+                                                <span className="text-sm font-medium">Chưa có thuốc nào</span>
                                             </div>
-                                        ))
-                                    ) : (
-                                        <div
-                                            onClick={() => setIsPickerOpen(true)}
-                                            className="py-8 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400 cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/30 transition-all"
-                                        >
-                                            <ShoppingBag size={32} className="mb-2 opacity-50" />
-                                            <span className="text-sm font-medium">Chưa có thuốc nào</span>
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="p-6 border-t border-slate-100 bg-slate-50/50">
-                            <button
-                                onClick={handleSubmit}
-                                className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all"
-                            >
-                                {editingTemplateId ? 'Cập Nhật Đơn Mẫu' : 'Lưu Đơn Mẫu'}
-                            </button>
+                            <div className="p-6 border-t border-slate-100 bg-slate-50/50">
+                                <button
+                                    onClick={handleSubmit}
+                                    className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all"
+                                >
+                                    {editingTemplateId ? 'Cập Nhật Đơn Mẫu' : 'Lưu Đơn Mẫu'}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Template Detail Modal */}
-            {isDetailModalOpen && selectedTemplate && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-                    <div className="w-full max-w-lg bg-white rounded-[2rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
-                        {/* Image Header */}
-                        <div className="relative aspect-video bg-slate-100">
-                            {selectedTemplate.image_url ? (
-                                <img src={selectedTemplate.image_url} className="w-full h-full object-cover" alt={selectedTemplate.name} />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-indigo-50">
-                                    <ClipboardList size={64} className="text-indigo-200" />
-                                </div>
-                            )}
-                            <button
-                                onClick={() => setIsDetailModalOpen(false)}
-                                className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full backdrop-blur-sm transition-colors"
-                            >
-                                <X size={20} />
-                            </button>
-                            <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-                                <h2 className="text-2xl font-black text-white line-clamp-2">{selectedTemplate.name}</h2>
-                            </div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="p-6 flex-1 overflow-y-auto">
-                            <div className="flex justify-between items-center mb-6">
-                                <div>
-                                    <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Giá bán</p>
-                                    <p className="text-3xl font-black text-indigo-600">
-                                        {formatCurrency(
-                                            selectedTemplate.total_price !== null
-                                                ? Number(selectedTemplate.total_price)
-                                                : (selectedTemplate.items?.reduce((sum: any, item: any) => sum + ((item.custom_price || item.drugs?.unit_price || 0) * item.quantity), 0) || 0)
-                                        )}
-                                    </p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Số lượng thuốc</p>
-                                    <p className="text-xl font-bold text-slate-800">{selectedTemplate.items?.length || 0} loại</p>
-                                </div>
-                            </div>
-
-                            <div className="space-y-3">
-                                <h4 className="font-bold text-slate-800 flex items-center gap-2">
-                                    <ShoppingBag size={18} />
-                                    Chi tiết thành phần
-                                </h4>
-                                {selectedTemplate.items?.map((item: any, i: number) => (
-                                    <div key={i} className="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                        <div className="h-16 w-16 bg-white rounded-lg flex items-center justify-center border border-slate-100 shrink-0 overflow-hidden">
-                                            {item.drugs?.image_url ? (
-                                                <img src={item.drugs.image_url} className="h-full w-full object-cover" alt={item.drugs?.name} />
-                                            ) : (
-                                                <Pill size={24} className="text-slate-300" />
-                                            )}
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="font-bold text-slate-700 text-base">{item.drugs?.name}</p>
-                                            <p className="text-xs text-slate-500 font-medium">Số lượng: <span className="font-bold text-slate-900">{item.quantity} {item.drugs?.unit}</span></p>
-                                        </div>
+            {
+                isDetailModalOpen && selectedTemplate && (
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+                        <div className="w-full max-w-lg bg-white rounded-[2rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+                            {/* Image Header */}
+                            <div className="relative aspect-video bg-slate-100">
+                                {selectedTemplate.image_url ? (
+                                    <img src={selectedTemplate.image_url} className="w-full h-full object-cover" alt={selectedTemplate.name} />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-indigo-50">
+                                        <ClipboardList size={64} className="text-indigo-200" />
                                     </div>
-                                ))}
+                                )}
+                                <button
+                                    onClick={() => setIsDetailModalOpen(false)}
+                                    className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full backdrop-blur-sm transition-colors"
+                                >
+                                    <X size={20} />
+                                </button>
+                                <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+                                    <h2 className="text-2xl font-black text-white line-clamp-2">{selectedTemplate.name}</h2>
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Actions */}
-                        <div className="p-4 border-t border-slate-100 bg-slate-50 flex gap-3">
-                            <button
-                                onClick={() => {
-                                    setIsDeleting(selectedTemplate.id);
-                                }}
-                                className="px-4 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors flex items-center justify-center"
-                            >
-                                <Trash2 size={20} />
-                            </button>
-                            <button
-                                onClick={() => openEditModal(selectedTemplate)}
-                                className="px-4 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors flex items-center justify-center"
-                            >
-                                <Edit3 size={20} />
-                            </button>
-                            <button
-                                onClick={() => handleCreateOrder(selectedTemplate)}
-                                className="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                            >
-                                <ShoppingBag size={20} />
-                                Tạo đơn hàng
-                            </button>
+                            {/* Content */}
+                            <div className="p-6 flex-1 overflow-y-auto">
+                                <div className="flex justify-between items-center mb-6">
+                                    <div>
+                                        <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Giá bán</p>
+                                        <p className="text-3xl font-black text-indigo-600">
+                                            {formatCurrency(
+                                                selectedTemplate.total_price !== null
+                                                    ? Number(selectedTemplate.total_price)
+                                                    : (selectedTemplate.items?.reduce((sum: any, item: any) => sum + ((item.custom_price || item.drugs?.unit_price || 0) * item.quantity), 0) || 0)
+                                            )}
+                                        </p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Số lượng thuốc</p>
+                                        <p className="text-xl font-bold text-slate-800">{selectedTemplate.items?.length || 0} loại</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <h4 className="font-bold text-slate-800 flex items-center gap-2">
+                                        <ShoppingBag size={18} />
+                                        Chi tiết thành phần
+                                    </h4>
+                                    {selectedTemplate.items?.map((item: any, i: number) => (
+                                        <div key={i} className="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                            <div className="h-16 w-16 bg-white rounded-lg flex items-center justify-center border border-slate-100 shrink-0 overflow-hidden">
+                                                {item.drugs?.image_url ? (
+                                                    <img src={item.drugs.image_url} className="h-full w-full object-cover" alt={item.drugs?.name} />
+                                                ) : (
+                                                    <Pill size={24} className="text-slate-300" />
+                                                )}
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-bold text-slate-700 text-base">{item.drugs?.name}</p>
+                                                <p className="text-xs text-slate-500 font-medium">Số lượng: <span className="font-bold text-slate-900">{item.quantity} {item.drugs?.unit}</span></p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="p-4 border-t border-slate-100 bg-slate-50 flex gap-3">
+                                <button
+                                    onClick={() => {
+                                        setIsDeleting(selectedTemplate.id);
+                                    }}
+                                    className="px-4 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors flex items-center justify-center"
+                                >
+                                    <Trash2 size={20} />
+                                </button>
+                                <button
+                                    onClick={() => openEditModal(selectedTemplate)}
+                                    className="px-4 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors flex items-center justify-center"
+                                >
+                                    <Edit3 size={20} />
+                                </button>
+                                <button
+                                    onClick={() => handleCreateOrder(selectedTemplate)}
+                                    className="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                                >
+                                    <ShoppingBag size={20} />
+                                    Tạo đơn hàng
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             <DrugPicker
                 isOpen={isPickerOpen}
@@ -560,33 +564,35 @@ export default function TemplatesPage() {
             />
 
             {/* Action Menu / Preview Popup */}
-            {actionMenuTemplate && (
-                <ActionMenu
-                    isOpen={!!actionMenuTemplate}
-                    onClose={() => setActionMenuTemplate(null)}
-                    type="template"
-                    data={actionMenuTemplate}
-                    actions={[
-                        {
-                            label: 'Xóa',
-                            icon: <Trash2 size={18} />,
-                            onClick: () => setIsDeleting(actionMenuTemplate.id),
-                            variant: 'danger'
-                        },
-                        {
-                            label: 'Sửa',
-                            icon: <Edit3 size={18} />,
-                            onClick: () => openEditModal(actionMenuTemplate)
-                        },
-                        {
-                            label: 'Tạo đơn',
-                            icon: <ShoppingBag size={18} />,
-                            onClick: () => handleCreateOrder(actionMenuTemplate),
-                            variant: 'primary'
-                        }
-                    ]}
-                />
-            )}
-        </Container>
+            {
+                actionMenuTemplate && (
+                    <ActionMenu
+                        isOpen={!!actionMenuTemplate}
+                        onClose={() => setActionMenuTemplate(null)}
+                        type="template"
+                        data={actionMenuTemplate}
+                        actions={[
+                            {
+                                label: 'Xóa',
+                                icon: <Trash2 size={18} />,
+                                onClick: () => setIsDeleting(actionMenuTemplate.id),
+                                variant: 'danger'
+                            },
+                            {
+                                label: 'Sửa',
+                                icon: <Edit3 size={18} />,
+                                onClick: () => openEditModal(actionMenuTemplate)
+                            },
+                            {
+                                label: 'Tạo đơn',
+                                icon: <ShoppingBag size={18} />,
+                                onClick: () => handleCreateOrder(actionMenuTemplate),
+                                variant: 'primary'
+                            }
+                        ]}
+                    />
+                )
+            }
+        </Container >
     );
 }
