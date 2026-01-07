@@ -9,12 +9,13 @@ import { useState } from 'react';
 interface DrugListItemProps {
     drug: Drug;
     onEdit: (drug: Drug) => void;
+    onClick: (drug: Drug) => void;
     onContextMenu: (e: React.MouseEvent, drug: Drug) => void;
     onLongPress: (drug: Drug) => void;
     onMoreClick?: (drug: Drug) => void;
 }
 
-export default function DrugListItem({ drug, onEdit, onContextMenu, onLongPress, onMoreClick }: DrugListItemProps) {
+export default function DrugListItem({ drug, onEdit, onClick, onContextMenu, onLongPress, onMoreClick }: DrugListItemProps) {
     const longPressHandlers = useLongPress(() => {
         onLongPress(drug);
     });
@@ -25,7 +26,8 @@ export default function DrugListItem({ drug, onEdit, onContextMenu, onLongPress,
             onEdit={() => onEdit(drug)}
         >
             <div
-                className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl relative"
+                className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl relative cursor-pointer"
+                onClick={() => onClick(drug)}
                 onContextMenu={(e) => onContextMenu(e, drug)}
                 {...longPressHandlers}
             >

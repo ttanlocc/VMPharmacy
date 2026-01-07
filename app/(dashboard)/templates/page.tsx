@@ -249,7 +249,7 @@ export default function TemplatesPage() {
                                             key={template.id}
                                             template={template}
                                             index={idx}
-                                            onClick={openDetail}
+                                            onClick={setActionMenuTemplate}
                                             onContextMenu={handleContextMenu}
                                             onLongPress={setActionMenuTemplate}
                                             onMoreClick={setActionMenuTemplate}
@@ -553,51 +553,30 @@ export default function TemplatesPage() {
                 description="Đơn mẫu sẽ bị xóa khỏi danh sách nhưng lịch sử đơn hàng cũ vẫn được giữ nguyên."
             />
 
-            {/* Action Menu */}
+            {/* Action Menu / Preview Popup */}
             {actionMenuTemplate && (
                 <ActionMenu
                     isOpen={!!actionMenuTemplate}
                     onClose={() => setActionMenuTemplate(null)}
-                    title="Chi tiết đơn mẫu"
-                    info={[
-                        { label: 'Tên mẫu', value: actionMenuTemplate.name },
-                        { label: 'Số loại thuốc', value: `${actionMenuTemplate.items?.length || 0} loại` },
-                        {
-                            label: 'Tổng tiền',
-                            value: formatCurrency(
-                                actionMenuTemplate.total_price !== null
-                                    ? Number(actionMenuTemplate.total_price)
-                                    : (actionMenuTemplate.items?.reduce((sum: number, item: any) => sum + ((item.custom_price || item.drugs?.unit_price || 0) * item.quantity), 0) || 0)
-                            )
-                        },
-                        { label: 'Ghi chú', value: actionMenuTemplate.note || '—' },
-                    ]}
+                    type="template"
+                    data={actionMenuTemplate}
                     actions={[
                         {
-                            label: 'Xem chi tiết',
-                            icon: <Eye size={18} />,
-                            onClick: () => openDetail(actionMenuTemplate)
+                            label: 'Xóa',
+                            icon: <Trash2 size={18} />,
+                            onClick: () => setIsDeleting(actionMenuTemplate.id),
+                            variant: 'danger'
                         },
                         {
-                            label: 'Tạo đơn hàng',
-                            icon: <ShoppingBag size={18} />,
-                            onClick: () => handleCreateOrder(actionMenuTemplate)
-                        },
-                        {
-                            label: 'Chỉnh sửa',
+                            label: 'Sửa',
                             icon: <Edit3 size={18} />,
                             onClick: () => openEditModal(actionMenuTemplate)
                         },
                         {
-                            label: 'Nhân bản',
-                            icon: <Copy size={18} />,
-                            onClick: () => handleDuplicate(actionMenuTemplate)
-                        },
-                        {
-                            label: 'Xóa đơn',
-                            icon: <Trash2 size={18} />,
-                            onClick: () => setIsDeleting(actionMenuTemplate.id),
-                            variant: 'danger'
+                            label: 'Tạo đơn',
+                            icon: <ShoppingBag size={18} />,
+                            onClick: () => handleCreateOrder(actionMenuTemplate),
+                            variant: 'primary'
                         }
                     ]}
                 />

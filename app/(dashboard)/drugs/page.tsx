@@ -15,7 +15,7 @@ import { DrugGroupManager } from '@/components/DrugGroupManager';
 import IngredientInput from '@/components/IngredientInput';
 import { useLongPress } from '@/components/useLongPress'; // Keeping this for now if needed, but actually we should remove it if unused. Wait, better to replace it with DrugListItem import.
 import DrugListItem from '@/components/DrugListItem';
-import { ActionMenu, ActionMenuItem } from '@/components/ActionMenu';
+import { ActionMenu } from '@/components/ActionMenu';
 import { uploadDrugImage } from '@/lib/upload';
 import { cn, formatCurrency } from '@/lib/utils';
 import { DRUG_UNITS } from '@/lib/constants';
@@ -179,6 +179,7 @@ export default function DrugsPage() {
                                     key={drug.id}
                                     drug={drug}
                                     onEdit={openEditModal}
+                                    onClick={setActionMenuDrug}
                                     onContextMenu={handleContextMenu}
                                     onLongPress={setActionMenuDrug}
                                     onMoreClick={setActionMenuDrug}
@@ -321,22 +322,16 @@ export default function DrugsPage() {
                 title="Xóa thuốc?"
                 description="Hành động này không thể hoàn tác. Mọi đơn mẫu chứa thuốc này sẽ bị ảnh hưởng."
             />
-            {/* Action Menu */}
+            {/* Action Menu / Preview Popup */}
             {actionMenuDrug && (
                 <ActionMenu
                     isOpen={!!actionMenuDrug}
                     onClose={() => setActionMenuDrug(null)}
-                    title="Chi tiết thuốc"
-                    info={[
-                        { label: 'Tên thuốc', value: actionMenuDrug.name },
-                        { label: 'Hoạt chất', value: actionMenuDrug.active_ingredient || '—' },
-                        { label: 'Đơn vị', value: actionMenuDrug.unit },
-                        { label: 'Giá bán', value: formatCurrency(actionMenuDrug.unit_price) },
-                        { label: 'Nhóm', value: actionMenuDrug.drug_groups?.name || '—' },
-                    ]}
+                    type="drug"
+                    data={actionMenuDrug}
                     actions={[
                         {
-                            label: 'Chỉnh sửa',
+                            label: 'Sửa',
                             icon: <Edit size={18} />,
                             onClick: () => openEditModal(actionMenuDrug)
                         },
@@ -346,7 +341,7 @@ export default function DrugsPage() {
                             onClick: () => handleDuplicate(actionMenuDrug)
                         },
                         {
-                            label: 'Xóa thuốc',
+                            label: 'Xóa',
                             icon: <Trash2 size={18} />,
                             onClick: () => setIsDeleting(actionMenuDrug.id),
                             variant: 'danger'
