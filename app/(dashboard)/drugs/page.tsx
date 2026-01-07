@@ -5,15 +5,18 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDrugs, Drug } from '@/hooks/useDrugs';
 import { useDrugGroups } from '@/hooks/useDrugGroups';
-import { Plus, Search, Image as ImageIcon, X, Trash2, FolderPlus } from 'lucide-react';
+import { Plus, Search, Image as ImageIcon, X, Trash2, FolderPlus, Copy, MoreVertical, Edit } from 'lucide-react';
 import Container from '@/components/Container';
 import DrugCard from '@/components/DrugCard';
 import SwipeableItem from '@/components/SwipeableItem';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { DrugGroupManager } from '@/components/DrugGroupManager';
+import IngredientInput from '@/components/IngredientInput';
+import { useLongPress } from '@/components/useLongPress';
+import { ActionMenu, ActionMenuItem } from '@/components/ActionMenu';
 import { uploadDrugImage } from '@/lib/upload';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import { DRUG_UNITS } from '@/lib/constants';
 
 export default function DrugsPage() {
@@ -23,6 +26,7 @@ export default function DrugsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingDrug, setEditingDrug] = useState<Drug | null>(null);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
+    const [actionMenuDrug, setActionMenuDrug] = useState<Drug | null>(null); // For context menu
     const [uploading, setUploading] = useState(false);
 
     // Form state
@@ -30,6 +34,7 @@ export default function DrugsPage() {
     const [price, setPrice] = useState('');
     const [unit, setUnit] = useState(DRUG_UNITS[0]);
     const [groupId, setGroupId] = useState<string>('');
+    const [activeIngredient, setActiveIngredient] = useState('');
     const [imageUrl, setImageUrl] = useState('');
 
     const filteredDrugs = drugs.filter(d =>
@@ -41,6 +46,7 @@ export default function DrugsPage() {
         setPrice('');
         setUnit(DRUG_UNITS[0]);
         setGroupId('');
+        setActiveIngredient('');
         setImageUrl('');
         setEditingDrug(null);
     };
@@ -56,6 +62,7 @@ export default function DrugsPage() {
         setPrice(drug.unit_price.toString());
         setUnit(drug.unit);
         setGroupId(drug.group_id || '');
+        setActiveIngredient(drug.active_ingredient || '');
         setImageUrl(drug.image_url || '');
         setIsModalOpen(true);
     };
@@ -84,6 +91,7 @@ export default function DrugsPage() {
             unit,
             unit_price: parseFloat(price),
             group_id: groupId || null,
+            active_ingredient: activeIngredient || null,
             image_url: imageUrl,
         };
 
@@ -101,6 +109,35 @@ export default function DrugsPage() {
             toast.error(error.message || 'Thao tác thất bại');
             console.error(error);
         }
+    };
+
+    const handleDuplicate = async (drug: Drug) => {
+        try {
+            const newItem = {
+                name: `${drug.name} (Copy)`,
+                unit: drug.unit,
+                unit_price: drug.unit_price,
+                group_id: drug.group_id,
+                active_ingredient: drug.active_ingredient,
+                image_url: drug.image_url
+            };
+            await addDrug(newItem);
+            toast.success('Đã nhân bản thuốc');
+        } catch (error) {
+            toast.error('Nhân bản thất bại');
+        }
+    };
+
+    const handleContextMenu = (e: React.MouseEvent, drug: Drug) => {
+        e.preventDefault();
+        setActionMenuDrug(drug);
+    };
+
+    const drugLongPressHandlers = (drug: Drug) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        return useLongPress(() => {
+            setActionMenuDrug(drug);
+        });
     };
 
     return (
@@ -145,10 +182,14 @@ export default function DrugsPage() {
                                 <SwipeableItem
                                     key={drug.id}
                                     onEdit={() => openEditModal(drug)}
-                                    onDelete={() => setIsDeleting(drug.id)}
+                                    // onDelete={() => setIsDeleting(drug.id)} // Prefer context menu delete to avoid conflict
                                     className="rounded-2xl"
                                 >
-                                    <div className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl">
+                                    <div
+                                        className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl relative"
+                                        onContextMenu={(e) => handleContextMenu(e, drug)}
+                                        {...drugLongPressHandlers(drug)}
+                                    >
                                         <div className="relative h-16 w-16 bg-slate-50 rounded-xl overflow-hidden flex items-center justify-center shrink-0">
                                             {drug.image_url ? (
                                                 <img src={drug.image_url} alt={drug.name} className="h-full w-full object-cover" />
@@ -156,8 +197,13 @@ export default function DrugsPage() {
                                                 <ImageIcon size={24} className="text-slate-300" />
                                             )}
                                         </div>
-                                        <div className="flex-1">
-                                            <h3 className="font-bold text-slate-900">{drug.name}</h3>
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="font-bold text-slate-900 truncate">{drug.name}</h3>
+                                            {drug.active_ingredient && (
+                                                <p className="text-xs text-slate-500 truncate mb-1">
+                                                    {drug.active_ingredient}
+                                                </p>
+                                            )}
                                             <div className="flex items-center gap-2 mt-1">
                                                 <span className="text-[10px] font-bold text-slate-500 px-2 py-0.5 bg-slate-100 rounded-full uppercase tracking-wider">
                                                     {drug.unit}
@@ -167,6 +213,17 @@ export default function DrugsPage() {
                                                 </span>
                                             </div>
                                         </div>
+
+                                        {/* More Button */}
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setActionMenuDrug(drug);
+                                            }}
+                                            className="p-2 text-slate-300 hover:text-slate-500 rounded-full hover:bg-slate-50 transition-colors"
+                                        >
+                                            <MoreVertical size={20} />
+                                        </button>
                                     </div>
                                 </SwipeableItem>
                             ))
@@ -238,6 +295,14 @@ export default function DrugsPage() {
                                     />
                                 </div>
 
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Hoạt chất</label>
+                                    <IngredientInput
+                                        value={activeIngredient}
+                                        onChange={setActiveIngredient}
+                                    />
+                                </div>
+
                                 <div className="flex gap-4">
                                     <div className="flex-1">
                                         <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Nhóm thuốc</label>
@@ -299,6 +364,39 @@ export default function DrugsPage() {
                 title="Xóa thuốc?"
                 description="Hành động này không thể hoàn tác. Mọi đơn mẫu chứa thuốc này sẽ bị ảnh hưởng."
             />
+            {/* Action Menu */}
+            {actionMenuDrug && (
+                <ActionMenu
+                    isOpen={!!actionMenuDrug}
+                    onClose={() => setActionMenuDrug(null)}
+                    title="Chi tiết thuốc"
+                    info={[
+                        { label: 'Tên thuốc', value: actionMenuDrug.name },
+                        { label: 'Hoạt chất', value: actionMenuDrug.active_ingredient || '—' },
+                        { label: 'Đơn vị', value: actionMenuDrug.unit },
+                        { label: 'Giá bán', value: formatCurrency(actionMenuDrug.unit_price) },
+                        { label: 'Nhóm', value: actionMenuDrug.drug_groups?.name || '—' },
+                    ]}
+                    actions={[
+                        {
+                            label: 'Chỉnh sửa',
+                            icon: <Edit size={18} />,
+                            onClick: () => openEditModal(actionMenuDrug)
+                        },
+                        {
+                            label: 'Nhân bản',
+                            icon: <Copy size={18} />,
+                            onClick: () => handleDuplicate(actionMenuDrug)
+                        },
+                        {
+                            label: 'Xóa thuốc',
+                            icon: <Trash2 size={18} />,
+                            onClick: () => setIsDeleting(actionMenuDrug.id),
+                            variant: 'danger'
+                        }
+                    ]}
+                />
+            )}
         </Container>
     );
 }

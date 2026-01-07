@@ -26,6 +26,23 @@ export interface Database {
                     created_at?: string
                 }
             }
+            ingredients: {
+                Row: {
+                    id: string
+                    name: string
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    name: string
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    name?: string
+                    created_at?: string
+                }
+            }
             drugs: {
                 Row: {
                     id: string
@@ -34,6 +51,7 @@ export interface Database {
                     unit_price: number
                     image_url: string | null
                     group_id: string | null
+                    active_ingredient: string | null
                     created_at: string
                 }
                 Insert: {
@@ -43,6 +61,7 @@ export interface Database {
                     unit_price?: number
                     image_url?: string | null
                     group_id?: string | null
+                    active_ingredient?: string | null
                     created_at?: string
                 }
                 Update: {
@@ -52,6 +71,7 @@ export interface Database {
                     unit_price?: number
                     image_url?: string | null
                     group_id?: string | null
+                    active_ingredient?: string | null
                     created_at?: string
                 }
             }

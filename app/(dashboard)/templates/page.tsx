@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTemplates } from '@/hooks/useTemplates';
 import { useCheckout } from '@/app/context/CheckoutContext';
-import { Plus, Search, ClipboardList, Trash2, Edit3, ShoppingBag, Pill, X, Image as ImageIcon, ChevronRight, Eye } from 'lucide-react';
+import { Plus, Search, ClipboardList, Trash2, Edit3, ShoppingBag, Pill, X, Image as ImageIcon, ChevronRight, Eye, Copy, MoreVertical } from 'lucide-react';
 import Container from '@/components/Container';
 import GlassCard from '@/components/ui/GlassCard';
 import DrugPicker from '@/components/DrugPicker';
@@ -17,6 +17,8 @@ import { useRouter } from 'next/navigation';
 import { uploadImage } from '@/lib/upload';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
+import { useLongPress } from '@/components/useLongPress';
+import { ActionMenu } from '@/components/ActionMenu';
 
 export default function TemplatesPage() {
     const router = useRouter();
@@ -38,6 +40,7 @@ export default function TemplatesPage() {
 
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
+    const [actionMenuTemplate, setActionMenuTemplate] = useState<any | null>(null);
 
     const filteredTemplates = templates.filter(t =>
         t.name.toLowerCase().includes(search.toLowerCase())
@@ -117,9 +120,43 @@ export default function TemplatesPage() {
             toast.success('Đã xóa đơn mẫu');
             setIsDeleting(null);
             setIsDetailModalOpen(false); // Close detail modal if open
+            if (actionMenuTemplate?.id === isDeleting) setActionMenuTemplate(null);
         } catch (error: any) {
             toast.error('Xóa thất bại');
         }
+    };
+
+    const handleDuplicate = async (template: any) => {
+        try {
+            const items = template.items?.map((item: any) => ({
+                drug_id: item.drug_id,
+                quantity: item.quantity,
+                note: item.note
+            })) || [];
+
+            await addTemplate(
+                `${template.name} (Copy)`,
+                items,
+                template.total_price,
+                template.image_url,
+                template.note
+            );
+            toast.success('Đã nhân bản đơn mẫu');
+        } catch (error) {
+            toast.error('Nhân bản thất bại');
+        }
+    };
+
+    const handleContextMenu = (e: React.MouseEvent, template: any) => {
+        e.preventDefault();
+        setActionMenuTemplate(template);
+    };
+
+    const templateLongPressHandlers = (template: any) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        return useLongPress(() => {
+            setActionMenuTemplate(template);
+        });
     };
 
     const handleCreateOrder = (template: any) => {
@@ -224,7 +261,9 @@ export default function TemplatesPage() {
                                             exit={{ opacity: 0, scale: 0.9 }}
                                             transition={{ delay: idx * 0.05 }}
                                             onClick={() => openDetail(template)}
-                                            className="cursor-pointer group"
+                                            onContextMenu={(e) => handleContextMenu(e, template)}
+                                            {...templateLongPressHandlers(template)}
+                                            className="cursor-pointer group relative"
                                         >
                                             <GlassCard className="h-full !p-0 overflow-hidden flex flex-col hover:border-indigo-300 transition-colors">
                                                 {/* Image Section (Top Half) */}
@@ -252,9 +291,21 @@ export default function TemplatesPage() {
                                                 {/* Content Section */}
                                                 <div className="p-4 flex flex-col flex-1">
                                                     <div className="flex-1">
-                                                        <h3 className="font-bold text-lg text-slate-800 line-clamp-2 mb-1 group-hover:text-indigo-700 transition-colors">
-                                                            {template.name}
-                                                        </h3>
+                                                        <div className="flex justify-between items-start gap-2">
+                                                            <h3 className="font-bold text-lg text-slate-800 line-clamp-2 mb-1 group-hover:text-indigo-700 transition-colors">
+                                                                {template.name}
+                                                            </h3>
+                                                            {/* More Button */}
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setActionMenuTemplate(template);
+                                                                }}
+                                                                className="p-1 -mr-1 text-slate-300 hover:text-slate-500 rounded-full hover:bg-slate-100 transition-colors"
+                                                            >
+                                                                <MoreVertical size={18} />
+                                                            </button>
+                                                        </div>
                                                         {template.total_price !== null && (
                                                             <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 uppercase tracking-wider mb-2">
                                                                 Giá thủ công
@@ -264,7 +315,7 @@ export default function TemplatesPage() {
 
                                                     <div className="mt-4 pt-4 border-t border-slate-50 flex justify-between items-end">
                                                         <div className="flex -space-x-2">
-                                                            {template.items?.slice(0, 3).map((item, i) => (
+                                                            {template.items?.slice(0, 3).map((item: any, i: number) => (
                                                                 <div key={i} className="h-6 w-6 rounded-full border-2 border-white bg-slate-100 overflow-hidden">
                                                                     {item.drugs?.image_url ? (
                                                                         <img src={item.drugs.image_url} className="h-full w-full object-cover" />
@@ -581,6 +632,56 @@ export default function TemplatesPage() {
                 title="Xóa đơn mẫu?"
                 description="Đơn mẫu sẽ bị xóa khỏi danh sách nhưng lịch sử đơn hàng cũ vẫn được giữ nguyên."
             />
+
+            {/* Action Menu */}
+            {actionMenuTemplate && (
+                <ActionMenu
+                    isOpen={!!actionMenuTemplate}
+                    onClose={() => setActionMenuTemplate(null)}
+                    title="Chi tiết đơn mẫu"
+                    info={[
+                        { label: 'Tên mẫu', value: actionMenuTemplate.name },
+                        { label: 'Số loại thuốc', value: `${actionMenuTemplate.items?.length || 0} loại` },
+                        {
+                            label: 'Tổng tiền',
+                            value: formatCurrency(
+                                actionMenuTemplate.total_price !== null
+                                    ? Number(actionMenuTemplate.total_price)
+                                    : (actionMenuTemplate.items?.reduce((sum: number, item: any) => sum + ((item.custom_price || item.drugs?.unit_price || 0) * item.quantity), 0) || 0)
+                            )
+                        },
+                        { label: 'Ghi chú', value: actionMenuTemplate.note || '—' },
+                    ]}
+                    actions={[
+                        {
+                            label: 'Xem chi tiết',
+                            icon: <Eye size={18} />,
+                            onClick: () => openDetail(actionMenuTemplate)
+                        },
+                        {
+                            label: 'Tạo đơn hàng',
+                            icon: <ShoppingBag size={18} />,
+                            onClick: () => handleCreateOrder(actionMenuTemplate)
+                        },
+                        {
+                            label: 'Chỉnh sửa',
+                            icon: <Edit3 size={18} />,
+                            onClick: () => openEditModal(actionMenuTemplate)
+                        },
+                        {
+                            label: 'Nhân bản',
+                            icon: <Copy size={18} />,
+                            onClick: () => handleDuplicate(actionMenuTemplate)
+                        },
+                        {
+                            label: 'Xóa đơn',
+                            icon: <Trash2 size={18} />,
+                            onClick: () => setIsDeleting(actionMenuTemplate.id),
+                            variant: 'danger'
+                        }
+                    ]}
+                />
+            )}
         </Container>
     );
 }
