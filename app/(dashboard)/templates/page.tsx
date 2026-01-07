@@ -42,9 +42,14 @@ export default function TemplatesPage() {
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
     const [actionMenuTemplate, setActionMenuTemplate] = useState<any | null>(null);
 
-    const filteredTemplates = templates.filter(t =>
-        t.name.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredTemplates = templates.filter(t => {
+        const query = search.toLowerCase();
+        const nameMatch = t.name.toLowerCase().includes(query);
+        const drugsMatch = t.items?.some((item: any) =>
+            item.drugs?.name?.toLowerCase().includes(query)
+        );
+        return nameMatch || drugsMatch;
+    });
 
     const resetForm = () => {
         setName('');
@@ -253,6 +258,7 @@ export default function TemplatesPage() {
                                             onContextMenu={handleContextMenu}
                                             onLongPress={setActionMenuTemplate}
                                             onMoreClick={setActionMenuTemplate}
+                                            onCreateOrder={handleCreateOrder}
                                         />
                                     );
                                 })

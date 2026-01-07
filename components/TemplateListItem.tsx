@@ -1,4 +1,4 @@
-import { ClipboardList, Pill, MoreVertical } from 'lucide-react';
+import { ClipboardList, Pill, MoreVertical, ShoppingBag } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import { useLongPress } from '@/components/useLongPress';
 import { motion } from 'framer-motion';
@@ -12,9 +12,10 @@ interface TemplateListItemProps {
     onContextMenu: (e: React.MouseEvent, template: any) => void;
     onLongPress: (template: any) => void;
     onMoreClick?: (template: any) => void;
+    onCreateOrder?: (template: any) => void;
 }
 
-export default function TemplateListItem({ template, index, onClick, onContextMenu, onLongPress, onMoreClick }: TemplateListItemProps) {
+export default function TemplateListItem({ template, index, onClick, onContextMenu, onLongPress, onMoreClick, onCreateOrder }: TemplateListItemProps) {
     const longPressHandlers = useLongPress(() => {
         onLongPress(template);
     });
@@ -96,9 +97,23 @@ export default function TemplateListItem({ template, index, onClick, onContextMe
                                 </div>
                             ))}
                         </div>
-                        <p className="text-lg font-black text-indigo-600">
-                            {formatCurrency(total)}
-                        </p>
+                        <div className="flex items-center gap-3">
+                            <p className="text-lg font-black text-indigo-600">
+                                {formatCurrency(total)}
+                            </p>
+                            {onCreateOrder && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onCreateOrder(template);
+                                    }}
+                                    className="p-2 bg-indigo-100 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-colors"
+                                    title="Tạo đơn hàng ngay"
+                                >
+                                    <ShoppingBag size={18} />
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
             </GlassCard>
