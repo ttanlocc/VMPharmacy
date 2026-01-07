@@ -5,6 +5,7 @@ import { formatCurrency } from '@/lib/utils';
 import { Calendar, Package, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import DetailedDrugList from './DetailedDrugList';
 
 export default function OrderHistory() {
     const { orders, isLoading } = useOrders();
@@ -73,26 +74,21 @@ export default function OrderHistory() {
                                 exit={{ height: 0 }}
                                 className="overflow-hidden bg-slate-50/50 border-t border-slate-100"
                             >
-                                <div className="p-4 space-y-2">
-                                    {order.order_items.map((item) => (
-                                        <div
-                                            key={item.id}
-                                            className="flex items-center justify-between text-sm"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <div className="font-medium text-slate-700">
-                                                    {item.quantity}x {item.drugs?.name || 'Thuốc đã xóa'}
-                                                </div>
-                                            </div>
-                                            <div className="text-slate-500 font-medium">
-                                                {formatCurrency(item.unit_price * item.quantity)}
-                                            </div>
-                                        </div>
-                                    ))}
+                                <div className="p-4 pt-2">
+                                    <DetailedDrugList
+                                        items={order.order_items.map((item) => ({
+                                            name: item.drugs?.name || 'Thuốc đã xóa',
+                                            unit: item.drugs?.unit || 'đơn vị',
+                                            quantity: item.quantity,
+                                            price: Number(item.unit_price),
+                                            image_url: item.drugs?.image_url
+                                        }))}
+                                    />
                                 </div>
                             </motion.div>
                         )}
                     </AnimatePresence>
+
                 </div>
             ))}
         </div>

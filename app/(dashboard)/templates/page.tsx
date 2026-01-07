@@ -41,6 +41,7 @@ export default function TemplatesPage() {
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
     const [actionMenuTemplate, setActionMenuTemplate] = useState<any | null>(null);
+    const [expandedId, setExpandedId] = useState<string | null>(null);
 
     const filteredTemplates = templates.filter(t => {
         const query = search.toLowerCase();
@@ -157,6 +158,10 @@ export default function TemplatesPage() {
         setActionMenuTemplate(template);
     };
 
+    const handleToggleExpand = (template: any) => {
+        setExpandedId(prev => prev === template.id ? null : template.id);
+    };
+
 
 
     const handleCreateOrder = (template: any) => {
@@ -254,7 +259,9 @@ export default function TemplatesPage() {
                                             key={template.id}
                                             template={template}
                                             index={idx}
-                                            onClick={setActionMenuTemplate}
+                                            isExpanded={expandedId === template.id}
+                                            onToggle={handleToggleExpand}
+                                            onClick={handleToggleExpand}
                                             onContextMenu={handleContextMenu}
                                             onLongPress={setActionMenuTemplate}
                                             onMoreClick={setActionMenuTemplate}

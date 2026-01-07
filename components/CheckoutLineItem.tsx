@@ -4,6 +4,7 @@ import SwipeableItem from '@/components/SwipeableItem';
 import { formatCurrency } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
+import DetailedDrugList from './DetailedDrugList';
 
 interface CheckoutLineItemProps {
     item: any;
@@ -78,17 +79,21 @@ export default function CheckoutLineItem({ item, index, onDelete, onEdit, onUpda
                                 exit={{ height: 0, opacity: 0 }}
                                 className="mt-2 overflow-hidden"
                             >
-                                <div className="pl-2 border-l-2 border-indigo-200 py-1 space-y-1">
-                                    {item.items.map((sub: any, i: number) => (
-                                        <div key={i} className="flex justify-between text-xs text-slate-600">
-                                            <span className="truncate mr-2">• {sub.name}</span>
-                                            <span className="font-bold text-slate-500 shrink-0">x{sub.quantity}</span>
-                                        </div>
-                                    ))}
+                                <div className="border-t border-indigo-100/50 pt-1">
+                                    <DetailedDrugList
+                                        items={item.items.map((sub: any) => ({
+                                            name: sub.name,
+                                            unit: sub.unit || 'đơn vị',
+                                            quantity: sub.quantity,
+                                            // Price might not be readily available in the condensed sub-items list in context
+                                            // but we pass what we have
+                                        }))}
+                                    />
                                 </div>
                             </motion.div>
                         )}
                     </AnimatePresence>
+
                 </div>
 
                 {/* Controls */}
