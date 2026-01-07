@@ -58,9 +58,9 @@ export default function TemplateListItem({
         >
             <div className={`flex flex-col bg-white border rounded-2xl transition-all ${isExpanded ? 'border-indigo-200 ring-1 ring-indigo-50 shadow-sm' : 'border-slate-100 hover:border-indigo-200'}`}>
                 {/* Main Row */}
-                <div className="flex items-center gap-4 p-4">
+                <div className="flex items-start gap-3 p-3">
                     {/* Image Section */}
-                    <div className="h-16 w-16 bg-slate-100 rounded-xl overflow-hidden shrink-0 relative">
+                    <div className="h-14 w-14 bg-slate-100 rounded-xl overflow-hidden shrink-0 relative">
                         {template.image_url ? (
                             <img
                                 src={template.image_url}
@@ -74,31 +74,31 @@ export default function TemplateListItem({
                         )}
                     </div>
 
-                    {/* Content Section */}
-                    <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-slate-900 mb-1">
+                    {/* Content Section - More space for Name */}
+                    <div className="flex-1 min-w-0 pt-0.5">
+                        <h3 className="font-bold text-slate-900 leading-tight mb-1">
                             {template.name}
                         </h3>
-                        <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-slate-500 px-2 py-0.5 bg-slate-100 rounded-full uppercase tracking-wider flex items-center gap-1">
-                                <Pill size={12} />
+                        <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-bold text-slate-500 px-2 py-0.5 bg-slate-100 rounded-full uppercase tracking-wider flex items-center gap-1 shrink-0">
+                                <Pill size={10} />
                                 {template.items?.length || 0} thuốc
                             </span>
+                            <p className="font-black text-indigo-600 text-sm">
+                                {formatCurrency(total)}
+                            </p>
                         </div>
                     </div>
 
-                    {/* Price & Actions */}
-                    <div className="flex items-center gap-3">
-                        <p className="font-bold text-indigo-600">
-                            {formatCurrency(total)}
-                        </p>
+                    {/* Actions only - Shrink to minimum */}
+                    <div className="flex items-center gap-1 shrink-0">
                         {onCreateOrder && (
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     onCreateOrder(template);
                                 }}
-                                className="p-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-colors"
+                                className="p-2 text-indigo-600 rounded-xl hover:bg-indigo-50 transition-colors"
                                 title="Tạo đơn hàng ngay"
                             >
                                 <ShoppingBag size={18} />

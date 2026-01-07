@@ -51,7 +51,7 @@ export default function CheckoutLineItem({ item, index, onDelete, onEdit, onUpda
                                 {item.name}
                             </h3>
                             {item.type === 'template' && (
-                                <span className="text-xs bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded">
+                                <span className="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded">
                                     {item.items?.length || 0} món
                                 </span>
                             )}
