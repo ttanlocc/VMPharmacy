@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Database } from '@/types/database';
+import { supabase } from '@/lib/supabase';
 
 type Customer = Database['public']['Tables']['customers']['Row'];
 
@@ -43,6 +44,7 @@ interface CheckoutContextType extends CheckoutState {
     updateItem: (index: number, updates: Partial<CheckoutItem>) => void;
     setCustomer: (customer: Customer | null) => void;
     clearCheckout: () => void;
+    saveAsTemplate: (name: string, price: number, note?: string) => Promise<any>;
 }
 
 const CheckoutContext = createContext<CheckoutContextType | undefined>(undefined);
@@ -127,6 +129,61 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem(STORAGE_KEY);
     };
 
+    const saveAsTemplate = async (name: string, price: number, note?: string) => {
+        try {
+            // 1. Create Template
+            const { data: template, error: templateError } = await (supabase
+                .from('templates') as any)
+                .insert({
+                    name,
+                    total_price: price,
+                    note,
+                    image_url: null // Or generate/pick one? For now null
+                })
+                .select()
+                .single();
+
+            if (templateError) throw templateError;
+
+            // 2. Prepare Items
+            // Flatten: Template(qty=2, items=[A(1), B(2)]) -> A(2), B(4)
+            const flatItems: Record<string, number> = {}; // drug_id -> total_quantity
+            const flatNotes: Record<string, string> = {}; // drug_id -> combined notes
+
+            items.forEach(item => {
+                if (item.type === 'template' && item.items) {
+                    item.items.forEach(sub => {
+                        const qty = sub.quantity * item.quantity;
+                        flatItems[sub.drug_id] = (flatItems[sub.drug_id] || 0) + qty;
+                        if (item.note) flatNotes[sub.drug_id] = [flatNotes[sub.drug_id], item.note].filter(Boolean).join('; ');
+                    });
+                } else if (item.drug_id) {
+                    flatItems[item.drug_id] = (flatItems[item.drug_id] || 0) + item.quantity;
+                    if (item.note) flatNotes[item.drug_id] = [flatNotes[item.drug_id], item.note].filter(Boolean).join('; ');
+                }
+            });
+
+            const templateItems = Object.entries(flatItems).map(([drug_id, quantity]) => ({
+                template_id: template.id,
+                drug_id,
+                quantity,
+                note: flatNotes[drug_id] || ''
+            }));
+
+            // 3. Insert Items
+            const { error: itemsError } = await (supabase
+                .from('template_items') as any)
+                .insert(templateItems);
+
+            if (itemsError) throw itemsError;
+
+            return template;
+        } catch (error) {
+            console.error('Error saving template:', error);
+            throw error;
+        }
+    };
+
     if (!isLoaded) {
         return null;
     }
@@ -140,7 +197,8 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
             removeItem,
             updateItem,
             setCustomer,
-            clearCheckout
+            clearCheckout,
+            saveAsTemplate
         }}>
             {children}
         </CheckoutContext.Provider>

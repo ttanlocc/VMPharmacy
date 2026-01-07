@@ -4,20 +4,20 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Plus, ShoppingBag, Trash2, Edit3, Pill, CheckCircle2, FileText, User, UserPlus, X, ClipboardList } from 'lucide-react';
+import { ArrowLeft, Plus, ShoppingBag, Trash2, CheckCircle2, FileText, User, X, Save, ClipboardList } from 'lucide-react';
 import Container from '@/components/Container';
-import SwipeableItem from '@/components/SwipeableItem';
 import DrugPicker from '@/components/DrugPicker';
 import CustomerPicker from '@/components/CustomerPicker';
 import TemplatePicker from '@/components/TemplatePicker';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import CheckoutLineItem from '@/components/CheckoutLineItem';
+import SaveTemplateModal from '@/components/SaveTemplateModal';
 import { formatCurrency } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOrders } from '@/hooks/useOrders';
 import { useCheckout, CheckoutItem } from '@/app/context/CheckoutContext';
 import { supabase } from '@/lib/supabase';
 import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
 
 function CheckoutContent() {
     const searchParams = useSearchParams();
@@ -35,11 +35,14 @@ function CheckoutContent() {
         addItems,
         removeItem,
         updateItem,
-        clearCheckout
+        clearCheckout,
+        saveAsTemplate
     } = useCheckout();
 
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const [isTemplatePickerOpen, setIsTemplatePickerOpen] = useState(false);
+    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+
     const [isSuccess, setIsSuccess] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isCustomerPickerOpen, setIsCustomerPickerOpen] = useState(false);
@@ -138,42 +141,18 @@ function CheckoutContent() {
 
         setIsSubmitting(true);
         try {
-            // Flatten items for the API
-            // The API expects a list of DRUGS with quantities.
-            // If we have a 'template' item, we need to expand it into its drugs.
-            // The API also expects 'total_price' which it uses for distribution.
-            // If we have mixed items (Template + Drugs), the API logic (assuming Single Template) will be weird.
-            // But we will send the hierarchy.
-
-            // To support the "Distribute Manual Price" logic correctly:
-            // The API takes `total_price` and `items`.
-
-            // Strategy: 
-            // 1. Expand template items into individual drug lines.
-            // 2. Pass the template_id of the first template item (as per limitation).
-            // 3. The `total_price` passed is `total`.
-
             const flattenedItems = items.flatMap(item => {
                 if (item.type === 'template' && item.items) {
-                    // For a template item with Quantity Q:
-                    // It contains Drugs [d1, d2] each with q1, q2.
-                    // The result should include [d1, d2] repeated Q times? 
-                    // No, multiply their quantities by Q.
                     return item.items.map(subItem => ({
                         drug_id: subItem.drug_id,
                         quantity: subItem.quantity * item.quantity,
-                        note: '', // Propagate note?
-                        // We do NOT send unit_price here because the API will calculate it based on total_price distribution?
-                        // BUT: If we have mixed items...
-                        // If we don't send unit_price, API fetches standard price.
-                        // If we are strictly creating a TEMPLATE order, this works.
+                        note: '',
                     }));
                 } else {
                     return [{
                         drug_id: item.drug_id,
                         quantity: item.quantity,
                         note: item.note,
-                        // unit_price: item.price // API might ignore this if distribution kicks in
                     }];
                 }
             });
@@ -189,6 +168,7 @@ function CheckoutContent() {
             }, 2500);
         } catch (error) {
             console.error(error);
+            toast.error('Có lỗi xảy ra khi tạo đơn hàng');
         } finally {
             setIsSubmitting(false);
         }
@@ -218,6 +198,16 @@ function CheckoutContent() {
         addItem(templateItem);
     };
 
+    const handleSaveTemplate = async (name: string, price: number, note?: string) => {
+        try {
+            await saveAsTemplate(name, price, note);
+            toast.success('Đã lưu đơn mẫu thành công!');
+        } catch (error) {
+            console.error(error);
+            toast.error('Lưu đơn mẫu thất bại');
+        }
+    };
+
     if (isSuccess) {
         return (
             <div className="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center p-6 text-center">
@@ -237,7 +227,7 @@ function CheckoutContent() {
     }
 
     return (
-        <Container className="bg-slate-50 min-h-screen">
+        <Container className="bg-slate-50 min-h-screen pb-32 lg:pb-0">
             <div className="flex flex-col gap-6">
                 {/* Header with Customer Info */}
                 <div className="flex items-center gap-4">
@@ -246,7 +236,6 @@ function CheckoutContent() {
                     </button>
                     <div className="flex-1">
                         <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Thanh toán</h1>
-                        {/* Customer Bar */}
                         <div className="flex items-center gap-2 mt-1">
                             {customer ? (
                                 <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg">
@@ -296,74 +285,14 @@ function CheckoutContent() {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
                                 >
-                                    <SwipeableItem
+                                    <CheckoutLineItem
+                                        item={item}
+                                        index={index}
                                         onDelete={() => removeItem(index)}
-                                        // Enable edit for both, but for template it edits the TOTAL
                                         onEdit={() => openPriceEditor(index)}
-                                        className="rounded-2xl"
+                                        onUpdateQuantity={(delta) => handleUpdateQuantity(index, delta)}
                                         showHint={index === 0}
-                                    >
-                                        <div className={`flex gap-3 p-3 ${item.type === 'template' ? 'bg-indigo-50/50 border-indigo-100' : 'bg-white border-slate-100'} border rounded-2xl relative overflow-hidden`}>
-                                            {/* Item Content */}
-                                            <div className="flex items-start gap-3 w-full">
-                                                <div className="h-12 w-12 bg-white rounded-lg flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-slate-100 relative mt-0.5">
-                                                    {item.image || item.image_url ? (
-                                                        <img
-                                                            src={item.image || item.image_url || ''}
-                                                            className="h-full w-full object-cover"
-                                                            alt={item.name}
-                                                            loading="lazy"
-                                                        />
-                                                    ) : (
-                                                        item.type === 'template' ? <ClipboardList size={24} className="text-indigo-400" /> : <Pill size={24} className="text-slate-300" />
-                                                    )}
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h3 className={`font-bold ${item.type === 'template' ? 'text-indigo-900' : 'text-slate-800'} text-sm truncate`}>{item.name}</h3>
-                                                    <div className="flex items-center gap-2">
-                                                        <p className="text-sm font-bold text-primary flex items-center gap-1">
-                                                            {formatCurrency(item.price)}
-                                                        </p>
-                                                        <span className="text-[10px] text-slate-500 font-medium">/ {item.type === 'template' ? 'đơn' : item.unit}</span>
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); openPriceEditor(index); }}
-                                                            className="p-1 text-slate-400 hover:text-sky-500 transition-colors"
-                                                        >
-                                                            <Edit3 size={14} />
-                                                        </button>
-                                                    </div>
-
-                                                    {/* Template Sub-items List */}
-                                                    {item.type === 'template' && item.items && (
-                                                        <div className="mt-1.5 pl-2 border-l-2 border-indigo-200">
-                                                            <ul className="text-[10px] text-slate-600 font-medium space-y-0.5">
-                                                                {item.items.map((sub, i) => (
-                                                                    <li key={i} className="flex justify-between">
-                                                                        <span className="truncate mr-2">• {sub.name}</span>
-                                                                        <span className="font-bold text-slate-500 shrink-0">x{sub.quantity}</span>
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="flex flex-col items-end gap-1.5 shrink-0">
-                                                    <div className="flex items-center bg-white rounded-lg border border-slate-200 px-0.5 py-0.5 shadow-sm">
-                                                        <button
-                                                            onClick={() => handleUpdateQuantity(index, -1)}
-                                                            className="w-6 h-6 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600 transition-colors text-xs"
-                                                        >-</button>
-                                                        <span className="w-6 text-center font-black text-xs text-slate-900">{item.quantity}</span>
-                                                        <button
-                                                            onClick={() => handleUpdateQuantity(index, 1)}
-                                                            className="w-6 h-6 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600 transition-colors text-xs"
-                                                        >+</button>
-                                                    </div>
-                                                    <span className="text-sm font-black text-slate-900">{formatCurrency(item.price * item.quantity)}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </SwipeableItem>
+                                    />
                                 </motion.div>
                             ))}
                         </AnimatePresence>
@@ -374,23 +303,31 @@ function CheckoutContent() {
                             </div>
                         )}
 
-                        <div className="grid grid-cols-2 gap-3">
+                        {/* Action Row */}
+                        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                             <button
                                 onClick={() => setIsPickerOpen(true)}
-                                className="py-4 border border-slate-200 bg-white rounded-2xl flex items-center justify-center gap-2 text-slate-500 font-bold hover:border-primary hover:text-primary transition-all active:scale-[0.98] shadow-sm"
+                                className="flex-1 min-w-[140px] py-4 border border-slate-200 bg-white rounded-2xl flex flex-col items-center justify-center gap-1 text-slate-600 font-bold hover:border-primary hover:text-primary transition-all active:scale-[0.98] shadow-sm"
                             >
-                                <Plus size={20} /> Thêm thuốc
+                                <Plus size={24} className="mb-1" />
+                                <span className="text-sm">Thêm thuốc</span>
                             </button>
                             <button
                                 onClick={() => setIsTemplatePickerOpen(true)}
-                                className="py-4 border border-slate-200 bg-white rounded-2xl flex items-center justify-center gap-2 text-slate-500 font-bold hover:border-sky-500 hover:text-sky-500 transition-all active:scale-[0.98] shadow-sm"
+                                className="flex-1 min-w-[140px] py-4 border border-slate-200 bg-white rounded-2xl flex flex-col items-center justify-center gap-1 text-slate-600 font-bold hover:border-sky-500 hover:text-sky-500 transition-all active:scale-[0.98] shadow-sm"
                             >
-                                <FileText size={20} /> Đơn mẫu
+                                <FileText size={24} className="mb-1" />
+                                <span className="text-sm">Đơn mẫu</span>
+                            </button>
+                            <button
+                                disabled={items.length === 0}
+                                onClick={() => setIsSaveModalOpen(true)}
+                                className="flex-1 min-w-[140px] py-4 border-2 border-dashed border-indigo-200 bg-indigo-50/50 rounded-2xl flex flex-col items-center justify-center gap-1 text-indigo-600 font-bold hover:bg-indigo-100 transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale"
+                            >
+                                <Save size={24} className="mb-1" />
+                                <span className="text-sm">Lưu đơn mẫu</span>
                             </button>
                         </div>
-
-                        {/* Mobile Spacer for Bottom Bar */}
-                        <div className="h-40 lg:hidden" />
                     </div>
 
                     {/* RIGHT COLUMN: Sticky Sidebar (Desktop Only) */}
@@ -444,28 +381,34 @@ function CheckoutContent() {
                     </div>
                 </div>
 
-                {/* Floating Bottom Bar (Mobile Only) */}
-                <div className="fixed lg:hidden bottom-0 left-0 right-0 p-6 bg-white border-t border-slate-100 glassmorphism rounded-t-[2.5rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] z-50">
-                    <div className="max-w-lg mx-auto flex items-center justify-between gap-6">
-                        <div className="flex flex-col">
-                            <span className="text-[10px] uppercase font-black text-slate-400 tracking-widest leading-none mb-1">Tổng tiền</span>
-                            <span className="text-2xl font-black text-primary leading-none">{formatCurrency(total)}</span>
+                {/* Floating Bottom Bar (Mobile Only) - Integrated with Bottom Sheet style */}
+                <div className="fixed lg:hidden bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-slate-200 glassmorphism rounded-t-[2rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] z-40 pb-safe">
+                    <div className="flex items-center gap-4 mb-3 px-2">
+                        <div className="flex flex-col flex-1">
+                            <span className="text-[10px] uppercase font-black text-slate-400 tracking-widest leading-none mb-1">Tổng cộng ({items.length} món)</span>
+                            <span className="text-2xl font-black text-primary leading-none truncate">{formatCurrency(total)}</span>
                         </div>
-                        <button
-                            disabled={items.length === 0 || isSubmitting}
-                            onClick={handleCheckout}
-                            className="flex-1 h-16 bg-primary text-white rounded-[1.5rem] font-black text-lg shadow-xl shadow-sky-100 hover:bg-sky-600 active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:grayscale"
-                        >
-                            {isSubmitting ? (
-                                <LoadingSpinner size={24} label="" className="p-0 text-white" />
-                            ) : (
-                                <>
-                                    <ShoppingBag size={22} strokeWidth={3} />
-                                    BÁN HÀNG
-                                </>
-                            )}
-                        </button>
+                        {customer && (
+                            <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg max-w-[120px]">
+                                <User size={14} className="fill-indigo-700 shrink-0" />
+                                <span className="text-xs font-bold truncate">{customer.name}</span>
+                            </div>
+                        )}
                     </div>
+                    <button
+                        disabled={items.length === 0 || isSubmitting}
+                        onClick={handleCheckout}
+                        className="w-full h-14 bg-primary text-white rounded-2xl font-black text-lg shadow-xl shadow-sky-100 hover:bg-sky-600 active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:grayscale"
+                    >
+                        {isSubmitting ? (
+                            <LoadingSpinner size={24} label="" className="p-0 text-white" />
+                        ) : (
+                            <>
+                                <ShoppingBag size={22} strokeWidth={3} />
+                                BÁN HÀNG
+                            </>
+                        )}
+                    </button>
                 </div>
 
                 {/* Price Edit Modal */}
@@ -522,6 +465,14 @@ function CheckoutContent() {
                     isOpen={isTemplatePickerOpen}
                     onClose={() => setIsTemplatePickerOpen(false)}
                     onSelect={handleAddTemplateItems}
+                />
+
+                <SaveTemplateModal
+                    isOpen={isSaveModalOpen}
+                    onClose={() => setIsSaveModalOpen(false)}
+                    onSave={handleSaveTemplate}
+                    items={items}
+                    total={total}
                 />
 
                 {/* Customer Picker Modal */}
