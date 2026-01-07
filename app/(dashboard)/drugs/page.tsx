@@ -13,7 +13,8 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { DrugGroupManager } from '@/components/DrugGroupManager';
 import IngredientInput from '@/components/IngredientInput';
-import { useLongPress } from '@/components/useLongPress';
+import { useLongPress } from '@/components/useLongPress'; // Keeping this for now if needed, but actually we should remove it if unused. Wait, better to replace it with DrugListItem import.
+import DrugListItem from '@/components/DrugListItem';
 import { ActionMenu, ActionMenuItem } from '@/components/ActionMenu';
 import { uploadDrugImage } from '@/lib/upload';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -133,12 +134,7 @@ export default function DrugsPage() {
         setActionMenuDrug(drug);
     };
 
-    const drugLongPressHandlers = (drug: Drug) => {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        return useLongPress(() => {
-            setActionMenuDrug(drug);
-        });
-    };
+
 
     return (
         <Container className="bg-slate-50 min-h-screen">
@@ -179,53 +175,14 @@ export default function DrugsPage() {
                     <div className="space-y-3">
                         {filteredDrugs.length > 0 ? (
                             filteredDrugs.map(drug => (
-                                <SwipeableItem
+                                <DrugListItem
                                     key={drug.id}
-                                    onEdit={() => openEditModal(drug)}
-                                    // onDelete={() => setIsDeleting(drug.id)} // Prefer context menu delete to avoid conflict
-                                    className="rounded-2xl"
-                                >
-                                    <div
-                                        className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl relative"
-                                        onContextMenu={(e) => handleContextMenu(e, drug)}
-                                        {...drugLongPressHandlers(drug)}
-                                    >
-                                        <div className="relative h-16 w-16 bg-slate-50 rounded-xl overflow-hidden flex items-center justify-center shrink-0">
-                                            {drug.image_url ? (
-                                                <img src={drug.image_url} alt={drug.name} className="h-full w-full object-cover" />
-                                            ) : (
-                                                <ImageIcon size={24} className="text-slate-300" />
-                                            )}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="font-bold text-slate-900 truncate">{drug.name}</h3>
-                                            {drug.active_ingredient && (
-                                                <p className="text-xs text-slate-500 truncate mb-1">
-                                                    {drug.active_ingredient}
-                                                </p>
-                                            )}
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <span className="text-[10px] font-bold text-slate-500 px-2 py-0.5 bg-slate-100 rounded-full uppercase tracking-wider">
-                                                    {drug.unit}
-                                                </span>
-                                                <span className="text-sm font-bold text-primary">
-                                                    {new Intl.NumberFormat('vi-VN').format(drug.unit_price)} đ
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {/* More Button */}
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setActionMenuDrug(drug);
-                                            }}
-                                            className="p-2 text-slate-300 hover:text-slate-500 rounded-full hover:bg-slate-50 transition-colors"
-                                        >
-                                            <MoreVertical size={20} />
-                                        </button>
-                                    </div>
-                                </SwipeableItem>
+                                    drug={drug}
+                                    onEdit={openEditModal}
+                                    onContextMenu={handleContextMenu}
+                                    onLongPress={setActionMenuDrug}
+                                    onMoreClick={setActionMenuDrug}
+                                />
                             ))
                         ) : (
                             <div className="text-center py-20 text-slate-400 font-medium">

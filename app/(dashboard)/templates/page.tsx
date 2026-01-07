@@ -17,7 +17,7 @@ import { useRouter } from 'next/navigation';
 import { uploadImage } from '@/lib/upload';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
-import { useLongPress } from '@/components/useLongPress';
+import TemplateListItem from '@/components/TemplateListItem';
 import { ActionMenu } from '@/components/ActionMenu';
 
 export default function TemplatesPage() {
@@ -152,12 +152,7 @@ export default function TemplatesPage() {
         setActionMenuTemplate(template);
     };
 
-    const templateLongPressHandlers = (template: any) => {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        return useLongPress(() => {
-            setActionMenuTemplate(template);
-        });
-    };
+
 
     const handleCreateOrder = (template: any) => {
         // Calculate price to show in checkout (either manual or sum)
@@ -249,91 +244,16 @@ export default function TemplatesPage() {
                         <AnimatePresence>
                             {filteredTemplates.length > 0 ? (
                                 filteredTemplates.map((template, idx) => {
-                                    const total = template.total_price !== null
-                                        ? Number(template.total_price)
-                                        : (template.items?.reduce((sum, item) => sum + ((item.custom_price || item.drugs?.unit_price || 0) * item.quantity), 0) || 0);
-
                                     return (
-                                        <motion.div
+                                        <TemplateListItem
                                             key={template.id}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, scale: 0.9 }}
-                                            transition={{ delay: idx * 0.05 }}
-                                            onClick={() => openDetail(template)}
-                                            onContextMenu={(e) => handleContextMenu(e, template)}
-                                            {...templateLongPressHandlers(template)}
-                                            className="cursor-pointer group relative"
-                                        >
-                                            <GlassCard className="h-full !p-0 overflow-hidden flex flex-col hover:border-indigo-300 transition-colors">
-                                                {/* Image Section (Top Half) */}
-                                                <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden">
-                                                    {template.image_url ? (
-                                                        <img
-                                                            src={template.image_url}
-                                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                            alt={template.name}
-                                                        />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center bg-indigo-50/50">
-                                                            <ClipboardList className="text-indigo-200" size={48} />
-                                                        </div>
-                                                    )}
-                                                    <div
-                                                        className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-lg text-xs font-bold text-slate-600 shadow-sm border border-slate-100 flex items-center gap-1"
-                                                        aria-label={`${template.items?.length || 0} loại thuốc`}
-                                                    >
-                                                        <Pill size={12} className="text-indigo-500" />
-                                                        {(template.items?.length || 0)}
-                                                    </div>
-                                                </div>
-
-                                                {/* Content Section */}
-                                                <div className="p-4 flex flex-col flex-1">
-                                                    <div className="flex-1">
-                                                        <div className="flex justify-between items-start gap-2">
-                                                            <h3 className="font-bold text-lg text-slate-800 line-clamp-2 mb-1 group-hover:text-indigo-700 transition-colors">
-                                                                {template.name}
-                                                            </h3>
-                                                            {/* More Button */}
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    setActionMenuTemplate(template);
-                                                                }}
-                                                                className="p-1 -mr-1 text-slate-300 hover:text-slate-500 rounded-full hover:bg-slate-100 transition-colors"
-                                                            >
-                                                                <MoreVertical size={18} />
-                                                            </button>
-                                                        </div>
-                                                        {template.total_price !== null && (
-                                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 uppercase tracking-wider mb-2">
-                                                                Giá thủ công
-                                                            </span>
-                                                        )}
-                                                    </div>
-
-                                                    <div className="mt-4 pt-4 border-t border-slate-50 flex justify-between items-end">
-                                                        <div className="flex -space-x-2">
-                                                            {template.items?.slice(0, 3).map((item: any, i: number) => (
-                                                                <div key={i} className="h-6 w-6 rounded-full border-2 border-white bg-slate-100 overflow-hidden">
-                                                                    {item.drugs?.image_url ? (
-                                                                        <img src={item.drugs.image_url} className="h-full w-full object-cover" />
-                                                                    ) : (
-                                                                        <div className="h-full w-full flex items-center justify-center">
-                                                                            <Pill size={10} className="text-slate-300" />
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                        <p className="text-lg font-black text-indigo-600">
-                                                            {formatCurrency(total)}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </GlassCard>
-                                        </motion.div>
+                                            template={template}
+                                            index={idx}
+                                            onClick={openDetail}
+                                            onContextMenu={handleContextMenu}
+                                            onLongPress={setActionMenuTemplate}
+                                            onMoreClick={setActionMenuTemplate}
+                                        />
                                     );
                                 })
                             ) : (
