@@ -47,11 +47,11 @@ export default function CheckoutLineItem({ item, index, onDelete, onEdit, onUpda
                 <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
                     <div>
                         <div className="flex justify-between items-start gap-2">
-                            <h3 className={`font-bold text-base ${item.type === 'template' ? 'text-indigo-900' : 'text-slate-800'} truncate leading-tight`}>
+                            <h3 className={`font-bold text-base ${item.type === 'template' ? 'text-indigo-900' : 'text-slate-800'} leading-tight`}>
                                 {item.name}
                             </h3>
                             {item.type === 'template' && (
-                                <span className="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded">
+                                <span className="text-xs bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded">
                                     {item.items?.length || 0} món
                                 </span>
                             )}

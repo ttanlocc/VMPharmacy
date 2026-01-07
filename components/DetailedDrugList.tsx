@@ -36,12 +36,11 @@ export default function DetailedDrugList({ items, className = "" }: DetailedDrug
                         )}
                     </div>
 
-                    {/* Info */}
                     <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-slate-800 truncate">
+                        <p className="text-sm font-bold text-slate-800">
                             {item.name}
                         </p>
-                        <p className="text-[10px] text-slate-500 font-medium">
+                        <p className="text-xs text-slate-500 font-medium">
                             {item.quantity} {item.unit}
                             {item.price !== undefined && (
                                 <span className="ml-1 text-slate-400">
@@ -54,7 +53,7 @@ export default function DetailedDrugList({ items, className = "" }: DetailedDrug
                     {/* Item Total */}
                     {item.price !== undefined && (
                         <div className="text-right shrink-0">
-                            <p className="text-[10px] font-bold text-slate-900">
+                            <p className="text-xs font-bold text-slate-900">
                                 {formatCurrency(item.price * item.quantity)}
                             </p>
                         </div>

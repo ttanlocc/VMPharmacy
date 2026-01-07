@@ -55,7 +55,7 @@ export default function OrderHistory() {
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <div className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold uppercase rounded-full">
+                            <div className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold uppercase rounded-full">
                                 Hoàn thành
                             </div>
                             {expandedId === order.id ? (

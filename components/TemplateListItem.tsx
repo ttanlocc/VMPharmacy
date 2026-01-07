@@ -76,19 +76,14 @@ export default function TemplateListItem({
 
                     {/* Content Section */}
                     <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-slate-900 truncate mb-1">
+                        <h3 className="font-bold text-slate-900 mb-1">
                             {template.name}
                         </h3>
                         <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-slate-500 px-2 py-0.5 bg-slate-100 rounded-full uppercase tracking-wider flex items-center gap-1">
-                                <Pill size={10} />
+                            <span className="text-xs font-bold text-slate-500 px-2 py-0.5 bg-slate-100 rounded-full uppercase tracking-wider flex items-center gap-1">
+                                <Pill size={12} />
                                 {template.items?.length || 0} thuốc
                             </span>
-                            {template.total_price !== null && (
-                                <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                                    Thủ công
-                                </span>
-                            )}
                         </div>
                     </div>
 
