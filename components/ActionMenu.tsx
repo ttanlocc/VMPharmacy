@@ -1,7 +1,6 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -47,59 +46,56 @@ export function ActionMenu({ isOpen, onClose, title, info, actions }: ActionMenu
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[80]"
+                        className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[80]"
                     />
 
-                    {/* Content - Bottom Sheet (Mobile) / Modal (Desktop) */}
-                    <div className="fixed inset-0 z-[90] pointer-events-none flex items-end sm:items-center justify-center sm:p-4">
+                    {/* Menu Content */}
+                    <div className="fixed inset-0 z-[90] pointer-events-none flex items-center justify-center p-4 sm:items-center">
                         <motion.div
-                            initial={{ y: "100%" }}
-                            animate={{ y: 0 }}
-                            exit={{ y: "100%" }}
-                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            className="w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl pointer-events-auto overflow-hidden shadow-2xl max-h-[85vh] flex flex-col"
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            transition={{ type: "spring", duration: 0.4, bounce: 0.25 }}
+                            className="w-full max-w-[260px] pointer-events-auto flex flex-col gap-3"
                         >
-                            {/* Header */}
-                            <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                                <h3 className="font-bold text-lg text-slate-800 line-clamp-1">{title}</h3>
-                                <button
-                                    onClick={onClose}
-                                    className="p-2 -mr-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors"
-                                >
-                                    <X size={20} />
-                                </button>
-                            </div>
-
-                            <div className="overflow-y-auto">
-                                {/* Info Section */}
-                                <div className="p-4 sm:p-5 space-y-3">
-                                    {info.map((item, index) => (
-                                        <div key={index} className="flex justify-between items-start gap-4">
-                                            <span className="text-sm font-medium text-slate-500 shrink-0">{item.label}</span>
-                                            <span className="text-sm font-bold text-slate-900 text-right break-words">{item.value}</span>
-                                        </div>
-                                    ))}
+                            {/* Info Section (Optional Bubble) */}
+                            {(title || (info && info.length > 0)) && (
+                                <div className="bg-zinc-800/90 backdrop-blur-xl rounded-xl overflow-hidden p-4 shadow-2xl border border-white/10">
+                                    {title && (
+                                        <h3 className="font-semibold text-white/90 text-sm mb-3 text-center border-b border-white/10 pb-2">{title}</h3>
+                                    )}
+                                    <div className="space-y-2">
+                                        {info.map((item, i) => (
+                                            <div key={i} className="flex justify-between items-center text-xs">
+                                                <span className="text-zinc-400">{item.label}</span>
+                                                <span className="text-white font-medium max-w-[60%] truncate">{item.value}</span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
+                            )}
 
-                                {/* Actions Section */}
-                                <div className="p-4 sm:p-5 pt-0 grid grid-cols-1 gap-2">
+                            {/* Actions List */}
+                            <div className="bg-zinc-800/90 backdrop-blur-xl rounded-xl overflow-hidden shadow-2xl border border-white/10">
+                                <div className="divide-y divide-white/10">
                                     {actions.map((action, index) => (
                                         <button
                                             key={index}
-                                            onClick={() => {
+                                            onClick={(e) => {
+                                                e.stopPropagation();
                                                 action.onClick();
                                                 onClose();
                                             }}
                                             className={`
-                                                w-full flex items-center gap-3 p-4 rounded-xl font-bold text-sm transition-all active:scale-[0.98]
-                                                ${action.variant === 'danger'
-                                                    ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                                                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
-                                                }
+                                                w-full flex items-center justify-between p-3.5 px-4 text-[13px] font-medium transition-colors
+                                                hover:bg-white/10 active:bg-white/20
+                                                ${action.variant === 'danger' ? 'text-red-400' : 'text-white'}
                                             `}
                                         >
-                                            <span className="shrink-0">{action.icon}</span>
-                                            {action.label}
+                                            <span>{action.label}</span>
+                                            <span className={action.variant === 'danger' ? 'text-red-400' : 'text-zinc-400'}>
+                                                {action.icon}
+                                            </span>
                                         </button>
                                     ))}
                                 </div>

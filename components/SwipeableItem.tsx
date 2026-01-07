@@ -63,52 +63,9 @@ export default function SwipeableItem({
         }
     }, [showHint, controls]);
 
-    const [showMenu, setShowMenu] = useState(false);
-    const longPressTimer = useRef<NodeJS.Timeout | null>(null);
-    const isDragging = useRef(false);
-
-    const handleTouchStart = () => {
-        isDragging.current = false;
-        longPressTimer.current = setTimeout(() => {
-            if (!isDragging.current) {
-                setShowMenu(true);
-                // Trigger haptic feedback
-                if (typeof navigator !== 'undefined' && navigator.vibrate) {
-                    navigator.vibrate(50);
-                }
-            }
-        }, 500); // 500ms for long press
-    };
-
-    const handleTouchEnd = () => {
-        if (longPressTimer.current) {
-            clearTimeout(longPressTimer.current);
-        }
-    };
-
-    const handleTouchMove = () => {
-        isDragging.current = true;
-        if (longPressTimer.current) {
-            clearTimeout(longPressTimer.current);
-        }
-    };
-
     return (
         <div
             className={cn("relative overflow-hidden group touch-pan-y select-none", className)}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-            onTouchMove={handleTouchMove}
-            onMouseDown={() => {
-                // For desktop testing
-                longPressTimer.current = setTimeout(() => setShowMenu(true), 500);
-            }}
-            onMouseUp={() => {
-                if (longPressTimer.current) clearTimeout(longPressTimer.current);
-            }}
-            onMouseLeave={() => {
-                if (longPressTimer.current) clearTimeout(longPressTimer.current);
-            }}
         >
             {/* Action Backgrounds */}
             <div className="absolute inset-0 flex items-center justify-between px-6 pointer-events-none">
@@ -144,58 +101,8 @@ export default function SwipeableItem({
                 className="relative z-10 bg-white"
             >
                 {children}
-
-                {/* Long Press Menu Overlay */}
-                <AnimatePresence>
-                    {showMenu && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="absolute inset-0 z-50 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center gap-4"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setShowMenu(false);
-                            }}
-                        >
-                            <motion.button
-                                initial={{ scale: 0.8, y: 10 }}
-                                animate={{ scale: 1, y: 0 }}
-                                exit={{ scale: 0.8, y: 10 }}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (onEdit) onEdit();
-                                    setShowMenu(false);
-                                }}
-                                className="flex flex-col items-center gap-1 text-white p-2 text-center"
-                            >
-                                <div className="w-12 h-12 bg-sky-500 rounded-full flex items-center justify-center shadow-lg shadow-sky-500/40 mb-1">
-                                    <Edit2 size={24} />
-                                </div>
-                                <span className="text-xs font-bold">Sửa</span>
-                            </motion.button>
-
-                            <motion.button
-                                initial={{ scale: 0.8, y: 10 }}
-                                animate={{ scale: 1, y: 0 }}
-                                exit={{ scale: 0.8, y: 10 }}
-                                transition={{ delay: 0.1 }}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (onDelete) onDelete();
-                                    setShowMenu(false);
-                                }}
-                                className="flex flex-col items-center gap-1 text-white p-2 text-center"
-                            >
-                                <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center shadow-lg shadow-red-500/40 mb-1">
-                                    <Trash2 size={24} />
-                                </div>
-                                <span className="text-xs font-bold">Xóa</span>
-                            </motion.button>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
             </motion.div>
         </div>
     );
 }
+
