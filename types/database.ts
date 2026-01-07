@@ -62,6 +62,7 @@ export interface Database {
                     user_id: string | null
                     total_price: number | null
                     image_url: string | null
+                    note: string | null
                     deleted_at: string | null
                     created_at: string
                 }
@@ -71,6 +72,7 @@ export interface Database {
                     user_id?: string | null
                     total_price?: number | null
                     image_url?: string | null
+                    note?: string | null
                     deleted_at?: string | null
                     created_at?: string
                 }
@@ -80,6 +82,7 @@ export interface Database {
                     user_id?: string | null
                     total_price?: number | null
                     image_url?: string | null
+                    note?: string | null
                     deleted_at?: string | null
                     created_at?: string
                 }

@@ -15,6 +15,8 @@ import { formatCurrency } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { uploadImage } from '@/lib/upload';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
 
 export default function TemplatesPage() {
     const router = useRouter();
@@ -31,6 +33,7 @@ export default function TemplatesPage() {
     const [selectedDrugs, setSelectedDrugs] = useState<any[]>([]);
     const [manualPrice, setManualPrice] = useState<number | undefined>(undefined);
     const [imageUrl, setImageUrl] = useState('');
+    const [note, setNote] = useState('');
     const [isUploading, setIsUploading] = useState(false);
 
     const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -45,6 +48,7 @@ export default function TemplatesPage() {
         setSelectedDrugs([]);
         setManualPrice(undefined);
         setImageUrl('');
+        setNote('');
         setEditingTemplateId(null);
     };
 
@@ -67,6 +71,7 @@ export default function TemplatesPage() {
         })));
         setManualPrice(template.total_price !== null ? Number(template.total_price) : undefined);
         setImageUrl(template.image_url || '');
+        setNote(template.note || '');
         setIsModalOpen(true);
         setIsDetailModalOpen(false); // Close detail modal if open
     };
@@ -85,7 +90,8 @@ export default function TemplatesPage() {
                 note: d.note
             })),
             total_price: manualPrice,
-            image_url: imageUrl
+            image_url: imageUrl,
+            note
         };
 
         try {
@@ -93,7 +99,7 @@ export default function TemplatesPage() {
                 await updateTemplate(editingTemplateId, templateData);
                 toast.success('Cập nhật đơn mẫu thành công');
             } else {
-                await addTemplate(templateData.name, templateData.items, templateData.total_price, templateData.image_url);
+                await addTemplate(templateData.name, templateData.items, templateData.total_price, templateData.image_url, templateData.note);
                 toast.success('Tạo đơn mẫu thành công');
             }
             setIsModalOpen(false);
@@ -189,12 +195,12 @@ export default function TemplatesPage() {
                 {/* Search */}
                 <div className="relative">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                    <input
+                    <Input
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Tìm kiếm đơn mẫu..."
-                        className="w-full pl-12 pr-4 py-4 bg-white border border-slate-100 rounded-2xl shadow-sm outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                        className="pl-12"
                     />
                 </div>
 
@@ -346,11 +352,10 @@ export default function TemplatesPage() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Tên đơn mẫu</label>
-                                    <input
+                                    <Input
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                         placeholder="VD: Combo Cảm Cúm"
-                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
                                     />
                                 </div>
                                 <div>
@@ -358,21 +363,34 @@ export default function TemplatesPage() {
                                         Giá bán (đ) <span className="text-slate-500 font-normal">- Tùy chọn</span>
                                     </label>
                                     <div className="relative">
-                                        <input
+                                        <Input
                                             type="number"
                                             value={manualPrice === undefined ? '' : manualPrice}
                                             onChange={(e) => setManualPrice(e.target.value ? Number(e.target.value) : undefined)}
-                                            placeholder={'Tổng gốc: ' + formatCurrency(currentDrugsSum)}
-                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-indigo-600"
+                                            placeholder={'Tổng: ' + formatCurrency(currentDrugsSum)}
+                                            className="font-bold text-indigo-600"
                                         />
                                         <button
                                             onClick={() => setManualPrice(currentDrugsSum)}
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold bg-indigo-100 text-indigo-600 px-2 py-1 rounded-lg hover:bg-indigo-200 transition-colors"
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold bg-indigo-100 text-indigo-600 px-2 py-1 rounded-lg hover:bg-indigo-200 transition-colors z-10"
                                         >
                                             AUTO
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+
+                            {/* Note Field - NEW */}
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">
+                                    Ghi chú <span className="text-slate-400 font-normal">(tùy chọn)</span>
+                                </label>
+                                <Textarea
+                                    value={note}
+                                    onChange={(e) => setNote(e.target.value)}
+                                    placeholder="VD: Hỏi dị ứng, không dùng cho bà bầu..."
+                                    rows={2}
+                                />
                             </div>
 
                             {/* Drugs List */}

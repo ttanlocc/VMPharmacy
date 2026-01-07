@@ -43,7 +43,7 @@ export function useTemplates() {
         fetchTemplates();
     }, []);
 
-    const addTemplate = async (name: string, items: any[], totalPrice?: number, imageUrl?: string) => {
+    const addTemplate = async (name: string, items: any[], totalPrice?: number, imageUrl?: string, note?: string) => {
         const { data: { user } } = await supabase.auth.getUser();
 
         // 1. Create template
@@ -52,7 +52,8 @@ export function useTemplates() {
                 name,
                 user_id: user?.id,
                 total_price: totalPrice || null,
-                image_url: imageUrl || null
+                image_url: imageUrl || null,
+                note: note || null
             } as any)
             .select()
             .single();
@@ -88,12 +89,13 @@ export function useTemplates() {
         setTemplates(templates.filter(t => t.id !== id));
     };
 
-    const updateTemplate = async (id: string, updates: { name?: string, items?: any[], total_price?: number, image_url?: string }) => {
+    const updateTemplate = async (id: string, updates: { name?: string, items?: any[], total_price?: number, image_url?: string, note?: string }) => {
         const { error: tError } = await (supabase.from('templates') as any)
             .update({
                 name: updates.name,
                 total_price: updates.total_price || null,
-                image_url: updates.image_url || null
+                image_url: updates.image_url || null,
+                note: updates.note || null
             } as any)
             .eq('id', id);
 

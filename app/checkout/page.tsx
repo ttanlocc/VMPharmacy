@@ -16,6 +16,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useOrders } from '@/hooks/useOrders';
 import { useCheckout, CheckoutItem } from '@/app/context/CheckoutContext';
 import { supabase } from '@/lib/supabase';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
 
 function CheckoutContent() {
     const searchParams = useSearchParams();
@@ -41,6 +43,7 @@ function CheckoutContent() {
     const [isSuccess, setIsSuccess] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isCustomerPickerOpen, setIsCustomerPickerOpen] = useState(false);
+    const [activeTemplate, setActiveTemplate] = useState<{ name: string; note: string | null } | null>(null);
 
     // Legacy loading logic for direct URL access
     useEffect(() => {
@@ -53,6 +56,16 @@ function CheckoutContent() {
                 }
 
                 if (templateIdParam) {
+                    const { data: templateData } = await supabase
+                        .from('templates')
+                        .select('name, note')
+                        .eq('id', templateIdParam)
+                        .single();
+
+                    if (templateData) {
+                        setActiveTemplate(templateData);
+                    }
+
                     const { data } = await supabase
                         .from('template_items')
                         .select('*, drugs(*)')
@@ -240,6 +253,18 @@ function CheckoutContent() {
                                     <User size={14} className="fill-indigo-700" />
                                     <span className="text-sm font-bold">{customer.name}</span>
                                 </div>
+                            ) : activeTemplate ? (
+                                <div className="flex flex-col">
+                                    <div className="flex items-center gap-2 px-3 py-1 bg-sky-50 text-sky-700 rounded-lg w-fit">
+                                        <FileText size={14} className="fill-sky-700" />
+                                        <span className="text-sm font-bold">{activeTemplate.name}</span>
+                                    </div>
+                                    {activeTemplate.note && (
+                                        <p className="text-xs text-amber-600 font-bold mt-1 flex items-center gap-1">
+                                            ⚠️ {activeTemplate.note}
+                                        </p>
+                                    )}
+                                </div>
                             ) : (
                                 <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 text-slate-500 rounded-lg">
                                     <User size={14} />
@@ -278,10 +303,10 @@ function CheckoutContent() {
                                         className="rounded-2xl"
                                         showHint={index === 0}
                                     >
-                                        <div className={`flex flex-col sm:flex-row gap-4 p-4 ${item.type === 'template' ? 'bg-indigo-50/50 border-indigo-100' : 'bg-white border-slate-100'} border rounded-2xl relative overflow-hidden`}>
+                                        <div className={`flex gap-3 p-3 ${item.type === 'template' ? 'bg-indigo-50/50 border-indigo-100' : 'bg-white border-slate-100'} border rounded-2xl relative overflow-hidden`}>
                                             {/* Item Content */}
-                                            <div className="flex items-center gap-4 w-full">
-                                                <div className="h-20 w-20 bg-white rounded-xl flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-slate-100 relative">
+                                            <div className="flex items-start gap-3 w-full">
+                                                <div className="h-12 w-12 bg-white rounded-lg flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-slate-100 relative mt-0.5">
                                                     {item.image || item.image_url ? (
                                                         <img
                                                             src={item.image || item.image_url || ''}
@@ -290,49 +315,48 @@ function CheckoutContent() {
                                                             loading="lazy"
                                                         />
                                                     ) : (
-                                                        item.type === 'template' ? <ClipboardList size={32} className="text-indigo-400" /> : <Pill size={32} className="text-slate-300" />
+                                                        item.type === 'template' ? <ClipboardList size={24} className="text-indigo-400" /> : <Pill size={24} className="text-slate-300" />
                                                     )}
                                                 </div>
-                                                <div className="flex-1">
-                                                    <h3 className={`font-bold ${item.type === 'template' ? 'text-indigo-900' : 'text-slate-800'} text-base`}>{item.name}</h3>
-                                                    <div className="flex items-center gap-2 mt-1">
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className={`font-bold ${item.type === 'template' ? 'text-indigo-900' : 'text-slate-800'} text-sm truncate`}>{item.name}</h3>
+                                                    <div className="flex items-center gap-2">
                                                         <p className="text-sm font-bold text-primary flex items-center gap-1">
                                                             {formatCurrency(item.price)}
                                                         </p>
-                                                        <span className="text-xs text-slate-500 font-medium">/ {item.type === 'template' ? 'đơn' : item.unit}</span>
+                                                        <span className="text-[10px] text-slate-500 font-medium">/ {item.type === 'template' ? 'đơn' : item.unit}</span>
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); openPriceEditor(index); }}
                                                             className="p-1 text-slate-400 hover:text-sky-500 transition-colors"
                                                         >
-                                                            <Edit3 size={16} />
+                                                            <Edit3 size={14} />
                                                         </button>
                                                     </div>
 
-                                                    {/* Template Sub-items List (Requested: Show list only, no individual prices) */}
+                                                    {/* Template Sub-items List */}
                                                     {item.type === 'template' && item.items && (
-                                                        <div className="mt-2 pl-3 border-l-2 border-indigo-200">
-                                                            <p className="text-[10px] font-bold text-indigo-500 uppercase mb-1">Gồm {item.items.length} loại thuốc:</p>
-                                                            <ul className="text-xs text-slate-600 font-medium space-y-1">
+                                                        <div className="mt-1.5 pl-2 border-l-2 border-indigo-200">
+                                                            <ul className="text-[10px] text-slate-600 font-medium space-y-0.5">
                                                                 {item.items.map((sub, i) => (
                                                                     <li key={i} className="flex justify-between">
-                                                                        <span>• {sub.name}</span>
-                                                                        <span className="font-bold text-slate-500">x{sub.quantity} {sub.unit}</span>
+                                                                        <span className="truncate mr-2">• {sub.name}</span>
+                                                                        <span className="font-bold text-slate-500 shrink-0">x{sub.quantity}</span>
                                                                     </li>
                                                                 ))}
                                                             </ul>
                                                         </div>
                                                     )}
                                                 </div>
-                                                <div className="flex flex-col items-end gap-2 shrink-0">
-                                                    <div className="flex items-center bg-white rounded-xl border border-slate-200 px-1 py-1 shadow-sm">
+                                                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                                    <div className="flex items-center bg-white rounded-lg border border-slate-200 px-0.5 py-0.5 shadow-sm">
                                                         <button
                                                             onClick={() => handleUpdateQuantity(index, -1)}
-                                                            className="w-8 h-8 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600 transition-colors"
+                                                            className="w-6 h-6 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600 transition-colors text-xs"
                                                         >-</button>
-                                                        <span className="w-8 text-center font-black text-sm text-slate-900">{item.quantity}</span>
+                                                        <span className="w-6 text-center font-black text-xs text-slate-900">{item.quantity}</span>
                                                         <button
                                                             onClick={() => handleUpdateQuantity(index, 1)}
-                                                            className="w-8 h-8 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600 transition-colors"
+                                                            className="w-6 h-6 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600 transition-colors text-xs"
                                                         >+</button>
                                                     </div>
                                                     <span className="text-sm font-black text-slate-900">{formatCurrency(item.price * item.quantity)}</span>
@@ -466,11 +490,11 @@ function CheckoutContent() {
 
                                 <div className="mb-6">
                                     <p className="text-sm font-bold text-slate-500 mb-2">Giá mới (VNĐ)</p>
-                                    <input
+                                    <Input
                                         type="number"
                                         value={editPriceValue}
                                         onChange={(e) => setEditPriceValue(e.target.value)}
-                                        className="w-full text-3xl font-black text-primary border-b-2 border-primary/20 focus:border-primary outline-none py-2 bg-transparent"
+                                        className="text-3xl font-black text-primary border-b-2 border-primary/20 focus:border-primary outline-none py-2 bg-transparent"
                                         placeholder="0"
                                         autoFocus
                                     />

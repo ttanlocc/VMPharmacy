@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useDrugs, Drug } from '@/hooks/useDrugs';
 import { useDrugGroups } from '@/hooks/useDrugGroups';
-import DrugCard from './DrugCard';
+import { DrugItem } from './DrugItem';
+import { Input } from './ui/Input';
 import LoadingSpinner from './LoadingSpinner';
 import { Search, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -53,12 +54,12 @@ export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProp
                     <div className="px-6 py-4 shrink-0 space-y-3">
                         <div className="relative">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                            <input
+                            <Input
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="Tìm tên thuốc..."
-                                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all"
+                                className="pl-12"
                             />
                         </div>
 
@@ -97,20 +98,19 @@ export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProp
                         {loading ? (
                             <LoadingSpinner className="mt-20" label="Đang tải danh mục thuốc..." />
                         ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                 {filteredDrugs.length > 0 ? (
                                     filteredDrugs.map(drug => (
-                                        <DrugCard
+                                        <DrugItem
                                             key={drug.id}
                                             drug={drug}
                                             onClick={() => {
                                                 onSelect(drug);
-                                                onClose();
                                             }}
                                         />
                                     ))
                                 ) : (
-                                    <div className="col-span-2 text-center py-20 text-slate-400">
+                                    <div className="col-span-full text-center py-20 text-slate-400">
                                         Không tìm thấy thuốc nào khớp với "{search}"
                                     </div>
                                 )}

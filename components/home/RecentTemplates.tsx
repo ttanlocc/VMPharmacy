@@ -73,6 +73,11 @@ export default function RecentTemplates() {
                                         )}
                                     </div>
                                     <h3 className="font-bold text-slate-800 text-sm line-clamp-2 leading-tight">{template.name}</h3>
+                                    {template.note && (
+                                        <p className="text-[10px] text-slate-500 truncate mt-1">
+                                            {template.note}
+                                        </p>
+                                    )}
                                 </div>
                                 <div className="flex items-center justify-between mt-2">
                                     <span className="text-xs font-bold text-slate-500">
