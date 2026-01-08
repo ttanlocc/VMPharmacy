@@ -6,9 +6,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Plus, ShoppingBag, Trash2, CheckCircle2, FileText, User, X, Save, ClipboardList } from 'lucide-react';
 import Container from '@/components/Container';
-import DrugPicker from '@/components/DrugPicker';
+import AddItemModal from '@/components/AddItemModal';
 import CustomerPicker from '@/components/CustomerPicker';
-import TemplatePicker from '@/components/TemplatePicker';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import CheckoutLineItem from '@/components/CheckoutLineItem';
 import SaveTemplateModal from '@/components/SaveTemplateModal';
@@ -39,8 +38,8 @@ function CheckoutContent() {
         saveAsTemplate
     } = useCheckout();
 
-    const [isPickerOpen, setIsPickerOpen] = useState(false);
-    const [isTemplatePickerOpen, setIsTemplatePickerOpen] = useState(false);
+    const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
+    const [addItemInitialTab, setAddItemInitialTab] = useState<'drug' | 'template'>('drug');
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
 
     const [isSuccess, setIsSuccess] = useState(false);
@@ -99,20 +98,7 @@ function CheckoutContent() {
     const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
     const [editPriceValue, setEditPriceValue] = useState<string>('');
 
-    const handleAddDrug = (drug: any) => {
-        addItem({
-            drug_id: drug.id,
-            name: drug.name,
-            unit: drug.unit,
-            price: drug.unit_price,
-            image: drug.image_url,
-            quantity: 1,
-            note: '',
-            type: 'drug'
-        });
-        setIsPickerOpen(false); // Close after select
-        toast.success(`Đã thêm ${drug.name}`);
-    };
+
 
     const handleUpdateQuantity = (index: number, delta: number) => {
         const item = items[index];
@@ -176,29 +162,7 @@ function CheckoutContent() {
         }
     };
 
-    const handleAddTemplateItems = (newItems: any[], template: any) => {
-        // Create a single "Template Item"
-        // Calculate the initial total price for the template (either manual override or sum of parts)
-        const templateTotal = template.total_price !== null ? Number(template.total_price) : newItems.reduce((acc, i) => acc + (i.price * i.quantity), 0);
 
-        const templateItem: CheckoutItem = {
-            name: template.name,
-            price: templateTotal,
-            quantity: 1,
-            type: 'template',
-            template_id: template.id,
-            image_url: template.image_url,
-            // Store the raw items so we can expand them later or show them
-            items: newItems.map(i => ({
-                drug_id: i.drug_id,
-                name: i.name,
-                quantity: i.quantity,
-                unit: i.unit
-            }))
-        };
-
-        addItem(templateItem);
-    };
 
     const handleSaveTemplate = async (name: string, price: number, note?: string) => {
         try {
@@ -308,14 +272,20 @@ function CheckoutContent() {
                         {/* Action Row - COMPACT GRID */}
                         <div className="grid grid-cols-3 gap-3">
                             <button
-                                onClick={() => setIsPickerOpen(true)}
+                                onClick={() => {
+                                    setAddItemInitialTab('drug');
+                                    setIsAddItemModalOpen(true);
+                                }}
                                 className="w-full py-3 bg-white border border-slate-200 rounded-xl flex flex-col items-center justify-center gap-1 text-slate-700 font-bold shadow-sm hover:bg-slate-50 active:scale-95 transition-all"
                             >
                                 <Plus size={20} className="text-primary" />
                                 <span className="text-xs">Thêm thuốc</span>
                             </button>
                             <button
-                                onClick={() => setIsTemplatePickerOpen(true)}
+                                onClick={() => {
+                                    setAddItemInitialTab('template');
+                                    setIsAddItemModalOpen(true);
+                                }}
                                 className="w-full py-3 bg-white border border-slate-200 rounded-xl flex flex-col items-center justify-center gap-1 text-slate-700 font-bold shadow-sm hover:bg-slate-50 active:scale-95 transition-all"
                             >
                                 <ClipboardList size={20} className="text-blue-500" />
@@ -457,16 +427,10 @@ function CheckoutContent() {
                     )}
                 </AnimatePresence>
 
-                <DrugPicker
-                    isOpen={isPickerOpen}
-                    onClose={() => setIsPickerOpen(false)}
-                    onSelect={handleAddDrug}
-                />
-
-                <TemplatePicker
-                    isOpen={isTemplatePickerOpen}
-                    onClose={() => setIsTemplatePickerOpen(false)}
-                    onSelect={handleAddTemplateItems}
+                <AddItemModal
+                    isOpen={isAddItemModalOpen}
+                    onClose={() => setIsAddItemModalOpen(false)}
+                    initialTab={addItemInitialTab}
                 />
 
                 <SaveTemplateModal
