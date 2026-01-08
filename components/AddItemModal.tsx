@@ -28,7 +28,8 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
         }
     }, [isOpen, initialTab]);
 
-    const { items, addItem, removeItem, total } = useCheckout();
+    const { items, addItem, removeItem } = useCheckout();
+    const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const [showCartPreview, setShowCartPreview] = useState(false);
 
     // --- Drug Logic ---
