@@ -4,7 +4,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Plus, ShoppingBag, Trash2, CheckCircle2, FileText, User, X, Save, ClipboardList } from 'lucide-react';
+import { ArrowLeft, Plus, ShoppingBag, Trash2, CheckCircle2, FileText, User, X, Save, ClipboardList, History, ChevronDown, Clock, Pill } from 'lucide-react';
 import Container from '@/components/Container';
 import AddItemModal from '@/components/AddItemModal';
 import CustomerPicker from '@/components/CustomerPicker';
@@ -13,10 +13,12 @@ import CheckoutLineItem from '@/components/CheckoutLineItem';
 import SaveTemplateModal from '@/components/SaveTemplateModal';
 import { formatCurrency } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useOrders } from '@/hooks/useOrders';
+import { useOrders, Order } from '@/hooks/useOrders';
 import { useCheckout, CheckoutItem } from '@/app/context/CheckoutContext';
 import { supabase } from '@/lib/supabase';
 import { Input } from '@/components/ui/Input';
+import { formatDistanceToNow } from 'date-fns';
+import { vi } from 'date-fns/locale';
 
 function CheckoutContent() {
     const searchParams = useSearchParams();
@@ -46,6 +48,11 @@ function CheckoutContent() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isCustomerPickerOpen, setIsCustomerPickerOpen] = useState(false);
     const [activeTemplate, setActiveTemplate] = useState<{ name: string; note: string | null } | null>(null);
+
+    // Quick Reorder State
+    const [isReorderOpen, setIsReorderOpen] = useState(false);
+    const [reorderHistory, setReorderHistory] = useState<Order[]>([]);
+    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
     // Legacy loading logic for direct URL access
     useEffect(() => {
@@ -93,6 +100,62 @@ function CheckoutContent() {
         };
         loadInitialState();
     }, [templateIdParam, customerIdParam]); // Only runs on mount/param change if empty
+
+    // Fetch order history when customer is set (for Quick Reorder)
+    useEffect(() => {
+        const fetchHistory = async () => {
+            if (customer?.id) {
+                setIsLoadingHistory(true);
+                try {
+                    const res = await fetch(`/api/orders?customerId=${customer.id}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        setReorderHistory(data.slice(0, 5)); // Last 5 orders
+                    }
+                } catch (e) {
+                    console.error('Failed to fetch history', e);
+                } finally {
+                    setIsLoadingHistory(false);
+                }
+            } else {
+                setReorderHistory([]);
+            }
+        };
+        fetchHistory();
+    }, [customer?.id]);
+
+    // Handle Quick Reorder
+    const handleReorder = async (order: Order) => {
+        const loadingToast = toast.loading('Đang tải đơn...');
+        try {
+            const drugIds = order.order_items.map(oi => oi.drug_id).filter((id): id is string => !!id);
+            const { data: currentDrugs } = await supabase.from('drugs').select('*').in('id', drugIds);
+            const typedDrugs = (currentDrugs as any[]) || [];
+            const drugMap = new Map<string, any>(typedDrugs.map(d => [d.id, d]));
+
+            const newItems: CheckoutItem[] = order.order_items.map(oi => {
+                const currentDrug = oi.drug_id ? drugMap.get(oi.drug_id) : null;
+                return {
+                    name: currentDrug?.name || oi.drugs?.name || 'Thuốc',
+                    price: currentDrug?.unit_price || oi.unit_price,
+                    quantity: oi.quantity,
+                    type: 'drug',
+                    drug_id: oi.drug_id!,
+                    unit: currentDrug?.unit || oi.drugs?.unit || '',
+                    image: currentDrug?.image_url || oi.drugs?.image_url || null,
+                    note: oi.note || ''
+                };
+            });
+
+            clearCheckout();
+            if (customer) setCustomer(customer);
+            addItems(newItems);
+            setIsReorderOpen(false);
+            toast.success('Đã tải lại đơn!', { id: loadingToast });
+        } catch (error) {
+            toast.error('Không thể tải đơn', { id: loadingToast });
+        }
+    };
 
     // Price Edit Modal State
     const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
@@ -242,6 +305,69 @@ function CheckoutContent() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* LEFT COLUMN: Item List */}
                     <div className="lg:col-span-8 space-y-3">
+                        {/* Quick Reorder Section (for returning customers) */}
+                        {customer && reorderHistory.length > 0 && (
+                            <div className="bg-gradient-to-br from-indigo-50 to-sky-50 rounded-2xl border border-indigo-100 overflow-hidden">
+                                <button
+                                    onClick={() => setIsReorderOpen(!isReorderOpen)}
+                                    className="w-full flex items-center justify-between p-4 text-left"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center">
+                                            <History size={20} />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-slate-800">Mua lại đơn cũ</p>
+                                            <p className="text-xs text-slate-500">{reorderHistory.length} đơn gần nhất</p>
+                                        </div>
+                                    </div>
+                                    <ChevronDown size={20} className={`text-slate-400 transition-transform ${isReorderOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                                <AnimatePresence>
+                                    {isReorderOpen && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            className="overflow-hidden"
+                                        >
+                                            <div className="p-4 pt-0 space-y-2">
+                                                {reorderHistory.map((order) => (
+                                                    <div
+                                                        key={order.id}
+                                                        onClick={() => handleReorder(order)}
+                                                        className="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-100 cursor-pointer hover:border-indigo-200 hover:shadow-sm transition-all active:scale-[0.98]"
+                                                    >
+                                                        <div className="flex -space-x-2">
+                                                            {order.order_items.slice(0, 2).map((oi, i) => (
+                                                                <div key={i} className="h-8 w-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center overflow-hidden">
+                                                                    {oi.drugs?.image_url ? (
+                                                                        <img src={oi.drugs.image_url} alt="" className="w-full h-full object-cover" />
+                                                                    ) : (
+                                                                        <Pill size={12} className="text-slate-400" />
+                                                                    )}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-bold text-slate-800 truncate">
+                                                                {order.order_items.map(oi => oi.drugs?.name).filter(Boolean).join(', ') || 'Đơn hàng'}
+                                                            </p>
+                                                            <div className="flex items-center gap-2 text-[10px] text-slate-500">
+                                                                <Clock size={10} />
+                                                                {formatDistanceToNow(new Date(order.created_at), { addSuffix: true, locale: vi })}
+                                                            </div>
+                                                        </div>
+                                                        <span className="text-xs font-black text-indigo-600">{formatCurrency(order.total_price)}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        )}
+
                         <AnimatePresence mode="popLayout">
                             {items.map((item, index) => (
                                 <motion.div
