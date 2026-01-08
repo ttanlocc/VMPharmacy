@@ -44,6 +44,17 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
         return matchesSearch && matchesGroup;
     });
 
+
+    // Helper to get quantity in cart
+    const getQuantityInCart = (id: string, type: 'drug' | 'template') => {
+        return items
+            .filter(item => {
+                if (type === 'drug') return item.type === 'drug' && item.drug_id === id;
+                return item.type === 'template' && item.template_id === id;
+            })
+            .reduce((sum, item) => sum + item.quantity, 0);
+    };
+
     const handleAddDrug = (drug: any) => {
         addItem({
             drug_id: drug.id,
@@ -53,6 +64,7 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
             image: drug.image_url,
             quantity: 1,
             note: '',
+            /* @ts-ignore */
             type: 'drug'
         });
         // Feedback?
@@ -89,9 +101,12 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
             name: template.name,
             price: templateTotal,
             quantity: 1,
+            /* @ts-ignore */
             type: 'template',
             template_id: template.id,
             image_url: template.image_url,
+            // Use 'Combo' or empty string for unit if not available
+            unit: 'Combo',
             items: template.items?.map((i: any) => ({
                 drug_id: i.drug_id,
                 name: i.drugs?.name || '',
@@ -213,6 +228,7 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                                 <DrugItem
                                                     key={drug.id}
                                                     drug={drug}
+                                                    quantity={getQuantityInCart(drug.id, 'drug')}
                                                     onClick={() => handleAddDrug(drug)}
                                                 />
                                             )) : (
@@ -262,6 +278,11 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                                                 <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-lg self-start">
                                                                     {template.items?.length || 0} món
                                                                 </span>
+                                                                {getQuantityInCart(template.id, 'template') > 0 && (
+                                                                    <span className="text-[10px] font-bold bg-blue-100 text-blue-600 px-2 py-1 rounded-lg self-start">
+                                                                        x{getQuantityInCart(template.id, 'template')}
+                                                                    </span>
+                                                                )}
                                                                 {isExpanded ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
                                                             </div>
                                                         </div>
@@ -362,7 +383,9 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                                         </div>
                                                         <div>
                                                             <div className="font-bold text-slate-800 text-sm line-clamp-1">{item.name}</div>
-                                                            <div className="text-xs text-slate-400">{item.unit} x {item.quantity}</div>
+                                                            <div className="text-xs text-slate-400">
+                                                                {item.unit ? item.unit : ''} x {item.quantity}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-3">
