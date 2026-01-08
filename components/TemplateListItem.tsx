@@ -126,6 +126,12 @@ export default function TemplateListItem({
                             className="overflow-hidden"
                         >
                             <div className="px-4 pb-4 pt-1 border-t border-slate-50">
+                                {template.note && (
+                                    <div className="mb-3 p-3 bg-amber-50 text-amber-700 text-xs rounded-xl flex gap-2 items-start border border-amber-100">
+                                        <div className="mt-0.5 shrink-0">📝</div>
+                                        <p className="font-medium">{template.note}</p>
+                                    </div>
+                                )}
                                 <DetailedDrugList
                                     items={template.items?.map((item: any) => ({
                                         name: item.drugs?.name || 'Thuốc đã xóa',

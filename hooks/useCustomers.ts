@@ -60,5 +60,29 @@ export function useCustomers() {
         error,
         searchCustomers: fetchCustomers,
         createCustomer,
+        updateCustomer: async (customer: Customer) => {
+            setLoading(true);
+            try {
+                const res = await fetch('/api/customers', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(customer),
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.error || 'Failed to update customer');
+                }
+
+                const data = await res.json();
+                setCustomers(prev => prev.map(c => c.id === data.id ? data : c));
+                return data;
+            } catch (err: any) {
+                setError(err.message);
+                throw err;
+            } finally {
+                setLoading(false);
+            }
+        },
     };
 }

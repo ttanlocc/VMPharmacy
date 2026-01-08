@@ -32,7 +32,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, items, image_url, total_price } = await request.json();
+    const { name, items, image_url, total_price, note } = await request.json();
 
     // 1. Create Template
     const { data: template, error: templateError } = await supabase
@@ -41,7 +41,8 @@ export async function POST(request: Request) {
             name,
             user_id: user.id,
             image_url: image_url || null,
-            total_price: total_price || null
+            total_price: total_price || null,
+            note: note || null
         } as any)
         .select()
         .single();

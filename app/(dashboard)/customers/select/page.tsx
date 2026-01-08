@@ -3,16 +3,19 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCustomers } from '@/hooks/useCustomers';
-import { Search, Plus, User, ArrowLeft, Loader2, Check, Phone } from 'lucide-react';
+import { Search, Plus, User, ArrowLeft, Loader2, Check, Phone, Edit3 } from 'lucide-react';
 import Container from '@/components/Container';
+import toast from 'react-hot-toast'; // Assuming toast is available, if not I'll standard alert or just error handle
+// Actually, let's use toast if it's in layout, which it is.
 import { motion, AnimatePresence } from 'framer-motion';
 import GlassCard from '@/components/ui/GlassCard';
 
 export default function CustomerSelectPage() {
     const router = useRouter();
-    const { customers, loading, searchCustomers, createCustomer } = useCustomers();
+    const { customers, loading, searchCustomers, createCustomer, updateCustomer } = useCustomers();
     const [query, setQuery] = useState('');
     const [isCreating, setIsCreating] = useState(false);
+    const [editingCustomer, setEditingCustomer] = useState<any | null>(null);
 
     // New Customer Form
     const [newName, setNewName] = useState('');
@@ -22,29 +25,73 @@ export default function CustomerSelectPage() {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (!isCreating) {
+            if (!isCreating && !editingCustomer) {
                 searchCustomers(query);
             }
         }, 500);
         return () => clearTimeout(timer);
-    }, [query, isCreating, searchCustomers]);
+    }, [query, isCreating, editingCustomer, searchCustomers]);
 
     const handleSelect = (customer: any) => {
         router.push(`/checkout/new?customerId=${customer.id}`);
     };
 
-    const handleCreateWrapper = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const customer = await createCustomer({
-            name: newName,
-            phone: newPhone,
-            birth_year: newYear ? parseInt(newYear) : null,
-            medical_history: newHistory || null
-        });
+    const openEditModal = (customer: any) => {
+        setEditingCustomer(customer);
+        setNewName(customer.name);
+        setNewPhone(customer.phone);
+        setNewYear(customer.birth_year ? String(customer.birth_year) : '');
+        setNewHistory(customer.medical_history || '');
+    };
 
-        if (customer) {
-            handleSelect(customer);
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            if (editingCustomer) {
+                // Update
+                const updated = await updateCustomer({
+                    id: editingCustomer.id,
+                    name: newName,
+                    phone: newPhone,
+                    birth_year: newYear ? parseInt(newYear) : null,
+                    medical_history: newHistory || null
+                });
+                toast.success('Cập nhật thành công');
+                // Don't auto select on edit, just close modal
+                setEditingCustomer(null);
+                resetForm();
+            } else {
+                // Create
+                const customer = await createCustomer({
+                    name: newName,
+                    phone: newPhone,
+                    birth_year: newYear ? parseInt(newYear) : null,
+                    medical_history: newHistory || null
+                });
+
+                if (customer) {
+                    toast.success('Đã thêm khách hàng');
+                    handleSelect(customer); // Select immediately on create
+                }
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Có lỗi xảy ra');
         }
+    };
+
+    const resetForm = () => {
+        setNewName('');
+        setNewPhone('');
+        setNewYear('');
+        setNewHistory('');
+    };
+
+    const isFormOpen = isCreating || !!editingCustomer;
+
+    const closeForm = () => {
+        setIsCreating(false);
+        setEditingCustomer(null);
+        resetForm();
     };
 
     return (
@@ -62,7 +109,7 @@ export default function CustomerSelectPage() {
                 </div>
             </div>
 
-            {!isCreating ? (
+            {!isFormOpen ? (
                 <div className="space-y-6">
                     {/* Search */}
                     <div className="relative">
@@ -81,7 +128,10 @@ export default function CustomerSelectPage() {
 
                     {/* New Customer Button */}
                     <button
-                        onClick={() => setIsCreating(true)}
+                        onClick={() => {
+                            resetForm();
+                            setIsCreating(true);
+                        }}
                         className="w-full py-4 bg-white border-2 border-dashed border-sky-200 text-sky-600 rounded-2xl font-bold hover:bg-sky-50 hover:border-sky-300 transition-all flex items-center justify-center gap-2"
                     >
                         <Plus size={20} /> Thêm khách hàng mới
@@ -95,11 +145,11 @@ export default function CustomerSelectPage() {
                                     key={c.id}
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    whileTap={{ scale: 0.98 }}
+                                    className="group relative"
                                 >
-                                    <button
+                                    <div
                                         onClick={() => handleSelect(c)}
-                                        className="w-full flex items-center gap-4 p-4 bg-white/60 backdrop-blur rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:bg-white hover:border-sky-200 transition-all group text-left"
+                                        className="w-full flex items-center gap-4 p-4 bg-white/60 backdrop-blur rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:bg-white hover:border-sky-200 transition-all cursor-pointer"
                                     >
                                         <div className="h-12 w-12 bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500 rounded-2xl flex items-center justify-center shrink-0 font-black text-lg group-hover:from-sky-100 group-hover:to-blue-100 group-hover:text-sky-600 transition-colors">
                                             {c.name.charAt(0).toUpperCase()}
@@ -111,10 +161,22 @@ export default function CustomerSelectPage() {
                                                 {c.phone}
                                             </div>
                                         </div>
-                                        <div className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-300 group-hover:border-sky-200 group-hover:bg-sky-50 group-hover:text-sky-500 transition-all">
-                                            <Check size={20} />
+
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openEditModal(c);
+                                                }}
+                                                className="h-10 w-10 rounded-full bg-slate-100 text-slate-400 hover:bg-sky-100 hover:text-sky-500 flex items-center justify-center transition-colors"
+                                            >
+                                                <Edit3 size={18} />
+                                            </button>
+                                            <div className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-300 group-hover:border-sky-200 group-hover:bg-sky-50 group-hover:text-sky-500 transition-all">
+                                                <Check size={20} />
+                                            </div>
                                         </div>
-                                    </button>
+                                    </div>
                                 </motion.div>
                             ))
                         ) : (
@@ -127,14 +189,16 @@ export default function CustomerSelectPage() {
                     </div>
                 </div>
             ) : (
-                /* Create Customer Form */
+                /* Create/Edit Customer Form */
                 <GlassCard className="!p-6">
-                    <form onSubmit={handleCreateWrapper} className="space-y-4">
+                    <form onSubmit={handleSave} className="space-y-4">
                         <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-xl font-black text-slate-800">Thêm khách hàng mới</h3>
+                            <h3 className="text-xl font-black text-slate-800">
+                                {editingCustomer ? 'Chỉnh sửa thông tin' : 'Thêm khách hàng mới'}
+                            </h3>
                             <button
                                 type="button"
-                                onClick={() => setIsCreating(false)}
+                                onClick={closeForm}
                                 className="px-4 py-2 bg-slate-100 rounded-xl text-slate-500 font-bold hover:bg-slate-200 transition-colors"
                             >
                                 Hủy
@@ -193,7 +257,7 @@ export default function CustomerSelectPage() {
                             className="w-full py-4 mt-4 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-sky-200 hover:shadow-sky-300 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                         >
                             {loading ? <Loader2 className="animate-spin" /> : <Check size={24} />}
-                            Lưu & Chọn
+                            {editingCustomer ? 'Cập Nhật' : 'Lưu & Chọn'}
                         </button>
                     </form>
                 </GlassCard>
