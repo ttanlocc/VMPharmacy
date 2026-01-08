@@ -124,6 +124,7 @@ export async function PUT(request: Request) {
 
     const { data, error } = await supabase
         .from('customers')
+        // @ts-ignore
         .update({
             name,
             phone,

@@ -3,6 +3,7 @@ import { Database } from '@/types/database';
 
 type Customer = Database['public']['Tables']['customers']['Row'];
 type NewCustomer = Database['public']['Tables']['customers']['Insert'];
+type UpdateCustomer = Database['public']['Tables']['customers']['Update'];
 
 export function useCustomers() {
     const [customers, setCustomers] = useState<Customer[]>([]);
@@ -60,7 +61,7 @@ export function useCustomers() {
         error,
         searchCustomers: fetchCustomers,
         createCustomer,
-        updateCustomer: async (customer: Customer) => {
+        updateCustomer: async (customer: UpdateCustomer) => {
             setLoading(true);
             try {
                 const res = await fetch('/api/customers', {
