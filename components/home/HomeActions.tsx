@@ -4,7 +4,7 @@ import { User, Star, ShoppingBag, UserCheck } from 'lucide-react';
 export default function HomeActions() {
     return (
         <div className="grid grid-cols-2 gap-4 mb-6 lg:mb-0 w-full">
-            <Link href="/checkout/new?type=guest" className="group relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-sky-400 to-blue-600 p-6 text-white shadow-lg shadow-sky-200 transition-all duration-300 hover:shadow-sky-300 active:scale-95">
+            <Link href="/checkout?type=guest" className="group relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-sky-400 to-blue-600 p-6 text-white shadow-lg shadow-sky-200 transition-all duration-300 hover:shadow-sky-300 active:scale-95">
                 <div className="absolute top-0 right-0 p-8 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10" />
 
                 <div className="relative z-10 flex flex-col items-center gap-3">
