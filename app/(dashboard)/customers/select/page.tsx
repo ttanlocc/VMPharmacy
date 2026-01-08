@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCustomers } from '@/hooks/useCustomers';
-import { Search, Plus, User, ArrowLeft, Loader2, Check, Phone, Edit3 } from 'lucide-react';
+import { Search, Plus, User, ArrowLeft, Loader2, Check, Phone, Edit3, ShoppingBag } from 'lucide-react';
 import Container from '@/components/Container';
-import toast from 'react-hot-toast'; // Assuming toast is available, if not I'll standard alert or just error handle
-// Actually, let's use toast if it's in layout, which it is.
+import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import GlassCard from '@/components/ui/GlassCard';
+import CustomerOrderHistory from '@/components/CustomerOrderHistory';
 
 export default function CustomerSelectPage() {
     const router = useRouter();
@@ -23,16 +23,22 @@ export default function CustomerSelectPage() {
     const [newYear, setNewYear] = useState('');
     const [newHistory, setNewHistory] = useState('');
 
+    const [viewingHistoryCustomer, setViewingHistoryCustomer] = useState<any | null>(null);
+
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (!isCreating && !editingCustomer) {
+            if (!isCreating && !editingCustomer && !viewingHistoryCustomer) {
                 searchCustomers(query);
             }
         }, 500);
         return () => clearTimeout(timer);
-    }, [query, isCreating, editingCustomer, searchCustomers]);
+    }, [query, isCreating, editingCustomer, viewingHistoryCustomer, searchCustomers]);
 
     const handleSelect = (customer: any) => {
+        setViewingHistoryCustomer(customer);
+    };
+
+    const proceedWithCustomer = (customer: any) => {
         router.push(`/checkout/new?customerId=${customer.id}`);
     };
 
@@ -48,8 +54,7 @@ export default function CustomerSelectPage() {
         e.preventDefault();
         try {
             if (editingCustomer) {
-                // Update
-                const updated = await updateCustomer({
+                await updateCustomer({
                     id: editingCustomer.id,
                     name: newName,
                     phone: newPhone,
@@ -57,11 +62,9 @@ export default function CustomerSelectPage() {
                     medical_history: newHistory || null
                 });
                 toast.success('Cập nhật thành công');
-                // Don't auto select on edit, just close modal
                 setEditingCustomer(null);
                 resetForm();
             } else {
-                // Create
                 const customer = await createCustomer({
                     name: newName,
                     phone: newPhone,
@@ -71,7 +74,7 @@ export default function CustomerSelectPage() {
 
                 if (customer) {
                     toast.success('Đã thêm khách hàng');
-                    handleSelect(customer); // Select immediately on create
+                    handleSelect(customer);
                 }
             }
         } catch (error: any) {
@@ -94,24 +97,68 @@ export default function CustomerSelectPage() {
         resetForm();
     };
 
+    const backFromHistory = () => {
+        setViewingHistoryCustomer(null);
+    };
+
     return (
         <Container>
             <div className="flex items-center gap-4 mb-6">
                 <button
-                    onClick={() => router.back()}
+                    onClick={() => viewingHistoryCustomer ? backFromHistory() : router.back()}
                     className="p-3 bg-white shadow-sm border border-slate-100 rounded-2xl text-slate-600 active:scale-90 transition-transform"
                 >
                     <ArrowLeft size={20} />
                 </button>
                 <div>
-                    <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Chọn khách hàng</h1>
-                    <p className="text-sm font-medium text-slate-500">Tìm kiếm hoặc thêm mới</p>
+                    <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight">
+                        {viewingHistoryCustomer ? viewingHistoryCustomer.name : 'Chọn khách hàng'}
+                    </h1>
+                    <p className="text-sm font-medium text-slate-500">
+                        {viewingHistoryCustomer ? 'Lịch sử giao dịch & Bán mới' : 'Tìm kiếm hoặc thêm mới'}
+                    </p>
                 </div>
             </div>
 
-            {!isFormOpen ? (
+            {viewingHistoryCustomer ? (
                 <div className="space-y-6">
-                    {/* Search */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-gradient-to-br from-indigo-500 to-blue-600 rounded-[2rem] p-6 text-white shadow-xl shadow-indigo-100"
+                    >
+                        <div className="flex justify-between items-start mb-6">
+                            <div>
+                                <h3 className="text-2xl font-black uppercase tracking-tight">{viewingHistoryCustomer.name}</h3>
+                                <div className="flex items-center gap-2 text-indigo-100 font-bold opacity-90 text-sm mt-1">
+                                    <Phone size={14} />
+                                    {viewingHistoryCustomer.phone}
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => openEditModal(viewingHistoryCustomer)}
+                                className="p-3 bg-white/20 backdrop-blur-md rounded-2xl border border-white/30 hover:bg-white/30 transition-colors"
+                            >
+                                <Edit3 size={20} />
+                            </button>
+                        </div>
+
+                        <button
+                            onClick={() => proceedWithCustomer(viewingHistoryCustomer)}
+                            className="w-full py-4 bg-white text-indigo-600 rounded-2xl font-black text-lg shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                        >
+                            <ShoppingBag size={22} className="fill-indigo-600" />
+                            BÁN MỚI (PHÒNG LẺ)
+                        </button>
+                    </motion.div>
+
+                    <CustomerOrderHistory
+                        customerId={viewingHistoryCustomer.id}
+                        customer={viewingHistoryCustomer}
+                    />
+                </div>
+            ) : !isFormOpen ? (
+                <div className="space-y-6">
                     <div className="relative">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                         <input
@@ -126,7 +173,6 @@ export default function CustomerSelectPage() {
                         )}
                     </div>
 
-                    {/* New Customer Button */}
                     <button
                         onClick={() => {
                             resetForm();
@@ -137,7 +183,6 @@ export default function CustomerSelectPage() {
                         <Plus size={20} /> Thêm khách hàng mới
                     </button>
 
-                    {/* List */}
                     <div className="space-y-3">
                         {customers.length > 0 ? (
                             customers.map(c => (
@@ -189,7 +234,6 @@ export default function CustomerSelectPage() {
                     </div>
                 </div>
             ) : (
-                /* Create/Edit Customer Form */
                 <GlassCard className="!p-6">
                     <form onSubmit={handleSave} className="space-y-4">
                         <div className="flex items-center justify-between mb-2">

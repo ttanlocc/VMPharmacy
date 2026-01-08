@@ -38,6 +38,7 @@ export async function GET(request: Request) {
     const dateFrom = searchParams.get('dateFrom');
     const dateTo = searchParams.get('dateTo');
     const search = searchParams.get('search');
+    const customerId = searchParams.get('customerId');
 
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -63,6 +64,9 @@ export async function GET(request: Request) {
     }
     if (dateTo) {
         query = query.lte('created_at', `${dateTo}T23:59:59.999Z`);
+    }
+    if (customerId) {
+        query = query.eq('customer_id', customerId);
     }
     // Search by customer name or phone is complex with joined tables in simple queries.
     // We will do basic filtering on the customer_id if provided, 

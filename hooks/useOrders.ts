@@ -12,13 +12,15 @@ export type Order = Database['public']['Tables']['orders']['Row'] & {
     })[];
 };
 
-export function useOrders() {
+export function useOrders(customerId?: string) {
     const [orders, setOrders] = useState<Order[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchOrders = async () => {
         try {
-            const response = await fetch('/api/orders');
+            setIsLoading(true);
+            const url = customerId ? `/api/orders?customerId=${customerId}` : '/api/orders';
+            const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to fetch orders');
             const data = await response.json();
             setOrders(data);
@@ -30,12 +32,12 @@ export function useOrders() {
         }
     };
 
-    const createOrder = async (items: any[], totalPrice: number, customerId?: string | null, templateId?: string | null) => {
+    const createOrder = async (items: any[], totalPrice: number, selectedCustomerId?: string | null, templateId?: string | null) => {
         try {
             const response = await fetch('/api/orders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ items, total_price: totalPrice, customer_id: customerId, template_id: templateId }),
+                body: JSON.stringify({ items, total_price: totalPrice, customer_id: selectedCustomerId, template_id: templateId }),
             });
 
             if (!response.ok) {
@@ -56,7 +58,7 @@ export function useOrders() {
 
     useEffect(() => {
         fetchOrders();
-    }, []);
+    }, [customerId]);
 
     return {
         orders,
