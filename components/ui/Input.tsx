@@ -12,7 +12,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                     // Base
                     "w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors",
                     // Text - DARKER
-                    "text-gray-900 placeholder:text-gray-500",
+                    "text-gray-900 placeholder:text-gray-600",
                     // Focus
                     "focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none",
                     // Disabled

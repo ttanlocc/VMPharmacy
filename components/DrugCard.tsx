@@ -38,7 +38,7 @@ export default function DrugCard({ drug, onClick, className }: DrugCardProps) {
             <div className="p-3">
                 <h4 className="text-sm font-bold text-slate-900 line-clamp-1">{drug.name}</h4>
                 <div className="flex justify-between items-center mt-1">
-                    <span className="text-[10px] text-slate-500 font-medium px-2 py-0.5 bg-slate-100 rounded-full">
+                    <span className="text-[10px] text-slate-600 font-bold px-2 py-0.5 bg-slate-100 rounded-full">
                         {drug.unit}
                     </span>
                     <span className="text-xs font-bold text-primary">

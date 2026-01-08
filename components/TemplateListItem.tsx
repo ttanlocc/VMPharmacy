@@ -80,7 +80,7 @@ export default function TemplateListItem({
                             {template.name}
                         </h3>
                         <div className="flex items-center gap-3">
-                            <span className="text-[10px] font-bold text-slate-500 px-2 py-0.5 bg-slate-100 rounded-full uppercase tracking-wider flex items-center gap-1 shrink-0">
+                            <span className="text-[10px] font-bold text-slate-600 px-2 py-0.5 bg-slate-100 rounded-full uppercase tracking-wider flex items-center gap-1 shrink-0">
                                 <Pill size={10} />
                                 {template.items?.length || 0} thuốc
                             </span>

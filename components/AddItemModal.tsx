@@ -337,7 +337,7 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                         </div>
 
                         {/* Footer - Mini Cart / Status */}
-                        <div className="bg-white border-t border-slate-200 p-4 shrink-0 shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.1)] relative z-30">
+                        <div className="bg-white border-t border-slate-200 p-4 pb-[calc(1rem+env(safe-area-inset-bottom,24px))] shrink-0 shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.1)] relative z-30">
                             {/* Preview Overlay */}
                             <AnimatePresence>
                                 {showCartPreview && (

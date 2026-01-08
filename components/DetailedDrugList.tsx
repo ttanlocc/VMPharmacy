@@ -40,7 +40,7 @@ export default function DetailedDrugList({ items, className = "" }: DetailedDrug
                         <p className="text-xs font-bold text-slate-800">
                             {item.name}
                         </p>
-                        <p className="text-[10px] text-slate-500 font-medium">
+                        <p className="text-[10px] text-slate-600 font-bold">
                             {item.quantity} {item.unit}
                             {item.price !== undefined && (
                                 <span className="ml-1 text-slate-400">

@@ -41,12 +41,12 @@ export default function DrugListItem({ drug, onEdit, onClick, onContextMenu, onL
                 <div className="flex-1 min-w-0">
                     <h3 className="font-bold text-slate-900 truncate">{drug.name}</h3>
                     {drug.active_ingredient && (
-                        <p className="text-xs text-slate-500 truncate mb-1">
+                        <p className="text-xs text-slate-600 truncate mb-1 font-medium">
                             {drug.active_ingredient}
                         </p>
                     )}
                     <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] font-bold text-slate-500 px-2 py-0.5 bg-slate-100 rounded-full uppercase tracking-wider">
+                        <span className="text-[10px] font-bold text-slate-600 px-2 py-0.5 bg-slate-100 rounded-full uppercase tracking-wider">
                             {drug.unit}
                         </span>
                         <span className="text-sm font-bold text-primary">

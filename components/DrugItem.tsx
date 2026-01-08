@@ -29,7 +29,7 @@ export function DrugItem({ drug, onClick }: DrugItemProps) {
             {/* Info */}
             <div className="flex-1 min-w-0">
                 <p className="font-medium text-gray-900 truncate">{drug.name}</p>
-                <p className="text-sm text-gray-500">{drug.unit}</p>
+                <p className="text-sm text-gray-600 font-bold">{drug.unit}</p>
             </div>
 
             {/* Price */}

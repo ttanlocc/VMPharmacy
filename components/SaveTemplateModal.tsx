@@ -72,7 +72,7 @@ export default function SaveTemplateModal({ isOpen, onClose, onSave, items, tota
                                     onChange={(e) => setPrice(e.target.value)}
                                     className="font-bold text-indigo-600"
                                 />
-                                <p className="text-xs text-slate-400 mt-1 ml-1">Tự động tính từ tổng đơn hiện tại ({formatCurrency(total)})</p>
+                                <p className="text-xs text-slate-500 mt-1 ml-1">Tự động tính từ tổng đơn hiện tại ({formatCurrency(total)})</p>
                             </div>
 
                             <div>
@@ -86,19 +86,19 @@ export default function SaveTemplateModal({ isOpen, onClose, onSave, items, tota
                             </div>
 
                             <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Xem trước danh sách thuốc ({items.length})</p>
+                                <p className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-3">Xem trước danh sách thuốc ({items.length})</p>
                                 <div className="space-y-2 max-h-32 overflow-y-auto pr-2 custom-scrollbar">
                                     {items.map((item, idx) => (
                                         <div key={idx} className="flex items-center gap-2 text-sm">
                                             <div className="h-6 w-6 rounded bg-white border border-slate-200 flex items-center justify-center shrink-0">
-                                                {item.type === 'template' ? <ClipboardList size={12} className="text-indigo-400" /> : <div className="text-[10px] font-bold text-slate-400">Rx</div>}
+                                                {item.type === 'template' ? <ClipboardList size={12} className="text-indigo-400" /> : <div className="text-[10px] font-bold text-slate-500">Rx</div>}
                                             </div>
                                             <span className="flex-1 truncate text-slate-700 font-medium">{item.name}</span>
                                             <span className="text-slate-900 font-bold">x{item.quantity}</span>
                                         </div>
                                     ))}
                                 </div>
-                                <p className="text-[10px] text-slate-400 mt-3 italic text-center">
+                                <p className="text-[10px] text-slate-500 mt-1 italic text-center">
                                     * Các thuốc trong đơn mẫu con sẽ được gộp thành thuốc lẻ.
                                 </p>
                             </div>

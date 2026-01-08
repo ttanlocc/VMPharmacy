@@ -60,7 +60,7 @@ export default function CheckoutLineItem({ item, index, onDelete, onEdit, onUpda
                             <p className="text-sm font-bold text-primary flex items-center gap-1">
                                 {formatCurrency(item.price)}
                             </p>
-                            <span className="text-[10px] text-slate-500 font-medium">/ {item.type === 'template' ? 'đơn' : item.unit}</span>
+                            <span className="text-[10px] text-slate-600 font-bold">/ {item.type === 'template' ? 'đơn' : item.unit}</span>
                             <button
                                 onClick={(e) => { e.stopPropagation(); onEdit(); }}
                                 className="p-1 text-slate-400 hover:text-sky-500 transition-colors opacity-50 hover:opacity-100"
@@ -99,17 +99,17 @@ export default function CheckoutLineItem({ item, index, onDelete, onEdit, onUpda
                 {/* Controls */}
                 <div className="flex flex-col items-end justify-between shrink-0 pl-2">
                     <div
-                        className="flex items-center bg-white rounded-lg border border-slate-200 px-0.5 py-0.5 shadow-sm"
+                        className="flex items-center bg-white rounded-xl border border-slate-200 px-1 py-1 shadow-sm"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button
                             onClick={() => onUpdateQuantity(-1)}
-                            className="w-7 h-7 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600 transition-colors text-sm active:scale-90"
+                            className="w-11 h-11 flex items-center justify-center font-bold text-slate-500 hover:text-slate-700 transition-colors text-lg active:scale-90"
                         >-</button>
-                        <span className="w-6 text-center font-black text-sm text-slate-900">{item.quantity}</span>
+                        <span className="w-8 text-center font-black text-base text-slate-900">{item.quantity}</span>
                         <button
                             onClick={() => onUpdateQuantity(1)}
-                            className="w-7 h-7 flex items-center justify-center font-bold text-slate-400 hover:text-slate-600 transition-colors text-sm active:scale-90"
+                            className="w-11 h-11 flex items-center justify-center font-bold text-slate-500 hover:text-slate-700 transition-colors text-lg active:scale-90"
                         >+</button>
                     </div>
                     <span className="text-sm font-black text-slate-900 mt-2">{formatCurrency(item.price * item.quantity)}</span>
