@@ -110,6 +110,8 @@ function CheckoutContent() {
             note: '',
             type: 'drug'
         });
+        setIsPickerOpen(false); // Close after select
+        toast.success(`Đã thêm ${drug.name}`);
     };
 
     const handleUpdateQuantity = (index: number, delta: number) => {
@@ -303,29 +305,29 @@ function CheckoutContent() {
                             </div>
                         )}
 
-                        {/* Action Row */}
-                        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                        {/* Action Row - COMPACT GRID */}
+                        <div className="grid grid-cols-3 gap-3">
                             <button
                                 onClick={() => setIsPickerOpen(true)}
-                                className="flex-1 min-w-[140px] py-4 border border-slate-200 bg-white rounded-2xl flex flex-col items-center justify-center gap-1 text-slate-600 font-bold hover:border-primary hover:text-primary transition-all active:scale-[0.98] shadow-sm"
+                                className="w-full py-3 bg-white border border-slate-200 rounded-xl flex flex-col items-center justify-center gap-1 text-slate-700 font-bold shadow-sm hover:bg-slate-50 active:scale-95 transition-all"
                             >
-                                <Plus size={24} className="mb-1" />
-                                <span className="text-sm">Thêm thuốc</span>
+                                <Plus size={20} className="text-primary" />
+                                <span className="text-xs">Thêm thuốc</span>
                             </button>
                             <button
                                 onClick={() => setIsTemplatePickerOpen(true)}
-                                className="flex-1 min-w-[140px] py-4 border border-slate-200 bg-white rounded-2xl flex flex-col items-center justify-center gap-1 text-slate-600 font-bold hover:border-sky-500 hover:text-sky-500 transition-all active:scale-[0.98] shadow-sm"
+                                className="w-full py-3 bg-white border border-slate-200 rounded-xl flex flex-col items-center justify-center gap-1 text-slate-700 font-bold shadow-sm hover:bg-slate-50 active:scale-95 transition-all"
                             >
-                                <FileText size={24} className="mb-1" />
-                                <span className="text-sm">Đơn mẫu</span>
+                                <ClipboardList size={20} className="text-blue-500" />
+                                <span className="text-xs">Đơn mẫu</span>
                             </button>
                             <button
                                 disabled={items.length === 0}
                                 onClick={() => setIsSaveModalOpen(true)}
-                                className="flex-1 min-w-[140px] py-4 border-2 border-dashed border-indigo-200 bg-indigo-50/50 rounded-2xl flex flex-col items-center justify-center gap-1 text-indigo-600 font-bold hover:bg-indigo-100 transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale"
+                                className="w-full py-3 bg-white border border-slate-200 rounded-xl flex flex-col items-center justify-center gap-1 text-slate-700 font-bold shadow-sm hover:bg-slate-50 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale"
                             >
-                                <Save size={24} className="mb-1" />
-                                <span className="text-sm">Lưu đơn mẫu</span>
+                                <Save size={20} className="text-indigo-500" />
+                                <span className="text-xs">Lưu mẫu</span>
                             </button>
                         </div>
                     </div>
