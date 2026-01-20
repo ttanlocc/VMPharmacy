@@ -59,7 +59,7 @@ export function DrugGroupManager() {
                                 <h3 className="text-xl font-bold text-slate-900">Quản lý nhóm thuốc</h3>
                                 <button
                                     onClick={() => setIsOpen(false)}
-                                    className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-50 transition-colors"
+                                    className="p-2 text-slate-700 hover:text-slate-600 rounded-full hover:bg-slate-50 transition-colors"
                                 >
                                     <X size={24} />
                                 </button>
@@ -84,7 +84,7 @@ export function DrugGroupManager() {
                                         <button
                                             type="button"
                                             onClick={cancelEdit}
-                                            className="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-50"
+                                            className="p-2 text-slate-700 hover:text-slate-600 rounded-xl hover:bg-slate-50"
                                         >
                                             <X size={20} />
                                         </button>
@@ -115,7 +115,7 @@ export function DrugGroupManager() {
                                         </div>
                                     ))}
                                     {groups.length === 0 && (
-                                        <div className="text-center text-slate-400 py-8 text-sm">
+                                        <div className="text-center text-slate-700 py-8 text-sm">
                                             Chưa có nhóm thuốc nào.
                                         </div>
                                     )}

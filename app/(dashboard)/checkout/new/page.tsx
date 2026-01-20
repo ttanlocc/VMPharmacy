@@ -99,7 +99,7 @@ function TemplateSelectionContent() {
                 </button>
                 <div>
                     <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-slate-400 uppercase tracking-wider">Chọn đơn cho</span>
+                        <span className="text-sm font-bold text-slate-700 uppercase tracking-wider">Chọn đơn cho</span>
                         {type === 'guest' && <span className="px-2 py-0.5 bg-sky-100 text-sky-600 rounded text-xs font-bold uppercase">Khách lẻ</span>}
                     </div>
                     <h1 className="text-2xl font-black text-slate-900 tracking-tight">{titleStart}</h1>
@@ -117,11 +117,11 @@ function TemplateSelectionContent() {
                     className="group"
                 >
                     <div className="h-full bg-white border-2 border-dashed border-slate-300 rounded-[2rem] p-6 flex flex-col items-center justify-center text-center hover:border-sky-400 hover:bg-sky-50 transition-all min-h-[200px]">
-                        <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-sky-100 text-slate-400 group-hover:text-sky-500 transition-colors">
+                        <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-sky-100 text-slate-700 group-hover:text-sky-500 transition-colors">
                             <Plus size={32} />
                         </div>
                         <h3 className="text-xl font-black text-slate-700 group-hover:text-sky-600 transition-colors">Đơn Trống</h3>
-                        <p className="text-slate-400 font-medium text-sm mt-1">Tạo đơn mới hoàn toàn</p>
+                        <p className="text-slate-700 font-medium text-sm mt-1">Tạo đơn mới hoàn toàn</p>
                     </div>
                 </motion.button>
 
@@ -151,7 +151,7 @@ function TemplateSelectionContent() {
                                             <div className="p-3 bg-indigo-50 text-indigo-500 rounded-2xl">
                                                 <ClipboardList size={22} />
                                             </div>
-                                            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest bg-slate-100/50 px-2 py-1 rounded-lg">
+                                            <span className="text-[10px] uppercase font-bold text-slate-700 tracking-widest bg-slate-100/50 px-2 py-1 rounded-lg">
                                                 {drugCount} loại
                                             </span>
                                         </div>
@@ -166,13 +166,13 @@ function TemplateSelectionContent() {
                                                         <img src={item.drugs.image_url} className="h-full w-full object-cover" />
                                                     ) : (
                                                         <div className="h-full w-full flex items-center justify-center bg-slate-50">
-                                                            <Pill size={12} className="text-slate-300" />
+                                                            <Pill size={12} className="text-slate-600" />
                                                         </div>
                                                     )}
                                                 </div>
                                             ))}
                                             {(template.items?.length || 0) > 3 && (
-                                                <div className="h-8 w-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500 shadow-sm">
+                                                <div className="h-8 w-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-800 shadow-sm">
                                                     +{(template.items?.length || 0) - 3}
                                                 </div>
                                             )}

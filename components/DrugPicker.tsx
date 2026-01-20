@@ -45,7 +45,7 @@ export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProp
                     {/* Header */}
                     <div className="p-6 border-b border-slate-100 flex items-center justify-between shrink-0">
                         <h3 className="text-xl font-bold text-slate-900">Chọn thuốc</h3>
-                        <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600">
+                        <button onClick={onClose} className="p-2 text-slate-700 hover:text-slate-600">
                             <X size={24} />
                         </button>
                     </div>
@@ -53,7 +53,7 @@ export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProp
                     {/* Search */}
                     <div className="px-6 py-4 shrink-0 space-y-3">
                         <div className="relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-800" size={20} />
                             <Input
                                 type="text"
                                 value={search}
@@ -110,7 +110,7 @@ export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProp
                                         />
                                     ))
                                 ) : (
-                                    <div className="col-span-full text-center py-20 text-slate-400">
+                                    <div className="col-span-full text-center py-20 text-slate-700">
                                         Không tìm thấy thuốc nào khớp với "{search}"
                                     </div>
                                 )}

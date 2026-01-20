@@ -40,7 +40,7 @@ export default function TodayStats() {
                     </div>
                 </div>
                 <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Doanh thu hôm nay</p>
+                    <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest mb-1">Doanh thu hôm nay</p>
                     <p className="text-2xl font-black text-slate-800 break-words">{formatCurrency(todayStats.revenue)}</p>
                 </div>
             </GlassCard>
@@ -52,7 +52,7 @@ export default function TodayStats() {
                     </div>
                 </div>
                 <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Đơn đã bán</p>
+                    <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest mb-1">Đơn đã bán</p>
                     <p className="text-2xl font-black text-slate-800">{todayStats.count}</p>
                 </div>
             </GlassCard>

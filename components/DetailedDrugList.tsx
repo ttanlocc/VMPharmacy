@@ -32,7 +32,7 @@ export default function DetailedDrugList({ items, className = "" }: DetailedDrug
                                 alt={item.name}
                             />
                         ) : (
-                            <Pill size={16} className="text-slate-300" />
+                            <Pill size={16} className="text-slate-600" />
                         )}
                     </div>
 
@@ -43,7 +43,7 @@ export default function DetailedDrugList({ items, className = "" }: DetailedDrug
                         <p className="text-[10px] text-slate-600 font-bold">
                             {item.quantity} {item.unit}
                             {item.price !== undefined && (
-                                <span className="ml-1 text-slate-400">
+                                <span className="ml-1 text-slate-700">
                                     • {formatCurrency(item.price)}
                                 </span>
                             )}

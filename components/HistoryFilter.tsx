@@ -17,7 +17,7 @@ export default function HistoryFilter({ filters, onChange }: HistoryFilterProps)
         <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4">
             {/* Search */}
             <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700" size={18} />
                 <input
                     value={filters.search || ''}
                     onChange={(e) => handleChange('search', e.target.value)}
@@ -29,9 +29,9 @@ export default function HistoryFilter({ filters, onChange }: HistoryFilterProps)
             {/* Date Range */}
             <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-400 uppercase ml-1">Từ ngày</label>
+                    <label className="text-xs font-bold text-slate-700 uppercase ml-1">Từ ngày</label>
                     <div className="relative">
-                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700" size={16} />
                         <input
                             type="date"
                             value={filters.dateFrom || ''}
@@ -41,9 +41,9 @@ export default function HistoryFilter({ filters, onChange }: HistoryFilterProps)
                     </div>
                 </div>
                 <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-400 uppercase ml-1">Đến ngày</label>
+                    <label className="text-xs font-bold text-slate-700 uppercase ml-1">Đến ngày</label>
                     <div className="relative">
-                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700" size={16} />
                         <input
                             type="date"
                             value={filters.dateTo || ''}
@@ -57,7 +57,7 @@ export default function HistoryFilter({ filters, onChange }: HistoryFilterProps)
             {hasFilters && (
                 <button
                     onClick={() => onChange({})}
-                    className="w-full py-2 flex items-center justify-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-colors"
+                    className="w-full py-2 flex items-center justify-center gap-2 text-sm font-bold text-slate-700 hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-colors"
                 >
                     <X size={16} /> Xóa bộ lọc
                 </button>

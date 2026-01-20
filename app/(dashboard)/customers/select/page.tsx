@@ -102,14 +102,14 @@ export default function CustomerSelectPage() {
                 </button>
                 <div>
                     <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Chọn khách hàng</h1>
-                    <p className="text-sm font-medium text-slate-500">Tìm kiếm hoặc thêm mới</p>
+                    <p className="text-sm font-medium text-slate-800">Tìm kiếm hoặc thêm mới</p>
                 </div>
             </div>
 
             {!isFormOpen ? (
                 <div className="space-y-6">
                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700" size={20} />
                         <input
                             autoFocus
                             value={query}
@@ -145,12 +145,12 @@ export default function CustomerSelectPage() {
                                         onClick={() => handleSelect(c)}
                                         className="w-full flex items-center gap-4 p-4 bg-white/60 backdrop-blur rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:bg-white hover:border-sky-200 transition-all cursor-pointer"
                                     >
-                                        <div className="h-12 w-12 bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500 rounded-2xl flex items-center justify-center shrink-0 font-black text-lg group-hover:from-sky-100 group-hover:to-blue-100 group-hover:text-sky-600 transition-colors">
+                                        <div className="h-12 w-12 bg-gradient-to-br from-slate-100 to-slate-200 text-slate-800 rounded-2xl flex items-center justify-center shrink-0 font-black text-lg group-hover:from-sky-100 group-hover:to-blue-100 group-hover:text-sky-600 transition-colors">
                                             {c.name.charAt(0).toUpperCase()}
                                         </div>
                                         <div className="flex-1">
                                             <h3 className="font-bold text-slate-900 text-lg">{c.name}</h3>
-                                            <div className="flex items-center gap-2 text-slate-500 text-sm font-medium">
+                                            <div className="flex items-center gap-2 text-slate-800 text-sm font-medium">
                                                 <Phone size={14} />
                                                 {c.phone}
                                             </div>
@@ -162,11 +162,11 @@ export default function CustomerSelectPage() {
                                                     e.stopPropagation();
                                                     openEditModal(c);
                                                 }}
-                                                className="h-10 w-10 rounded-full bg-slate-100 text-slate-400 hover:bg-sky-100 hover:text-sky-500 flex items-center justify-center transition-colors"
+                                                className="h-10 w-10 rounded-full bg-slate-100 text-slate-700 hover:bg-sky-100 hover:text-sky-500 flex items-center justify-center transition-colors"
                                             >
                                                 <Edit3 size={18} />
                                             </button>
-                                            <div className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-300 group-hover:border-sky-200 group-hover:bg-sky-50 group-hover:text-sky-500 transition-all">
+                                            <div className="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 group-hover:border-sky-200 group-hover:bg-sky-50 group-hover:text-sky-500 transition-all">
                                                 <Check size={20} />
                                             </div>
                                         </div>
@@ -175,7 +175,7 @@ export default function CustomerSelectPage() {
                             ))
                         ) : (
                             query && !loading && (
-                                <div className="text-center py-10 text-slate-400 font-medium bg-white/40 rounded-3xl border border-dashed border-slate-200">
+                                <div className="text-center py-10 text-slate-700 font-medium bg-white/40 rounded-3xl border border-dashed border-slate-200">
                                     Không tìm thấy khách hàng nào.
                                 </div>
                             )
@@ -192,7 +192,7 @@ export default function CustomerSelectPage() {
                             <button
                                 type="button"
                                 onClick={closeForm}
-                                className="px-4 py-2 bg-slate-100 rounded-xl text-slate-500 font-bold hover:bg-slate-200 transition-colors"
+                                className="px-4 py-2 bg-slate-100 rounded-xl text-slate-800 font-bold hover:bg-slate-200 transition-colors"
                             >
                                 Hủy
                             </button>

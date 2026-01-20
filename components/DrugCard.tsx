@@ -32,7 +32,7 @@ export default function DrugCard({ drug, onClick, className }: DrugCardProps) {
                         sizes="(max-width: 768px) 33vw, 150px"
                     />
                 ) : (
-                    <Pill size={32} className="text-slate-300" />
+                    <Pill size={32} className="text-slate-600" />
                 )}
             </div>
             <div className="p-3">

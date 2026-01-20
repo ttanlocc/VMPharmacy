@@ -41,14 +41,14 @@ export default function Register() {
                         <UserPlus size={32} />
                     </div>
                     <h1 className="text-2xl font-bold text-slate-900">Create Account</h1>
-                    <p className="text-slate-500">Start organizing your pharmacy</p>
+                    <p className="text-slate-800">Start organizing your pharmacy</p>
                 </div>
 
                 <form onSubmit={handleRegister} className="space-y-4">
                     <div>
                         <label className="mb-1 block text-sm font-medium text-slate-700">Email</label>
                         <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700" size={20} />
                             <input
                                 type="email"
                                 required
@@ -64,7 +64,7 @@ export default function Register() {
                     <div>
                         <label className="mb-1 block text-sm font-medium text-slate-700">Password</label>
                         <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700" size={20} />
                             <input
                                 type="password"
                                 required
@@ -92,7 +92,7 @@ export default function Register() {
                     </button>
                 </form>
 
-                <p className="mt-8 text-center text-slate-500">
+                <p className="mt-8 text-center text-slate-800">
                     Already have an account?{' '}
                     <Link href="/login" className="font-semibold text-sky-600 hover:text-sky-700">
                         Sign in

@@ -144,7 +144,7 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                         <div className="bg-white px-6 pt-6 pb-4 border-b border-slate-100 flex flex-col gap-4 shrink-0 shadow-sm relative z-20">
                             <div className="flex justify-between items-center">
                                 <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Thêm sản phẩm</h3>
-                                <button onClick={onClose} className="p-2 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-500 transition-colors">
+                                <button onClick={onClose} className="p-2 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-800 transition-colors">
                                     <X size={20} />
                                 </button>
                             </div>
@@ -154,7 +154,7 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                     onClick={() => setActiveTab('drug')}
                                     className={cn(
                                         "flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-bold rounded-lg transition-all z-10",
-                                        activeTab === 'drug' ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"
+                                        activeTab === 'drug' ? "bg-white text-primary shadow-sm" : "text-slate-800 hover:text-slate-700"
                                     )}
                                 >
                                     <Pill size={16} />
@@ -164,7 +164,7 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                     onClick={() => setActiveTab('template')}
                                     className={cn(
                                         "flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-bold rounded-lg transition-all z-10",
-                                        activeTab === 'template' ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                                        activeTab === 'template' ? "bg-white text-blue-600 shadow-sm" : "text-slate-800 hover:text-slate-700"
                                     )}
                                 >
                                     <ClipboardList size={16} />
@@ -181,7 +181,7 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                 {/* Search & Filter */}
                                 <div className="px-6 py-4 bg-white/50 backdrop-blur-sm space-y-3 shrink-0">
                                     <div className="relative">
-                                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700" size={18} />
                                         <Input
                                             value={drugSearch}
                                             onChange={(e) => setDrugSearch(e.target.value)}
@@ -232,7 +232,7 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                                     onClick={() => handleAddDrug(drug)}
                                                 />
                                             )) : (
-                                                <div className="col-span-full py-12 text-center text-slate-400">
+                                                <div className="col-span-full py-12 text-center text-slate-700">
                                                     Không tìm thấy thuốc nào
                                                 </div>
                                             )}
@@ -245,7 +245,7 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                             <div className={cn("absolute inset-0 flex flex-col transition-opacity duration-300", activeTab === 'template' ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none")}>
                                 <div className="px-6 py-4 bg-white/50 backdrop-blur-sm shrink-0">
                                     <div className="relative">
-                                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700" size={18} />
                                         <Input
                                             value={templateSearch}
                                             onChange={(e) => setTemplateSearch(e.target.value)}
@@ -275,7 +275,7 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                                         <div className="flex justify-between items-start mb-2">
                                                             <h4 className="font-bold text-slate-800 text-lg">{template.name}</h4>
                                                             <div className="flex gap-2">
-                                                                <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-lg self-start">
+                                                                <span className="text-[10px] font-bold bg-slate-100 text-slate-800 px-2 py-1 rounded-lg self-start">
                                                                     {template.items?.length || 0} món
                                                                 </span>
                                                                 {getQuantityInCart(template.id, 'template') > 0 && (
@@ -283,7 +283,7 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                                                         x{getQuantityInCart(template.id, 'template')}
                                                                     </span>
                                                                 )}
-                                                                {isExpanded ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
+                                                                {isExpanded ? <ChevronUp size={16} className="text-slate-700" /> : <ChevronDown size={16} className="text-slate-700" />}
                                                             </div>
                                                         </div>
 
@@ -295,12 +295,12 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                                                             {item.drugs?.image_url ? (
                                                                                 <img src={item.drugs.image_url} className="w-full h-full object-cover" alt="" />
                                                                             ) : (
-                                                                                <Pill size={14} className="text-slate-300" />
+                                                                                <Pill size={14} className="text-slate-600" />
                                                                             )}
                                                                         </div>
                                                                     ))}
                                                                     {template.items && template.items.length > 5 && (
-                                                                        <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-500">
+                                                                        <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-800">
                                                                             +{template.items.length - 5}
                                                                         </div>
                                                                     )}
@@ -331,7 +331,7 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                                                                 <div className="w-6 h-6 rounded bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
                                                                                     {item.drugs?.image_url ? (
                                                                                         <img src={item.drugs.image_url} className="w-full h-full object-cover" alt="" />
-                                                                                    ) : <Pill size={12} className="text-slate-300" />}
+                                                                                    ) : <Pill size={12} className="text-slate-600" />}
                                                                                 </div>
                                                                                 <span className="text-slate-700 font-medium line-clamp-1">{item.drugs?.name}</span>
                                                                             </div>
@@ -370,7 +370,7 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                     >
                                         <div className="flex justify-between items-center mb-3">
                                             <h4 className="font-bold text-slate-700">Giỏ hàng ({items.length})</h4>
-                                            <button onClick={() => setShowCartPreview(false)} className="text-xs font-bold text-slate-400">Đóng xem trước</button>
+                                            <button onClick={() => setShowCartPreview(false)} className="text-xs font-bold text-slate-700">Đóng xem trước</button>
                                         </div>
                                         <div className="space-y-2">
                                             {items.map((item, idx) => (
@@ -379,11 +379,11 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                                         <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
                                                             {item.image_url || item.image ? (
                                                                 <img src={item.image_url || item.image || ''} className="w-full h-full object-cover" alt="" />
-                                                            ) : <Pill size={16} className="text-slate-300" />}
+                                                            ) : <Pill size={16} className="text-slate-600" />}
                                                         </div>
                                                         <div>
                                                             <div className="font-bold text-slate-800 text-sm line-clamp-1">{item.name}</div>
-                                                            <div className="text-xs text-slate-400">
+                                                            <div className="text-xs text-slate-700">
                                                                 {item.unit ? item.unit : ''} x {item.quantity}
                                                             </div>
                                                         </div>
@@ -394,7 +394,7 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                                     </div>
                                                 </div>
                                             ))}
-                                            {items.length === 0 && <p className="text-center text-slate-400 text-sm py-4">Giỏ hàng trống</p>}
+                                            {items.length === 0 && <p className="text-center text-slate-700 text-sm py-4">Giỏ hàng trống</p>}
                                         </div>
                                     </motion.div>
                                 )}
@@ -406,8 +406,8 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                     onClick={() => setShowCartPreview(!showCartPreview)}
                                 >
                                     <div className="flex items-center gap-2">
-                                        <span className="text-xs font-bold text-slate-400 uppercase">Tạm tính ({items.length})</span>
-                                        <ChevronUp size={14} className={cn("text-slate-400 transition-transform", showCartPreview && "rotate-180")} />
+                                        <span className="text-xs font-bold text-slate-700 uppercase">Tạm tính ({items.length})</span>
+                                        <ChevronUp size={14} className={cn("text-slate-700 transition-transform", showCartPreview && "rotate-180")} />
                                     </div>
                                     <span className="text-2xl font-black text-slate-900">{formatCurrency(total)}</span>
                                 </div>

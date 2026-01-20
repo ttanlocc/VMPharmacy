@@ -29,7 +29,7 @@ export function DrugItem({ drug, quantity = 0, onClick }: DrugItemProps) {
                         className="w-full h-full object-cover"
                     />
                 ) : (
-                    <Pill size={24} className="text-slate-300" />
+                    <Pill size={24} className="text-slate-600" />
                 )}
 
                 {/* Quantity Badge on Image */}

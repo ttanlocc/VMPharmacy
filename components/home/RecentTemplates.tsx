@@ -60,27 +60,27 @@ export default function RecentTemplates() {
                                                 {item.drugs?.image_url ? (
                                                     <img src={item.drugs.image_url} alt="" className="h-full w-full object-cover" />
                                                 ) : (
-                                                    <div className="h-full w-full flex items-center justify-center bg-slate-200 text-slate-400 text-[10px] font-bold">
+                                                    <div className="h-full w-full flex items-center justify-center bg-slate-200 text-slate-700 text-[10px] font-bold">
                                                         Rx
                                                     </div>
                                                 )}
                                             </div>
                                         ))}
                                         {(template.items?.length || 0) > 3 && (
-                                            <div className="h-10 w-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">
+                                            <div className="h-10 w-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-800">
                                                 +{template.items.length - 3}
                                             </div>
                                         )}
                                     </div>
                                     <h3 className="font-bold text-slate-800 text-sm line-clamp-2 leading-tight">{template.name}</h3>
                                     {template.note && (
-                                        <p className="text-[10px] text-slate-500 truncate mt-1">
+                                        <p className="text-[10px] text-slate-800 truncate mt-1">
                                             {template.note}
                                         </p>
                                     )}
                                 </div>
                                 <div className="flex items-center justify-between mt-2">
-                                    <span className="text-xs font-bold text-slate-500">
+                                    <span className="text-xs font-bold text-slate-800">
                                         {template.items?.length || 0} thuốc
                                     </span>
                                     <span className="text-xs font-black text-sky-600 bg-sky-50 px-2 py-1 rounded-lg">
@@ -92,7 +92,7 @@ export default function RecentTemplates() {
                     </motion.div>
                 ))}
                 {templates.length === 0 && (
-                    <div className="col-span-2 text-center py-10 bg-white/40 backdrop-blur-sm rounded-3xl border border-dashed border-slate-200 text-slate-400 text-sm">
+                    <div className="col-span-2 text-center py-10 bg-white/40 backdrop-blur-sm rounded-3xl border border-dashed border-slate-200 text-slate-700 text-sm">
                         Chưa có đơn mẫu nào
                     </div>
                 )}

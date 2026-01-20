@@ -68,7 +68,7 @@ export default function LoginPage() {
                                     Email
                                 </label>
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-700">
                                         <Mail size={18} />
                                     </div>
                                     <input
@@ -88,7 +88,7 @@ export default function LoginPage() {
                                     Mật khẩu
                                 </label>
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-700">
                                         <Lock size={18} />
                                     </div>
                                     <input
@@ -124,11 +124,11 @@ export default function LoginPage() {
                                     <div className="w-full border-t border-slate-200" />
                                 </div>
                                 <div className="relative flex justify-center text-sm">
-                                    <span className="px-2 bg-white text-slate-500 font-medium">Hỗ trợ kỹ thuật</span>
+                                    <span className="px-2 bg-white text-slate-800 font-medium">Hỗ trợ kỹ thuật</span>
                                 </div>
                             </div>
                             <div className="mt-4 text-center">
-                                <p className="text-sm text-slate-500">
+                                <p className="text-sm text-slate-800">
                                     Quên mật khẩu? <span className="text-primary font-bold cursor-pointer hover:underline">Liên hệ quản trị</span>
                                 </p>
                             </div>

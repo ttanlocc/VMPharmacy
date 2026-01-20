@@ -16,12 +16,12 @@ export default function OrderHistory() {
     };
 
     if (isLoading) {
-        return <div className="text-center py-4 text-slate-400">Đang tải lịch sử...</div>;
+        return <div className="text-center py-4 text-slate-700">Đang tải lịch sử...</div>;
     }
 
     if (orders.length === 0) {
         return (
-            <div className="text-center py-8 text-slate-400 bg-slate-50 rounded-2xl border border-slate-100">
+            <div className="text-center py-8 text-slate-700 bg-slate-50 rounded-2xl border border-slate-100">
                 <Package className="w-8 h-8 mx-auto mb-2 opacity-50" />
                 <p>Chưa có đơn hàng nào</p>
             </div>
@@ -40,7 +40,7 @@ export default function OrderHistory() {
                         className="p-4 flex items-center justify-between cursor-pointer active:bg-slate-50 transition-colors"
                     >
                         <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-2 text-slate-500 text-xs font-medium">
+                            <div className="flex items-center gap-2 text-slate-800 text-xs font-medium">
                                 <Calendar size={12} />
                                 {new Date(order.created_at).toLocaleDateString('vi-VN', {
                                     day: '2-digit',
@@ -59,9 +59,9 @@ export default function OrderHistory() {
                                 Hoàn thành
                             </div>
                             {expandedId === order.id ? (
-                                <ChevronUp size={20} className="text-slate-400" />
+                                <ChevronUp size={20} className="text-slate-700" />
                             ) : (
-                                <ChevronDown size={20} className="text-slate-400" />
+                                <ChevronDown size={20} className="text-slate-700" />
                             )}
                         </div>
                     </div>

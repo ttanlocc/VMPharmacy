@@ -56,7 +56,7 @@ export function TemplateCard({ template, onClick }: TemplateCardProps) {
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-[8px] font-bold text-slate-400">Rx</div>
+                                    <div className="w-full h-full flex items-center justify-center text-[8px] font-bold text-slate-700">Rx</div>
                                 )}
                             </div>
                         ))}

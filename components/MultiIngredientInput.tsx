@@ -182,7 +182,7 @@ export default function MultiIngredientInput({ value, onChange }: MultiIngredien
                             >
                                 {suggestion.name}
                                 {ingredients.some(i => i.name.toLowerCase() === suggestion.name.toLowerCase()) && (
-                                    <span className="ml-2 text-xs text-slate-400">(đã thêm)</span>
+                                    <span className="ml-2 text-xs text-slate-700">(đã thêm)</span>
                                 )}
                             </button>
                         ))}

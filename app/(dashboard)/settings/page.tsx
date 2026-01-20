@@ -28,7 +28,7 @@ export default function SettingsPage() {
     };
 
     if (loading) {
-        return <div className="p-8 text-center text-slate-400">Đang tải...</div>;
+        return <div className="p-8 text-center text-slate-700">Đang tải...</div>;
     }
 
     return (
@@ -49,14 +49,14 @@ export default function SettingsPage() {
                         </div>
                         <div>
                             <p className="font-bold text-slate-900 text-lg">Dược sĩ</p>
-                            <p className="text-slate-500 text-sm">{user?.email}</p>
+                            <p className="text-slate-800 text-sm">{user?.email}</p>
                         </div>
                     </div>
 
                     <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Email</label>
-                            <div className="flex items-center gap-3 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-500">
+                            <div className="flex items-center gap-3 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800">
                                 <Mail size={18} />
                                 <span>{user?.email}</span>
                             </div>
@@ -64,7 +64,7 @@ export default function SettingsPage() {
 
                         <div>
                             <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Vai trò</label>
-                            <div className="flex items-center gap-3 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-500">
+                            <div className="flex items-center gap-3 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800">
                                 <Shield size={18} />
                                 <span>Quản trị viên</span>
                             </div>
@@ -80,7 +80,7 @@ export default function SettingsPage() {
                     </h2>
                     <button className="w-full py-3 px-4 border border-slate-200 rounded-xl text-slate-600 font-bold hover:bg-slate-50 transition-colors text-left flex justify-between items-center group">
                         <span>Đổi mật khẩu</span>
-                        <span className="text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
+                        <span className="text-slate-700 group-hover:translate-x-1 transition-transform">→</span>
                     </button>
                 </div>
 
@@ -93,7 +93,7 @@ export default function SettingsPage() {
                     Đăng xuất
                 </button>
 
-                <div className="text-center text-slate-400 text-xs font-medium py-4">
+                <div className="text-center text-slate-700 text-xs font-medium py-4">
                     VMPharmacy v0.1.0 © 2026
                 </div>
             </div>

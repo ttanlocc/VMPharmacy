@@ -109,7 +109,7 @@ export default function TemplateListItem({
                                 e.stopPropagation();
                                 if (onMoreClick) onMoreClick(template);
                             }}
-                            className="p-2 text-slate-300 hover:text-slate-500 rounded-full hover:bg-slate-50 transition-colors"
+                            className="p-2 text-slate-600 hover:text-slate-800 rounded-full hover:bg-slate-50 transition-colors"
                         >
                             <MoreVertical size={20} />
                         </button>

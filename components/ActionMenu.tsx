@@ -46,7 +46,7 @@ export function ActionMenu({ isOpen, onClose, type, data, actions }: ActionMenuP
                     {data.image_url ? (
                         <img src={data.image_url} alt={data.name} className="w-full h-full object-cover" />
                     ) : (
-                        <Pill size={32} className="text-slate-300" />
+                        <Pill size={32} className="text-slate-600" />
                     )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -57,7 +57,7 @@ export function ActionMenu({ isOpen, onClose, type, data, actions }: ActionMenuP
                             {data.drug_groups.name}
                         </span>
                     ) : (
-                        <span className="text-slate-400 text-xs">Chưa phân nhóm</span>
+                        <span className="text-slate-700 text-xs">Chưa phân nhóm</span>
                     )}
                 </div>
             </div>
@@ -65,18 +65,18 @@ export function ActionMenu({ isOpen, onClose, type, data, actions }: ActionMenuP
             <div className="px-4 pb-4 space-y-4">
                 {/* Active Ingredient */}
                 <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">💊 Hoạt chất</label>
+                    <label className="block text-[10px] font-bold text-slate-700 uppercase tracking-widest mb-1">💊 Hoạt chất</label>
                     <p className="text-[15px] font-medium text-slate-700">{data.active_ingredient || '—'}</p>
                 </div>
 
                 {/* Price & Unit */}
                 <div className="flex gap-8">
                     <div className="flex-1">
-                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">💰 Giá bán</label>
+                        <label className="block text-[10px] font-bold text-slate-700 uppercase tracking-widest mb-1">💰 Giá bán</label>
                         <p className="text-[18px] font-black text-sky-500">{formatCurrency(data.unit_price)} đ</p>
                     </div>
                     <div className="shrink-0 min-w-[60px]">
-                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">📦 Đơn vị</label>
+                        <label className="block text-[10px] font-bold text-slate-700 uppercase tracking-widest mb-1">📦 Đơn vị</label>
                         <p className="text-[15px] font-bold text-slate-700 uppercase">{data.unit}</p>
                     </div>
                 </div>
@@ -84,8 +84,8 @@ export function ActionMenu({ isOpen, onClose, type, data, actions }: ActionMenuP
                 {/* Optional Note */}
                 {data.note && (
                     <div className="pt-2 border-t border-slate-50">
-                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">📝 Ghi chú</label>
-                        <p className="text-[13px] text-slate-500 italic leading-relaxed">{data.note}</p>
+                        <label className="block text-[10px] font-bold text-slate-700 uppercase tracking-widest mb-1">📝 Ghi chú</label>
+                        <p className="text-[13px] text-slate-800 italic leading-relaxed">{data.note}</p>
                     </div>
                 )}
             </div>
@@ -107,11 +107,11 @@ export function ActionMenu({ isOpen, onClose, type, data, actions }: ActionMenuP
                     </div>
                     <div className="flex justify-between items-end">
                         <div className="flex-1">
-                            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Giá bán</label>
+                            <label className="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Giá bán</label>
                             <p className="text-[18px] font-black text-indigo-600">{formatCurrency(total)} đ</p>
                         </div>
                         <div className="text-right">
-                            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Số loại thuốc</label>
+                            <label className="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">Số loại thuốc</label>
                             <p className="text-[15px] font-bold text-slate-700">{data.items?.length || 0} loại</p>
                         </div>
                     </div>
@@ -119,7 +119,7 @@ export function ActionMenu({ isOpen, onClose, type, data, actions }: ActionMenuP
 
                 {/* Drug List Table */}
                 <div className="p-4 bg-slate-50/50">
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Chi tiết đơn thuốc:</label>
+                    <label className="block text-[10px] font-bold text-slate-700 uppercase tracking-widest mb-2">Chi tiết đơn thuốc:</label>
                     <div className="space-y-1.5 ring-1 ring-slate-100 rounded-xl overflow-hidden bg-white">
                         {data.items?.slice(0, 4).map((item: any, idx: number) => (
                             <div key={idx} className="flex items-center gap-3 p-2 hover:bg-slate-50 transition-colors border-b last:border-0 border-slate-50">
@@ -127,15 +127,15 @@ export function ActionMenu({ isOpen, onClose, type, data, actions }: ActionMenuP
                                     {item.drugs?.image_url ? (
                                         <img src={item.drugs.image_url} className="w-full h-full object-cover" />
                                     ) : (
-                                        <Pill size={14} className="text-slate-300" />
+                                        <Pill size={14} className="text-slate-600" />
                                     )}
                                 </div>
                                 <span className="flex-1 text-[13px] font-medium text-slate-700 truncate">{item.drugs?.name}</span>
-                                <span className="text-[11px] font-bold px-2 py-0.5 bg-slate-100 rounded-md text-slate-500">x{item.quantity}</span>
+                                <span className="text-[11px] font-bold px-2 py-0.5 bg-slate-100 rounded-md text-slate-800">x{item.quantity}</span>
                             </div>
                         ))}
                         {data.items?.length > 4 && (
-                            <div className="p-2 text-center text-[11px] font-medium text-slate-400 bg-slate-50/50">
+                            <div className="p-2 text-center text-[11px] font-medium text-slate-700 bg-slate-50/50">
                                 và {data.items.length - 4} loại thuốc khác...
                             </div>
                         )}

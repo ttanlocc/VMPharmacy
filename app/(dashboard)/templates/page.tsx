@@ -223,7 +223,7 @@ export default function TemplatesPage() {
                 <div className="flex justify-between items-end">
                     <div>
                         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Đơn mẫu</h1>
-                        <p className="text-slate-500 text-sm font-medium">Tạo các combo thuốc bán nhanh</p>
+                        <p className="text-slate-800 text-sm font-medium">Tạo các combo thuốc bán nhanh</p>
                     </div>
                     <button
                         onClick={openCreateModal}
@@ -236,7 +236,7 @@ export default function TemplatesPage() {
 
                 {/* Search */}
                 <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700" size={20} />
                     <Input
                         type="text"
                         value={search}
@@ -272,10 +272,10 @@ export default function TemplatesPage() {
                             ) : (
                                 <div className="text-center py-20">
                                     <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <ClipboardList className="text-slate-300" size={40} />
+                                        <ClipboardList className="text-slate-600" size={40} />
                                     </div>
                                     <h3 className="text-lg font-bold text-slate-900">Chưa có đơn mẫu nào</h3>
-                                    <p className="text-slate-500 mt-1">Bắt đầu bằng việc tạo combo thuốc đầu tiên</p>
+                                    <p className="text-slate-800 mt-1">Bắt đầu bằng việc tạo combo thuốc đầu tiên</p>
                                 </div>
                             )}
                         </AnimatePresence>
@@ -291,7 +291,7 @@ export default function TemplatesPage() {
                             <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                                 <h3 className="text-xl font-extrabold text-slate-900">{editingTemplateId ? 'Chỉnh Sửa Đơn Mẫu' : 'Tạo Đơn Mẫu Mới'}</h3>
                                 <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-                                    <X size={24} className="text-slate-400" />
+                                    <X size={24} className="text-slate-700" />
                                 </button>
                             </div>
 
@@ -317,8 +317,8 @@ export default function TemplatesPage() {
                                                     <LoadingSpinner size={24} className="p-0" label="" />
                                                 ) : (
                                                     <>
-                                                        <ImageIcon className="text-slate-300 mb-2" size={32} />
-                                                        <span className="text-xs font-bold text-slate-400 uppercase">Tải ảnh lên</span>
+                                                        <ImageIcon className="text-slate-600 mb-2" size={32} />
+                                                        <span className="text-xs font-bold text-slate-700 uppercase">Tải ảnh lên</span>
                                                     </>
                                                 )}
                                             </div>
@@ -345,7 +345,7 @@ export default function TemplatesPage() {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">
-                                            Giá bán (đ) <span className="text-slate-500 font-normal">- Tùy chọn</span>
+                                            Giá bán (đ) <span className="text-slate-800 font-normal">- Tùy chọn</span>
                                         </label>
                                         <div className="relative">
                                             <Input
@@ -368,7 +368,7 @@ export default function TemplatesPage() {
                                 {/* Note Field - NEW */}
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">
-                                        Ghi chú <span className="text-slate-400 font-normal">(tùy chọn)</span>
+                                        Ghi chú <span className="text-slate-700 font-normal">(tùy chọn)</span>
                                     </label>
                                     <Textarea
                                         value={note}
@@ -398,12 +398,12 @@ export default function TemplatesPage() {
                                                         {selected.image_url ? (
                                                             <img src={selected.image_url} className="h-full w-full object-cover rounded-lg" alt={selected.name} />
                                                         ) : (
-                                                            <Pill className="text-slate-300" size={16} />
+                                                            <Pill className="text-slate-600" size={16} />
                                                         )}
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <p className="font-bold text-slate-800 text-sm truncate">{selected.name}</p>
-                                                        <p className="text-xs text-slate-500">{formatCurrency(selected.price || selected.unit_price)} / {selected.unit}</p>
+                                                        <p className="text-xs text-slate-800">{formatCurrency(selected.price || selected.unit_price)} / {selected.unit}</p>
                                                     </div>
                                                     <div className="flex items-center gap-3">
                                                         <input
@@ -419,7 +419,7 @@ export default function TemplatesPage() {
                                                         />
                                                         <button
                                                             onClick={() => setSelectedDrugs(selectedDrugs.filter((_, i) => i !== idx))}
-                                                            className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                            className="p-1.5 text-slate-700 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                                                         >
                                                             <Trash2 size={16} />
                                                         </button>
@@ -429,7 +429,7 @@ export default function TemplatesPage() {
                                         ) : (
                                             <div
                                                 onClick={() => setIsPickerOpen(true)}
-                                                className="py-8 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400 cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/30 transition-all"
+                                                className="py-8 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-700 cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/30 transition-all"
                                             >
                                                 <ShoppingBag size={32} className="mb-2 opacity-50" />
                                                 <span className="text-sm font-medium">Chưa có thuốc nào</span>
@@ -481,7 +481,7 @@ export default function TemplatesPage() {
                             <div className="p-6 flex-1 overflow-y-auto">
                                 <div className="flex justify-between items-center mb-6">
                                     <div>
-                                        <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Giá bán</p>
+                                        <p className="text-sm font-semibold text-slate-800 uppercase tracking-wider">Giá bán</p>
                                         <p className="text-3xl font-black text-indigo-600">
                                             {formatCurrency(
                                                 selectedTemplate.total_price !== null
@@ -491,7 +491,7 @@ export default function TemplatesPage() {
                                         </p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Số lượng thuốc</p>
+                                        <p className="text-sm font-semibold text-slate-800 uppercase tracking-wider">Số lượng thuốc</p>
                                         <p className="text-xl font-bold text-slate-800">{selectedTemplate.items?.length || 0} loại</p>
                                     </div>
                                 </div>
@@ -507,12 +507,12 @@ export default function TemplatesPage() {
                                                 {item.drugs?.image_url ? (
                                                     <img src={item.drugs.image_url} className="h-full w-full object-cover" alt={item.drugs?.name} />
                                                 ) : (
-                                                    <Pill size={24} className="text-slate-300" />
+                                                    <Pill size={24} className="text-slate-600" />
                                                 )}
                                             </div>
                                             <div className="flex-1">
                                                 <p className="font-bold text-slate-700 text-base">{item.drugs?.name}</p>
-                                                <p className="text-xs text-slate-500 font-medium">Số lượng: <span className="font-bold text-slate-900">{item.quantity} {item.drugs?.unit}</span></p>
+                                                <p className="text-xs text-slate-800 font-medium">Số lượng: <span className="font-bold text-slate-900">{item.quantity} {item.drugs?.unit}</span></p>
                                             </div>
                                         </div>
                                     ))}

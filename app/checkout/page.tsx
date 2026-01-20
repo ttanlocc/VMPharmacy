@@ -221,7 +221,7 @@ function CheckoutContent() {
                         <CheckCircle2 size={48} strokeWidth={3} />
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 mb-2 uppercase tracking-tight">Thanh toán xong!</h2>
-                    <p className="text-slate-500 font-medium">Đơn hàng đã được lưu.<br />Đang quay lại sảnh...</p>
+                    <p className="text-slate-800 font-medium">Đơn hàng đã được lưu.<br />Đang quay lại sảnh...</p>
                 </motion.div>
             </div>
         );
@@ -256,21 +256,21 @@ function CheckoutContent() {
                                     )}
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 text-slate-500 rounded-lg">
+                                <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 text-slate-800 rounded-lg">
                                     <User size={14} />
                                     <span className="text-sm font-bold">Khách lẻ</span>
                                 </div>
                             )}
                             <button
                                 onClick={() => setIsCustomerPickerOpen(true)}
-                                className="text-xs font-bold text-slate-400 hover:text-sky-500 underline decoration-dashed"
+                                className="text-xs font-bold text-slate-700 hover:text-sky-500 underline decoration-dashed"
                             >
                                 Đổi
                             </button>
                         </div>
                     </div>
                     <div className="text-right">
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{items.length} món</p>
+                        <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">{items.length} món</p>
                     </div>
                 </div>
 
@@ -290,10 +290,10 @@ function CheckoutContent() {
                                         </div>
                                         <div>
                                             <p className="font-bold text-slate-800">Mua lại đơn cũ</p>
-                                            <p className="text-xs text-slate-500">{reorderHistory.length} đơn gần nhất</p>
+                                            <p className="text-xs text-slate-800">{reorderHistory.length} đơn gần nhất</p>
                                         </div>
                                     </div>
-                                    <ChevronDown size={20} className={`text-slate-400 transition-transform ${isReorderOpen ? 'rotate-180' : ''}`} />
+                                    <ChevronDown size={20} className={`text-slate-700 transition-transform ${isReorderOpen ? 'rotate-180' : ''}`} />
                                 </button>
                                 <AnimatePresence>
                                     {isReorderOpen && (
@@ -316,7 +316,7 @@ function CheckoutContent() {
                                                                     {oi.drugs?.image_url ? (
                                                                         <img src={oi.drugs.image_url} alt="" className="w-full h-full object-cover" />
                                                                     ) : (
-                                                                        <Pill size={12} className="text-slate-400" />
+                                                                        <Pill size={12} className="text-slate-700" />
                                                                     )}
                                                                 </div>
                                                             ))}
@@ -325,7 +325,7 @@ function CheckoutContent() {
                                                             <p className="text-sm font-bold text-slate-800 truncate">
                                                                 {order.order_items.map(oi => oi.drugs?.name).filter(Boolean).join(', ') || 'Đơn hàng'}
                                                             </p>
-                                                            <div className="flex items-center gap-2 text-[10px] text-slate-500">
+                                                            <div className="flex items-center gap-2 text-[10px] text-slate-800">
                                                                 <Clock size={10} />
                                                                 {formatDistanceToNow(new Date(order.created_at), { addSuffix: true, locale: vi })}
                                                             </div>
@@ -362,7 +362,7 @@ function CheckoutContent() {
                         </AnimatePresence>
 
                         {items.length === 0 && (
-                            <div className="py-20 text-center text-slate-300 font-medium border-2 border-dashed border-slate-100 rounded-3xl">
+                            <div className="py-20 text-center text-slate-600 font-medium border-2 border-dashed border-slate-100 rounded-3xl">
                                 Chưa có thuốc nào trong giỏ
                             </div>
                         )}
@@ -404,14 +404,14 @@ function CheckoutContent() {
                     <div className="hidden lg:block lg:col-span-4 sticky top-6 space-y-6">
                         {/* Customer Card */}
                         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Khách hàng</h3>
+                            <h3 className="text-xs font-black text-slate-700 uppercase tracking-widest mb-4">Khách hàng</h3>
                             <div className="flex items-center gap-3 mb-4">
-                                <div className={`h-12 w-12 rounded-full flex items-center justify-center ${customer ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-400'}`}>
+                                <div className={`h-12 w-12 rounded-full flex items-center justify-center ${customer ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-700'}`}>
                                     <User size={24} />
                                 </div>
                                 <div>
                                     <p className="font-bold text-slate-900">{customer ? customer.name : 'Khách lẻ'}</p>
-                                    <p className="text-xs text-slate-500">{customer ? customer.phone : 'Không có thông tin'}</p>
+                                    <p className="text-xs text-slate-800">{customer ? customer.phone : 'Không có thông tin'}</p>
                                 </div>
                             </div>
                             <button
@@ -425,7 +425,7 @@ function CheckoutContent() {
                         {/* Order Summary & Pay */}
                         <div className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100">
                             <div className="flex justify-between items-center mb-6">
-                                <span className="text-slate-500 font-medium">Tạm tính</span>
+                                <span className="text-slate-800 font-medium">Tạm tính</span>
                                 <span className="text-xl font-bold text-slate-900">{formatCurrency(total)}</span>
                             </div>
                             <div className="flex justify-between items-center mb-8 pb-8 border-b border-dashed border-slate-200">
@@ -455,7 +455,7 @@ function CheckoutContent() {
                 <div className="fixed lg:hidden bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-slate-200 glassmorphism rounded-t-[2rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] z-40 pb-safe">
                     <div className="flex items-center gap-4 mb-3 px-2">
                         <div className="flex flex-col flex-1">
-                            <span className="text-[10px] uppercase font-black text-slate-400 tracking-widest leading-none mb-1">Tổng cộng ({items.length} món)</span>
+                            <span className="text-[10px] uppercase font-black text-slate-700 tracking-widest leading-none mb-1">Tổng cộng ({items.length} món)</span>
                             <span className="text-2xl font-black text-primary leading-none truncate">{formatCurrency(total)}</span>
                         </div>
                         {customer && (
@@ -495,14 +495,14 @@ function CheckoutContent() {
                                     <h3 className="text-xl font-black text-slate-900">Sửa giá bán</h3>
                                     <button
                                         onClick={() => setEditingItemIndex(null)}
-                                        className="p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200"
+                                        className="p-2 bg-slate-100 rounded-full text-slate-800 hover:bg-slate-200"
                                     >
                                         <Trash2 size={20} className="rotate-45" />
                                     </button>
                                 </div>
 
                                 <div className="mb-6">
-                                    <p className="text-sm font-bold text-slate-500 mb-2">Giá mới (VNĐ)</p>
+                                    <p className="text-sm font-bold text-slate-800 mb-2">Giá mới (VNĐ)</p>
                                     <Input
                                         type="number"
                                         value={editPriceValue}
@@ -511,7 +511,7 @@ function CheckoutContent() {
                                         placeholder="0"
                                         autoFocus
                                     />
-                                    <p className="text-xs text-slate-400 mt-2">Giá gốc: {formatCurrency(editingItemIndex !== null ? items[editingItemIndex].price : 0)}</p>
+                                    <p className="text-xs text-slate-700 mt-2">Giá gốc: {formatCurrency(editingItemIndex !== null ? items[editingItemIndex].price : 0)}</p>
                                 </div>
 
                                 <button

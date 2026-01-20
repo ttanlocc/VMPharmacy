@@ -35,7 +35,7 @@ export default function DrugListItem({ drug, onEdit, onClick, onContextMenu, onL
                     {drug.image_url ? (
                         <img src={drug.image_url} alt={drug.name} className="h-full w-full object-cover" />
                     ) : (
-                        <ImageIcon size={24} className="text-slate-300" />
+                        <ImageIcon size={24} className="text-slate-600" />
                     )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -61,7 +61,7 @@ export default function DrugListItem({ drug, onEdit, onClick, onContextMenu, onL
                         e.stopPropagation();
                         if (onMoreClick) onMoreClick(drug);
                     }}
-                    className="p-2 text-slate-300 hover:text-slate-500 rounded-full hover:bg-slate-50 transition-colors"
+                    className="p-2 text-slate-600 hover:text-slate-800 rounded-full hover:bg-slate-50 transition-colors"
                 >
                     <MoreVertical size={20} />
                 </button>

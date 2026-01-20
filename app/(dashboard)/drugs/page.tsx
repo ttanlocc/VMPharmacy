@@ -143,7 +143,7 @@ export default function DrugsPage() {
                 <div className="flex justify-between items-end">
                     <div>
                         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Kho thuốc</h1>
-                        <p className="text-slate-500 text-sm font-medium">Quản lý danh mục thuốc của bạn</p>
+                        <p className="text-slate-800 text-sm font-medium">Quản lý danh mục thuốc của bạn</p>
                     </div>
                     <div className="flex gap-2">
                         <DrugGroupManager />
@@ -158,7 +158,7 @@ export default function DrugsPage() {
 
                 {/* Search */}
                 <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700" size={20} />
                     <input
                         type="text"
                         value={search}
@@ -186,7 +186,7 @@ export default function DrugsPage() {
                                 />
                             ))
                         ) : (
-                            <div className="text-center py-20 text-slate-400 font-medium">
+                            <div className="text-center py-20 text-slate-700 font-medium">
                                 Chưa có thuốc nào trong danh sách
                             </div>
                         )}
@@ -204,7 +204,7 @@ export default function DrugsPage() {
                             </h3>
                             <button
                                 onClick={() => setIsModalOpen(false)}
-                                className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-50 transition-colors"
+                                className="p-2 text-slate-700 hover:text-slate-600 rounded-full hover:bg-slate-50 transition-colors"
                             >
                                 <X size={24} />
                             </button>
@@ -225,8 +225,8 @@ export default function DrugsPage() {
                                                 <LoadingSpinner size={20} label="" className="p-0" />
                                             ) : (
                                                 <>
-                                                    <ImageIcon size={28} className="text-slate-300" />
-                                                    <span className="text-[10px] font-bold text-slate-400 mt-2 uppercase">Chọn ảnh</span>
+                                                    <ImageIcon size={28} className="text-slate-600" />
+                                                    <span className="text-[10px] font-bold text-slate-700 mt-2 uppercase">Chọn ảnh</span>
                                                 </>
                                             )}
                                         </>

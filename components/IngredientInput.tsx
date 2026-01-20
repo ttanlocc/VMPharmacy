@@ -68,7 +68,7 @@ export default function IngredientInput({ value, onChange }: IngredientInputProp
                             onChange('');
                             setSuggestions([]);
                         }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-700 hover:text-slate-600"
                     >
                         <X size={16} />
                     </button>

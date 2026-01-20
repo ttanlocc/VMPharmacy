@@ -29,7 +29,7 @@ export default function PriceEditor({
 
     return (
         <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-            {label && <span className="text-xs text-slate-500 mr-1">{label}</span>}
+            {label && <span className="text-xs text-slate-800 mr-1">{label}</span>}
 
             <button
                 onClick={handleDecrement}

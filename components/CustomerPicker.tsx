@@ -70,12 +70,12 @@ export default function CustomerPicker({ onSelect, selectedCustomer, forceOpen }
                         </div>
                         <div>
                             <p className="font-bold text-slate-900">{selectedCustomer.name}</p>
-                            <p className="text-xs font-medium text-slate-500">{selectedCustomer.phone}</p>
+                            <p className="text-xs font-medium text-slate-800">{selectedCustomer.phone}</p>
                         </div>
                     </div>
                     <button
                         onClick={() => onSelect(null)}
-                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                        className="p-2 text-slate-700 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
                     >
                         <X size={20} />
                     </button>
@@ -88,7 +88,7 @@ export default function CustomerPicker({ onSelect, selectedCustomer, forceOpen }
                                 setIsOpen(!isOpen);
                             }
                         }}
-                        className="w-full flex items-center gap-3 p-4 bg-white border border-slate-200 border-dashed rounded-2xl text-slate-500 hover:bg-sky-50 hover:border-sky-200 hover:text-sky-600 transition-all font-bold"
+                        className="w-full flex items-center gap-3 p-4 bg-white border border-slate-200 border-dashed rounded-2xl text-slate-800 hover:bg-sky-50 hover:border-sky-200 hover:text-sky-600 transition-all font-bold"
                     >
                         <div className="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center">
                             <User size={20} />
@@ -108,7 +108,7 @@ export default function CustomerPicker({ onSelect, selectedCustomer, forceOpen }
                                 {!isCreating ? (
                                     <>
                                         <div className="relative mb-4">
-                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700" size={18} />
                                             <input
                                                 autoFocus
                                                 value={query}
@@ -131,14 +131,14 @@ export default function CustomerPicker({ onSelect, selectedCustomer, forceOpen }
                                                     >
                                                         <div>
                                                             <p className="font-bold text-slate-800">{c.name}</p>
-                                                            <p className="text-xs text-slate-500">{c.phone}</p>
+                                                            <p className="text-xs text-slate-800">{c.phone}</p>
                                                         </div>
                                                         <Check size={16} className="text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                     </button>
                                                 ))
                                             ) : (
                                                 query && !loading && (
-                                                    <div className="text-center py-4 text-slate-400 text-sm">
+                                                    <div className="text-center py-4 text-slate-700 text-sm">
                                                         Không tìm thấy khách hàng
                                                     </div>
                                                 )
@@ -156,7 +156,7 @@ export default function CustomerPicker({ onSelect, selectedCustomer, forceOpen }
                                     <form onSubmit={handleCreateWrapper} className="space-y-3">
                                         <div className="flex items-center justify-between mb-2">
                                             <h4 className="font-bold text-slate-800">Thêm mới</h4>
-                                            <button type="button" onClick={() => setIsCreating(false)} className="text-sm text-slate-400 font-bold hover:text-slate-600">Hủy</button>
+                                            <button type="button" onClick={() => setIsCreating(false)} className="text-sm text-slate-700 font-bold hover:text-slate-600">Hủy</button>
                                         </div>
                                         <input
                                             required

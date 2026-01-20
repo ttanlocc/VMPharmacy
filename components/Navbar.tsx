@@ -29,7 +29,7 @@ export default function Navbar() {
                             href={item.href}
                             className={cn(
                                 "flex flex-col items-center gap-1 transition-colors w-16",
-                                isActive ? "text-primary" : "text-slate-400 hover:text-slate-600"
+                                isActive ? "text-primary" : "text-slate-700 hover:text-slate-600"
                             )}
                         >
                             <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
@@ -57,7 +57,7 @@ export default function Navbar() {
                             href={item.href}
                             className={cn(
                                 "flex flex-col items-center gap-1 transition-colors w-16",
-                                isActive ? "text-primary" : "text-slate-400 hover:text-slate-600"
+                                isActive ? "text-primary" : "text-slate-700 hover:text-slate-600"
                             )}
                         >
                             <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />

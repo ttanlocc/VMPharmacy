@@ -73,7 +73,7 @@ export default function CustomerOrderHistory({ customerId, customer }: CustomerO
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 gap-3 text-slate-400">
+            <div className="flex flex-col items-center justify-center py-20 gap-3 text-slate-700">
                 <Loader2 size={32} className="animate-spin text-primary" />
                 <p className="font-medium">Đang tải lịch sử...</p>
             </div>
@@ -83,12 +83,12 @@ export default function CustomerOrderHistory({ customerId, customer }: CustomerO
     if (orders.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
-                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
+                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-600">
                     <History size={32} />
                 </div>
                 <div>
                     <h4 className="font-bold text-slate-900">Chưa có đơn hàng</h4>
-                    <p className="text-sm text-slate-500 max-w-[200px] mt-1">Khách hàng này chưa thực hiện giao dịch nào.</p>
+                    <p className="text-sm text-slate-800 max-w-[200px] mt-1">Khách hàng này chưa thực hiện giao dịch nào.</p>
                 </div>
             </div>
         );
@@ -97,8 +97,8 @@ export default function CustomerOrderHistory({ customerId, customer }: CustomerO
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between px-2">
-                <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">Đơn hàng gần đây</h4>
-                <span className="text-xs font-bold text-slate-400">{orders.length} đơn</span>
+                <h4 className="text-sm font-black text-slate-700 uppercase tracking-widest">Đơn hàng gần đây</h4>
+                <span className="text-xs font-bold text-slate-700">{orders.length} đơn</span>
             </div>
 
             <div className="space-y-3">
@@ -111,7 +111,7 @@ export default function CustomerOrderHistory({ customerId, customer }: CustomerO
                         className="bg-white border border-slate-100 rounded-[1.5rem] overflow-hidden shadow-sm hover:shadow-md hover:border-sky-100 transition-all p-4"
                     >
                         <div className="flex justify-between items-start mb-3">
-                            <div className="flex items-center gap-2 text-slate-500">
+                            <div className="flex items-center gap-2 text-slate-800">
                                 <Clock size={14} />
                                 <span className="text-xs font-bold uppercase tracking-tight">
                                     {formatDistanceToNow(new Date(order.created_at), { addSuffix: true, locale: vi })}
@@ -129,12 +129,12 @@ export default function CustomerOrderHistory({ customerId, customer }: CustomerO
                                         {oi.drugs?.image_url ? (
                                             <img src={oi.drugs.image_url} alt="" className="w-full h-full object-cover" />
                                         ) : (
-                                            <Pill size={16} className="text-slate-300" />
+                                            <Pill size={16} className="text-slate-600" />
                                         )}
                                     </div>
                                 ))}
                                 {order.order_items.length > 3 && (
-                                    <div className="h-10 w-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-500 shadow-sm relative z-0">
+                                    <div className="h-10 w-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-800 shadow-sm relative z-0">
                                         +{order.order_items.length - 3}
                                     </div>
                                 )}
@@ -143,7 +143,7 @@ export default function CustomerOrderHistory({ customerId, customer }: CustomerO
                                 <p className="text-sm font-bold text-slate-800 line-clamp-1">
                                     {order.order_items.map(oi => oi.drugs?.name).join(', ')}
                                 </p>
-                                <p className="text-[10px] text-slate-500 font-medium">
+                                <p className="text-[10px] text-slate-800 font-medium">
                                     {order.order_items.length} mặt hàng
                                 </p>
                             </div>

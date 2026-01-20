@@ -48,7 +48,7 @@ export default function SaveTemplateModal({ isOpen, onClose, onSave, items, tota
                                 <Save size={20} className="text-indigo-600" />
                                 Lưu Đơn Mẫu
                             </h3>
-                            <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
+                            <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-700">
                                 <X size={24} />
                             </button>
                         </div>
@@ -72,7 +72,7 @@ export default function SaveTemplateModal({ isOpen, onClose, onSave, items, tota
                                     onChange={(e) => setPrice(e.target.value)}
                                     className="font-bold text-indigo-600"
                                 />
-                                <p className="text-xs text-slate-500 mt-1 ml-1">Tự động tính từ tổng đơn hiện tại ({formatCurrency(total)})</p>
+                                <p className="text-xs text-slate-800 mt-1 ml-1">Tự động tính từ tổng đơn hiện tại ({formatCurrency(total)})</p>
                             </div>
 
                             <div>
@@ -91,14 +91,14 @@ export default function SaveTemplateModal({ isOpen, onClose, onSave, items, tota
                                     {items.map((item, idx) => (
                                         <div key={idx} className="flex items-center gap-2 text-sm">
                                             <div className="h-6 w-6 rounded bg-white border border-slate-200 flex items-center justify-center shrink-0">
-                                                {item.type === 'template' ? <ClipboardList size={12} className="text-indigo-400" /> : <div className="text-[10px] font-bold text-slate-500">Rx</div>}
+                                                {item.type === 'template' ? <ClipboardList size={12} className="text-indigo-400" /> : <div className="text-[10px] font-bold text-slate-800">Rx</div>}
                                             </div>
                                             <span className="flex-1 truncate text-slate-700 font-medium">{item.name}</span>
                                             <span className="text-slate-900 font-bold">x{item.quantity}</span>
                                         </div>
                                     ))}
                                 </div>
-                                <p className="text-[10px] text-slate-500 mt-1 italic text-center">
+                                <p className="text-[10px] text-slate-800 mt-1 italic text-center">
                                     * Các thuốc trong đơn mẫu con sẽ được gộp thành thuốc lẻ.
                                 </p>
                             </div>

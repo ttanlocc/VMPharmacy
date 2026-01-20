@@ -68,9 +68,9 @@ export default function TemplatePicker({ isOpen, onClose, onSelect }: TemplatePi
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center shrink-0">
                             <div>
                                 <h3 className="text-xl font-extrabold text-slate-800 uppercase tracking-tight">Chọn Đơn Mẫu</h3>
-                                <p className="text-xs text-slate-500 font-medium">Tìm kiếm nhanh theo tên hoặc thuốc</p>
+                                <p className="text-xs text-slate-800 font-medium">Tìm kiếm nhanh theo tên hoặc thuốc</p>
                             </div>
-                            <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors">
+                            <button onClick={onClose} className="p-2 text-slate-700 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors">
                                 <X size={24} />
                             </button>
                         </div>
@@ -108,10 +108,10 @@ export default function TemplatePicker({ isOpen, onClose, onSelect }: TemplatePi
                                                     <div className="flex justify-between items-start mb-2">
                                                         <h4 className="font-bold text-slate-800 text-lg group-hover:text-sky-600 transition-colors">{template.name}</h4>
                                                         <div className="flex gap-2">
-                                                            <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-lg self-start">
+                                                            <span className="text-[10px] font-bold bg-slate-100 text-slate-800 px-2 py-1 rounded-lg self-start">
                                                                 {template.items?.length || 0} món
                                                             </span>
-                                                            {isExpanded ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
+                                                            {isExpanded ? <ChevronUp size={16} className="text-slate-700" /> : <ChevronDown size={16} className="text-slate-700" />}
                                                         </div>
                                                     </div>
 
@@ -123,12 +123,12 @@ export default function TemplatePicker({ isOpen, onClose, onSelect }: TemplatePi
                                                                         {item.drugs?.image_url ? (
                                                                             <img src={item.drugs.image_url} className="w-full h-full object-cover" alt="" />
                                                                         ) : (
-                                                                            <Pill size={14} className="text-slate-300" />
+                                                                            <Pill size={14} className="text-slate-600" />
                                                                         )}
                                                                     </div>
                                                                 ))}
                                                                 {template.items && template.items.length > 5 && (
-                                                                    <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-500">
+                                                                    <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-800">
                                                                         +{template.items.length - 5}
                                                                     </div>
                                                                 )}
@@ -159,7 +159,7 @@ export default function TemplatePicker({ isOpen, onClose, onSelect }: TemplatePi
                                                                             <div className="w-6 h-6 rounded bg-white border border-slate-200 flex items-center justify-center shrink-0">
                                                                                 {item.drugs?.image_url ? (
                                                                                     <img src={item.drugs.image_url} className="w-full h-full object-cover rounded-[3px]" />
-                                                                                ) : <Pill size={12} className="text-slate-300" />}
+                                                                                ) : <Pill size={12} className="text-slate-600" />}
                                                                             </div>
                                                                             <span className="text-slate-700 font-medium line-clamp-1">{item.drugs?.name}</span>
                                                                         </div>
@@ -181,7 +181,7 @@ export default function TemplatePicker({ isOpen, onClose, onSelect }: TemplatePi
                                         )
                                     })
                                 ) : (
-                                    <div className="text-center py-10 text-slate-400">
+                                    <div className="text-center py-10 text-slate-700">
                                         <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
                                             <Pill size={24} className="opacity-50" />
                                         </div>

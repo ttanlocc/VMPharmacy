@@ -23,7 +23,7 @@ export default function HistoryPage() {
                 <div className="flex justify-between items-end">
                     <div>
                         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Lịch sử</h1>
-                        <p className="text-slate-500 text-sm font-medium">Quản lý đơn hàng đã bán</p>
+                        <p className="text-slate-800 text-sm font-medium">Quản lý đơn hàng đã bán</p>
                     </div>
                 </div>
 
@@ -33,7 +33,7 @@ export default function HistoryPage() {
                     <LoadingSpinner label="Đang tải lịch sử..." className="mt-10" />
                 ) : (
                     orders.length === 0 ? (
-                        <div className="text-center py-20 text-slate-400 bg-white/50 border-2 border-dashed border-slate-200 rounded-[2rem]">
+                        <div className="text-center py-20 text-slate-700 bg-white/50 border-2 border-dashed border-slate-200 rounded-[2rem]">
                             <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
                             <p className="font-bold">Không tìm thấy đơn hàng nào</p>
                             <p className="text-sm">Thử thay đổi bộ lọc tìm kiếm</p>
@@ -52,7 +52,7 @@ export default function HistoryPage() {
                                         className="p-5 flex items-center justify-between cursor-pointer active:bg-slate-50 transition-colors"
                                     >
                                         <div className="flex flex-col gap-2">
-                                            <div className="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-wider">
+                                            <div className="flex items-center gap-2 text-slate-800 text-xs font-bold uppercase tracking-wider">
                                                 <Calendar size={12} />
                                                 {new Date(order.created_at).toLocaleDateString('vi-VN', {
                                                     day: '2-digit',
@@ -81,14 +81,14 @@ export default function HistoryPage() {
                                         <div className="flex items-center gap-3">
                                             <div className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded-full ${order.status === 'completed'
                                                     ? 'bg-green-100 text-green-700'
-                                                    : 'bg-slate-100 text-slate-500'
+                                                    : 'bg-slate-100 text-slate-800'
                                                 }`}>
                                                 {order.status === 'completed' ? 'Hoàn thành' : order.status}
                                             </div>
                                             {expandedId === order.id ? (
-                                                <ChevronUp size={20} className="text-slate-400" />
+                                                <ChevronUp size={20} className="text-slate-700" />
                                             ) : (
-                                                <ChevronDown size={20} className="text-slate-400" />
+                                                <ChevronDown size={20} className="text-slate-700" />
                                             )}
                                         </div>
                                     </div>
@@ -117,7 +117,7 @@ export default function HistoryPage() {
                                                                     <div className="font-bold text-slate-700">
                                                                         {item.drugs?.name || 'Thuốc đã xóa'}
                                                                     </div>
-                                                                    <div className="text-xs text-slate-400 font-medium">
+                                                                    <div className="text-xs text-slate-700 font-medium">
                                                                         {item.quantity} {item.drugs?.unit} x {formatCurrency(item.unit_price)}
                                                                     </div>
                                                                 </div>
@@ -129,7 +129,7 @@ export default function HistoryPage() {
                                                     ))}
                                                     {order.customers?.medical_history && (
                                                         <div className="mt-4 pt-4 border-t border-slate-200/50">
-                                                            <p className="text-xs font-bold text-slate-400 uppercase mb-1">Ghi chú / Tiền sử</p>
+                                                            <p className="text-xs font-bold text-slate-700 uppercase mb-1">Ghi chú / Tiền sử</p>
                                                             <p className="text-sm text-slate-600">{order.customers.medical_history}</p>
                                                         </div>
                                                     )}

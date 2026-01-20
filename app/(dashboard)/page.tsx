@@ -17,7 +17,7 @@ export default function Home() {
             >
                 <div>
                     <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Nhà thuốc Văn Minh</h1>
-                    <p className="text-slate-500 text-sm font-medium">Chào buổi sáng, Dược sĩ!</p>
+                    <p className="text-slate-800 text-sm font-medium">Chào buổi sáng, Dược sĩ!</p>
                 </div>
                 <div className="h-12 w-12 overflow-hidden rounded-2xl bg-white/50 backdrop-blur-sm border border-white/60 p-1 shadow-sm">
                     <img
