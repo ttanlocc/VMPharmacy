@@ -1,0 +1,44 @@
+legacy_id,name,active_ingredient,parent_group,child_group,unit,unit_price,purchase_price,supplier,image_url
+VD-25530-16,AMEFLU (Day),"Acetaminophen (Paracetamol): 500 mg, Guaifenesin: 200 mg, Phenylephrin HCl: 10 mg, Dextromethorphan HBr: 15 mg",2. GIẢM ĐAU KHÁNG VIÊM,Giảm đau hạ sốt,Viên,1500,1000,Công Ty Thái Nhân,THUỐC_Images/b8dd92a2.HÌNH.120434.jpg
+VD-32115-19,TRAVICOL FLU,"Paracetamol 500mg, Dextromethorphan 5mg, Loratadin 5mg",2. GIẢM ĐAU KHÁNG VIÊM,Giảm đau hạ sốt,Viên,1000,800,Dược Trà Vinh,THUỐC_Images/2a7c9752.HÌNH.120447.jpg
+VD-19615-13,CEPHA ÁO (Cephalexin 250),Cephalexin 250mg,1. KHÁNG SINH,A. Betalactam (Thế hệ 1),Viên,3500,3200,,https://cdn.upharma.vn/unsafe/3840x0/filters:quality(90)/san-pham/11445.png
+VD-25219-16,AMOXICILLIN 500mg,Amoxicillin 500mg,1. KHÁNG SINH,A. Betalactam (Penicilin),Viên,1000,800,,https://cdn.nhathuoclongchau.com.vn/v1/static/00000739_amoxicillin_500mg_mekophar_5641_5b71_large_134c2e50f4.JPG
+VD-25218-16,AMOXICILLIN 250mg,Amoxicillin 250mg,1. KHÁNG SINH,A. Betalactam (Penicilin),Gói,0,0,,THUỐC_Images/Amoxicilin 250mg.HÌNH.063530.jpg
+VD-25316-16,VIDALOXIN 250,Cephalexin 250mg,1. KHÁNG SINH,A. Betalactam (Thế hệ 1),Gói,0,0,,https://cdn.medigoapp.com/product/f3f3c2c2053d4fe68950ec2dda9b72c8./api/v1/getimagefile1024/b7402c9fb8494ccdaa7dd70d1f081389/wunazflry2havwfuvzmrmufpcnjoswwra1fgrlrpvvjsehnhy1rhsvkysklldefqmxpqbdz1clnlsvd1twvncur3mmlxy2dmemjyr2nlakpfdzbybnvgzzzcbwlfnevwrupyveltcgt5dfrxnw1kwvdtumtnvy8ym0pjz3lwtu9uzlpquuttrhm1wlmrmunbauu2m1znpt02nmfhyzrhndg5mjbkmgrmmjy4ywi3m2uwn2zjndm2yg==
+VD-19615-13,CEPHALEXIN 250 (DHG),Cephalexin 250mg,1. KHÁNG SINH,A. Betalactam (Thế hệ 1),Gói,0,0,,https://nhathuocthanthien.com.vn/wp-content/uploads/2024/01/dgm_nttt_Cephalexin-250mg.jpg
+VD-20037-13,HAGIMOX 250,Amoxicillin 250mg,1. KHÁNG SINH,A. Betalactam (Penicilin),Viên,0,0,,https://parapharmacy.vn/wp-content/uploads/2021/06/hagimox-500mg-dhg-pharma-10-vi-x-10-vien-.webp
+VD-23847-15,GLOTADOL FLU,"Paracetamol 500mg, Phenylephrine 5mg, Loratadin 5mg",2. GIẢM ĐAU KHÁNG VIÊM,Giảm đau hạ sốt,Viên,0,0,,https://cdnv2.tgdd.vn/mwg-static/ankhang/Products/Images/10022/243420/glotadol-flu-thumb01-638767824354623996-600x600.jpg
+VD-21512-14,A.C MEXCOLD,"Paracetamol 325mg, Clopheniramin 2mg",2. GIẢM ĐAU KHÁNG VIÊM,Giảm đau hạ sốt,Viên,1200,1000,Imex,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZcM-jrlKSPwjN08XuZv3HusIG75QSmKyoig&s
+VD-24345-16,BIVIFLU,"Paracetamol, Phenylephrine, Chlorpheniramine",2. GIẢM ĐAU KHÁNG VIÊM,Giảm đau hạ sốt,Viên,1200,1000,,https://www.pharmart.vn/images/product/430_430/biviflu-dieu-tri-cac-trieu-chung-cam-cum-6523ab503b411.jpg
+VD-25807-16,KLAMENTIN 500/62.5,Amoxicillin 500mg + Acid clavulanic 62.5mg,1. KHÁNG SINH,A. Betalactam (Phối hợp),Viên,0,0,,
+VD-25808-16,KLAMENTIN 1g,Amoxicillin 875mg + Acid clavulanic 125mg,1. KHÁNG SINH,A. Betalactam (Phối hợp),Viên,0,0,,
+VD-20387-14,DICLOFENAC DHG,Diclofenac natri 50mg,2. GIẢM ĐAU KHÁNG VIÊM,A. NSAID,Viên,0,0,,
+VN-18548-14,MYSOBENAL,Eperisone hydrochloride 50mg,3. DÃN CƠ VÂN,(Dãn cơ vân),Viên,0,0,,
+VD-21151-14,DOCHICHIN,Colchicine 1mg,2. TRỊ GOUT,A. Cấp tính,Viên,0,0,,http://domesco.com/san-pham/thuoc-hoa-duoc/giam-dau-ha-sot/thuoc-dieu-tri-gut/dochicin-1mg.html
+VN-18520-14,MEDROL 4mg,Methylprednisolone 4mg,2. GIẢM ĐAU KHÁNG VIÊM,B. Corticoid,Viên,0,0,,
+VN-18521-14,MEDROL 16mg,Methylprednisolone 16mg,2. GIẢM ĐAU KHÁNG VIÊM,B. Corticoid,Viên,0,0,,
+VD-24611-16,HAPENXIN 250 CAPS (Hồng-Trắng),Cephalexin 250mg,1. KHÁNG SINH,A. Betalactam (Thế hệ 1),Viên,0,0,,
+VD-24611-16,HAPENXIN 500 CAPS (Xanh-Tím),Cephalexin 500mg,1. KHÁNG SINH,A. Betalactam (Thế hệ 1),Viên,0,0,,
+VD-24611-16,HAPENXIN 500 CAPS (Xám-Vàng),Cephalexin 500mg,1. KHÁNG SINH,A. Betalactam (Thế hệ 1),Viên,0,0,,
+VD-21509-14,HAPACOL CF FORT,"Paracetamol 325mg, Phenylephrine 5mg, Dextromethorphan 10mg",2. GIẢM ĐAU KHÁNG VIÊM,Giảm đau hạ sốt,Viên,0,0,,
+VD-14069,COLDNIC,"Cetirizine Hydrochlorid 5mg, Dextromethorphan 15mg, Guaifenesin 100mg",2. GIẢM ĐAU KHÁNG VIÊM,Giảm đau hạ sốt,Viên,0,0,,
+VD-24706-16,CEDETAMIN (Vỉ màu hồng),"Betamethason 0.25mg, Dexchlorpheniramin 2mg",4. KHÁNG HISTAMIN H1,Thế hệ 1,Viên,0,0,,
+VD-24706-16,CEDETAMIN (Vỉ màu xanh),"Betamethason 0.25mg, Dexchlorpheniramin 2mg",4. KHÁNG HISTAMIN H1,Thế hệ 1,Viên,0,0,,
+VD-21516-14,DEXAMETHASONE (Imexpharm),Dexamethason 0.5mg,2. GIẢM ĐAU KHÁNG VIÊM,B. Corticoid,Viên,0,0,,
+VD-12154-10,DEXAMETHASON (Tipharco - Tiền Giang),Dexamethason 0.5mg,2. GIẢM ĐAU KHÁNG VIÊM,B. Corticoid,Viên,0,0,,
+VD-15228-11,DEXAMETHASON (Bepharco - Bến Tre),Dexamethason 0.5mg,2. GIẢM ĐAU KHÁNG VIÊM,B. Corticoid,Viên,0,0,,
+VD-25381-16,DEXAMETHASON (Hadiphar - Hà Tĩnh),Dexamethason 0.5mg,2. GIẢM ĐAU KHÁNG VIÊM,B. Corticoid,Viên,0,0,,
+VD-25081-16,NEO-PYRAZON,Diclofenac natri 50mg,2. GIẢM ĐAU KHÁNG VIÊM,A. NSAID,Viên,0,0,,
+VD-25595-16,MELOXICAM 7.5mg,Meloxicam 7.5mg,2. GIẢM ĐAU KHÁNG VIÊM,A. NSAID,Viên,0,0,,
+VD-23645-15,MENPEPTINE,"Papain, Alpha-amylase, Simethicone",7. NHÓM TIÊU HOÁ,F. Men vi sinh / Men tiêu hóa,Viên,0,0,,
+VN-17154-13,NEOPEPTINE,"Alpha-amylase, Papain, Simethicone",7. NHÓM TIÊU HOÁ,F. Men vi sinh / Men tiêu hóa,Viên,0,0,,
+VN-19602-16,GASICONE 80,Simethicone 80mg,7. NHÓM TIÊU HOÁ,B. Antacid (Giảm đầy hơi),Viên,0,0,,
+VD-21644-14,OMEPRAZOL 20,Omeprazol 20mg,7. NHÓM TIÊU HOÁ,A. PPI,Viên,0,0,,
+VD-24508-16,IBOTEN,Trimebutin maleat 100mg,2. GIẢM ĐAU KHÁNG VIÊM,A. NSAID (Phối hợp),Viên,0,0,,https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTie0Y8H7VcnAF4kNqoE1JLatj6AFpaDhYGLzd6owpk-WvdWWY_8_1FtlThgxF3
+VD-20412-14,NEUTRI FORE,"Vitamin B1, B6, B12 (Liều cao)",12. VITAMIN & KHOÁNG CHẤT,Nhóm Vitamin B,Viên,0,0,,https://www.nhathuocankhang.com/thuoc-bo-va-vitamin/neutri-fore-h-100v
+VD-30511-18,GLUCOSAMINE 500,Glucosamine sulfate,13. THỰC PHẨM CHỨC NĂNG,Hỗ trợ xương khớp,Viên,0,0,,
+VD-21510-14,HAPACOL PRIME 500,"Paracetamol 500mg, Ibuprofen 200",2. GIẢM ĐAU KHÁNG VIÊM,Giảm đau hạ sốt,Viên,0,0,,
+VD-21394-14,MASTIGEL,"Magnesi hydroxyd, Nhôm hydroxyd, Simethicone",7. NHÓM TIÊU HOÁ,B. Antacid,Viên,0,0,,
+VD-25032-16,TETRACYCLIN 500,Tetracyclin 500mg,1. KHÁNG SINH,E. Nhóm Cyclin,Viên,0,0,,
+VD-25217-16,AMPICILLIN 500,Ampicillin 500mg,1. KHÁNG SINH,A. Betalactam (Penicilin),Viên,0,0,,
+VD-32001-19,PANCRETINE-MDP,"Pancreatin, Simethicone",7. NHÓM TIÊU HOÁ,F. Men vi sinh / Men tiêu hóa,Viên,0,0,,

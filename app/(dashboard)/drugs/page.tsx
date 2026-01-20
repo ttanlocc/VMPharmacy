@@ -12,7 +12,7 @@ import SwipeableItem from '@/components/SwipeableItem';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { DrugGroupManager } from '@/components/DrugGroupManager';
-import IngredientInput from '@/components/IngredientInput';
+import MultiIngredientInput from '@/components/MultiIngredientInput';
 import { useLongPress } from '@/components/useLongPress'; // Keeping this for now if needed, but actually we should remove it if unused. Wait, better to replace it with DrugListItem import.
 import DrugListItem from '@/components/DrugListItem';
 import { ActionMenu } from '@/components/ActionMenu';
@@ -255,7 +255,7 @@ export default function DrugsPage() {
 
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Hoạt chất</label>
-                                    <IngredientInput
+                                    <MultiIngredientInput
                                         value={activeIngredient}
                                         onChange={setActiveIngredient}
                                     />
