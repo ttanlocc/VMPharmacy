@@ -249,7 +249,7 @@ export default function DrugsPage() {
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                         placeholder="VD: Panadol Extra"
-                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all"
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all text-slate-900 font-bold placeholder:text-slate-400"
                                     />
                                 </div>
 
@@ -267,7 +267,7 @@ export default function DrugsPage() {
                                         <select
                                             value={groupId}
                                             onChange={(e) => setGroupId(e.target.value)}
-                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all appearance-none"
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all appearance-none text-slate-900 font-bold"
                                         >
                                             <option value="">Chọn nhóm...</option>
                                             {groups.map(g => (
@@ -286,7 +286,7 @@ export default function DrugsPage() {
                                             value={price}
                                             onChange={(e) => setPrice(e.target.value)}
                                             placeholder="5.000"
-                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all"
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all text-slate-900 font-bold placeholder:text-slate-400"
                                         />
                                     </div>
                                     <div className="w-1/3">
@@ -294,7 +294,7 @@ export default function DrugsPage() {
                                         <select
                                             value={unit}
                                             onChange={(e) => setUnit(e.target.value)}
-                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all appearance-none"
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all appearance-none text-slate-900 font-bold"
                                         >
                                             {DRUG_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
                                         </select>
