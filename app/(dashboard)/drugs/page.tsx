@@ -212,6 +212,7 @@ export default function DrugsPage() {
                     selectedSubGroup={selectedSubGroup}
                     onMainGroupChange={setSelectedMainGroup}
                     onSubGroupChange={setSelectedSubGroup}
+                    drugs={drugs}
                 />
 
                 {/* List */}

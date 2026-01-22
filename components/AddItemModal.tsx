@@ -204,6 +204,7 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                         selectedSubGroup={selectedSubGroup}
                                         onMainGroupChange={setSelectedMainGroup}
                                         onSubGroupChange={setSelectedSubGroup}
+                                        drugs={drugs}
                                     />
                                 </div>
 

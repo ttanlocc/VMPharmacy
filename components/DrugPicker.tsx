@@ -79,6 +79,7 @@ export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProp
                             selectedSubGroup={selectedSubGroup}
                             onMainGroupChange={setSelectedMainGroup}
                             onSubGroupChange={setSelectedSubGroup}
+                            drugs={drugs}
                         />
                     </div>
 

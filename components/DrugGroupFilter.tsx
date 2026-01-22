@@ -3,6 +3,7 @@
 import { useDrugGroups } from '@/hooks/useDrugGroups';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
+import { Drug } from '@/hooks/useDrugs';
 
 interface DrugGroupFilterProps {
     selectedMainGroup: string | null;
@@ -10,6 +11,7 @@ interface DrugGroupFilterProps {
     onMainGroupChange: (id: string | null) => void;
     onSubGroupChange: (id: string | null) => void;
     compact?: boolean;
+    drugs: Drug[];
 }
 
 export default function DrugGroupFilter({
@@ -17,12 +19,33 @@ export default function DrugGroupFilter({
     selectedSubGroup,
     onMainGroupChange,
     onSubGroupChange,
-    compact = false
+    compact = false,
+    drugs
 }: DrugGroupFilterProps) {
-    const { hierarchical, getChildGroups } = useDrugGroups();
+    const { hierarchical, getChildGroups, getGroupIdsUnderParent } = useDrugGroups();
     const { parentGroups } = hierarchical;
 
-    const childGroups = selectedMainGroup ? getChildGroups(selectedMainGroup) : [];
+    // Helper to check if a group has any drugs (directly or via children)
+    const hasDrugs = (groupId: string) => {
+        // Direct match
+        if (drugs.some(d => d.group_id === groupId)) return true;
+
+        // Check children
+        const children = getChildGroups(groupId);
+        if (children.length > 0) {
+            const childIds = children.map(c => c.id);
+            if (drugs.some(d => d.group_id && childIds.includes(d.group_id))) return true;
+        }
+
+        return false;
+    };
+
+    // Filter main groups
+    const visibleParentGroups = parentGroups.filter(group => hasDrugs(group.id));
+
+    // Get current child groups and filter them
+    const allChildGroups = selectedMainGroup ? getChildGroups(selectedMainGroup) : [];
+    const visibleChildGroups = allChildGroups.filter(group => hasDrugs(group.id));
 
     const handleMainGroupClick = (id: string | null) => {
         if (id === selectedMainGroup) {
@@ -43,6 +66,9 @@ export default function DrugGroupFilter({
         }
     };
 
+    // If no groups visible, don't render anything (except maybe "All" if desired)
+    // But usually we want to keep "All" always visible
+
     return (
         <div className="space-y-2">
             {/* Main Groups Row */}
@@ -58,7 +84,7 @@ export default function DrugGroupFilter({
                 >
                     Tất cả
                 </button>
-                {parentGroups.map(group => (
+                {visibleParentGroups.map(group => (
                     <button
                         key={group.id}
                         onClick={() => handleMainGroupClick(group.id)}
@@ -83,8 +109,8 @@ export default function DrugGroupFilter({
                 ))}
             </div>
 
-            {/* Sub Groups Row - Only show when main group is selected and has children */}
-            {selectedMainGroup && childGroups.length > 0 && (
+            {/* Sub Groups Row - Only show when main group is selected and has visible children */}
+            {selectedMainGroup && visibleChildGroups.length > 0 && (
                 <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar pl-2 border-l-2 border-primary/20">
                     <button
                         onClick={() => handleSubGroupClick(null)}
@@ -97,7 +123,7 @@ export default function DrugGroupFilter({
                     >
                         Tất cả nhóm con
                     </button>
-                    {childGroups.map(group => (
+                    {visibleChildGroups.map(group => (
                         <button
                             key={group.id}
                             onClick={() => handleSubGroupClick(group.id)}
