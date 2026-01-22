@@ -180,10 +180,24 @@ function CheckoutContent() {
                 }
             });
 
+            // Filter out items with missing drug_id (e.g., deleted drugs still in localStorage)
+            const validItems = flattenedItems.filter(item => item.drug_id);
+            const invalidCount = flattenedItems.length - validItems.length;
+
+            if (invalidCount > 0) {
+                toast.error(`${invalidCount} sản phẩm không hợp lệ đã bị bỏ qua (có thể đã bị xóa)`);
+            }
+
+            if (validItems.length === 0) {
+                toast.error('Không có sản phẩm hợp lệ để thanh toán');
+                setIsSubmitting(false);
+                return;
+            }
+
             const templateItem = items.find(i => i.type === 'template');
             const primaryTemplateId = templateItem?.template_id || templateIdParam || null;
 
-            await createOrder(flattenedItems, total, customer?.id, primaryTemplateId);
+            await createOrder(validItems, total, customer?.id, primaryTemplateId);
             setIsSuccess(true);
             clearCheckout();
             setTimeout(() => {

@@ -112,8 +112,29 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Validate: Filter out items with missing drug_id
+    const validItems = items.filter((item: any) => item.drug_id);
+
+    if (validItems.length === 0) {
+        return NextResponse.json({ error: 'Không có sản phẩm hợp lệ để tạo đơn hàng' }, { status: 400 });
+    }
+
+    // Validate: Check if all drug_ids exist in database
+    const drugIds = validItems.map((i: any) => i.drug_id);
+    const { data: existingDrugs } = await supabase
+        .from('drugs')
+        .select('id')
+        .in('id', drugIds);
+
+    const existingDrugIds = new Set(existingDrugs?.map(d => d.id) || []);
+    const finalValidItems = validItems.filter((item: any) => existingDrugIds.has(item.drug_id));
+
+    if (finalValidItems.length === 0) {
+        return NextResponse.json({ error: 'Tất cả sản phẩm trong đơn hàng không tồn tại hoặc đã bị xóa' }, { status: 400 });
+    }
+
     let finalTotalPrice = requestTotalPrice;
-    let finalItems = [...items];
+    let finalItems = [...finalValidItems];
 
     // Handle Template Pricing Distribution
     if (template_id) {
@@ -121,7 +142,6 @@ export async function POST(request: Request) {
         // but for price, we now respect the request's total_price (allowing per-order override).
 
         // We still need to fetch drugs to get standard prices for ratio calculation
-        const drugIds = items.map((i: any) => i.drug_id);
         const { data: drugs } = await supabase
             .from('drugs')
             .select('id, unit_price')
