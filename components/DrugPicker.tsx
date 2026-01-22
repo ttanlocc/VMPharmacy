@@ -6,11 +6,9 @@ import { useDrugGroups } from '@/hooks/useDrugGroups';
 import { DrugItem } from './DrugItem';
 import { Input } from './ui/Input';
 import LoadingSpinner from './LoadingSpinner';
+import DrugGroupFilter from './DrugGroupFilter';
 import { Search, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
-
-
 
 interface DrugPickerProps {
     isOpen: boolean;
@@ -20,13 +18,25 @@ interface DrugPickerProps {
 
 export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProps) {
     const { drugs, loading } = useDrugs();
-    const { groups } = useDrugGroups();
+    const { getGroupIdsUnderParent } = useDrugGroups();
     const [search, setSearch] = useState('');
-    const [selectedGroup, setSelectedGroup] = useState<string>('all');
+    const [selectedMainGroup, setSelectedMainGroup] = useState<string | null>(null);
+    const [selectedSubGroup, setSelectedSubGroup] = useState<string | null>(null);
 
     const filteredDrugs = drugs.filter(d => {
         const matchesSearch = d.name.toLowerCase().includes(search.toLowerCase());
-        const matchesGroup = selectedGroup === 'all' || d.group_id === selectedGroup;
+
+        // Filter logic for hierarchical groups
+        let matchesGroup = true;
+        if (selectedSubGroup) {
+            // If sub-group selected, filter by exact sub-group
+            matchesGroup = d.group_id === selectedSubGroup;
+        } else if (selectedMainGroup) {
+            // If only main group selected, filter by main group and all its children
+            const groupIds = getGroupIdsUnderParent(selectedMainGroup);
+            matchesGroup = d.group_id !== null && groupIds.includes(d.group_id);
+        }
+
         return matchesSearch && matchesGroup;
     });
 
@@ -50,7 +60,7 @@ export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProp
                         </button>
                     </div>
 
-                    {/* Search */}
+                    {/* Search & Filter */}
                     <div className="px-6 py-4 shrink-0 space-y-3">
                         <div className="relative">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-800" size={20} />
@@ -63,34 +73,13 @@ export default function DrugPicker({ isOpen, onClose, onSelect }: DrugPickerProp
                             />
                         </div>
 
-                        {/* Category Filter */}
-                        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                            <button
-                                onClick={() => setSelectedGroup('all')}
-                                className={cn(
-                                    "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
-                                    selectedGroup === 'all'
-                                        ? "bg-primary text-white"
-                                        : "bg-slate-50 text-slate-600 hover:bg-slate-100"
-                                )}
-                            >
-                                Tất cả
-                            </button>
-                            {groups.map(group => (
-                                <button
-                                    key={group.id}
-                                    onClick={() => setSelectedGroup(group.id)}
-                                    className={cn(
-                                        "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
-                                        selectedGroup === group.id
-                                            ? "bg-primary text-white"
-                                            : "bg-slate-50 text-slate-600 hover:bg-slate-100"
-                                    )}
-                                >
-                                    {group.name}
-                                </button>
-                            ))}
-                        </div>
+                        {/* Hierarchical Category Filter */}
+                        <DrugGroupFilter
+                            selectedMainGroup={selectedMainGroup}
+                            selectedSubGroup={selectedSubGroup}
+                            onMainGroupChange={setSelectedMainGroup}
+                            onSubGroupChange={setSelectedSubGroup}
+                        />
                     </div>
 
                     {/* Grid */}

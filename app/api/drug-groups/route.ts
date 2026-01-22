@@ -53,11 +53,11 @@ export async function GET() {
 
 export async function POST(request: Request) {
     const supabase = await createClient();
-    const { name } = await request.json();
+    const { name, parent_id } = await request.json();
 
     const { data, error } = await supabase
         .from('drug_groups')
-        .insert([{ name }])
+        .insert([{ name, parent_id: parent_id || null }])
         .select()
         .single();
 
@@ -70,11 +70,15 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
     const supabase = await createClient();
-    const { id, name } = await request.json();
+    const { id, name, parent_id } = await request.json();
+
+    const updateData: { name?: string; parent_id?: string | null } = {};
+    if (name !== undefined) updateData.name = name;
+    if (parent_id !== undefined) updateData.parent_id = parent_id;
 
     const { data, error } = await supabase
         .from('drug_groups')
-        .update({ name })
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();

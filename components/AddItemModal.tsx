@@ -10,6 +10,7 @@ import { useTemplates } from '@/hooks/useTemplates';
 import { DrugItem } from './DrugItem';
 import { Input } from './ui/Input';
 import LoadingSpinner from './LoadingSpinner';
+import DrugGroupFilter from './DrugGroupFilter';
 import { cn, formatCurrency } from '@/lib/utils';
 
 
@@ -34,13 +35,23 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
 
     // --- Drug Logic ---
     const { drugs, loading: drugsLoading } = useDrugs();
-    const { groups } = useDrugGroups();
+    const { getGroupIdsUnderParent } = useDrugGroups();
     const [drugSearch, setDrugSearch] = useState('');
-    const [selectedGroup, setSelectedGroup] = useState<string>('all');
+    const [selectedMainGroup, setSelectedMainGroup] = useState<string | null>(null);
+    const [selectedSubGroup, setSelectedSubGroup] = useState<string | null>(null);
 
     const filteredDrugs = drugs.filter(d => {
         const matchesSearch = d.name.toLowerCase().includes(drugSearch.toLowerCase());
-        const matchesGroup = selectedGroup === 'all' || d.group_id === selectedGroup;
+
+        // Filter logic for hierarchical groups
+        let matchesGroup = true;
+        if (selectedSubGroup) {
+            matchesGroup = d.group_id === selectedSubGroup;
+        } else if (selectedMainGroup) {
+            const groupIds = getGroupIdsUnderParent(selectedMainGroup);
+            matchesGroup = d.group_id !== null && groupIds.includes(d.group_id);
+        }
+
         return matchesSearch && matchesGroup;
     });
 
@@ -67,7 +78,6 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
             /* @ts-ignore */
             type: 'drug'
         });
-        // Feedback?
     };
 
     // --- Template Logic ---
@@ -92,7 +102,6 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
     const handleAddTemplate = (template: any, e?: React.MouseEvent) => {
         e?.stopPropagation();
 
-        // Calculate the initial total price for the template
         const templateTotal = template.total_price !== null
             ? Number(template.total_price)
             : (template.items?.reduce((acc: number, i: any) => acc + ((i.custom_price || i.drugs?.unit_price || 0) * i.quantity), 0) || 0);
@@ -105,7 +114,6 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
             type: 'template',
             template_id: template.id,
             image_url: template.image_url,
-            // Use 'Combo' or empty string for unit if not available
             unit: 'Combo',
             items: template.items?.map((i: any) => ({
                 drug_id: i.drug_id,
@@ -189,33 +197,14 @@ export default function AddItemModal({ isOpen, onClose, initialTab = 'drug' }: A
                                             className="pl-11 bg-white border-slate-200 focus:ring-primary/20"
                                         />
                                     </div>
-                                    <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar mask-gradient-right">
-                                        <button
-                                            onClick={() => setSelectedGroup('all')}
-                                            className={cn(
-                                                "px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors border",
-                                                selectedGroup === 'all'
-                                                    ? "bg-primary text-white border-primary"
-                                                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
-                                            )}
-                                        >
-                                            Tất cả
-                                        </button>
-                                        {groups.map(group => (
-                                            <button
-                                                key={group.id}
-                                                onClick={() => setSelectedGroup(group.id)}
-                                                className={cn(
-                                                    "px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors border",
-                                                    selectedGroup === group.id
-                                                        ? "bg-primary text-white border-primary"
-                                                        : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
-                                                )}
-                                            >
-                                                {group.name}
-                                            </button>
-                                        ))}
-                                    </div>
+
+                                    {/* Hierarchical Category Filter */}
+                                    <DrugGroupFilter
+                                        selectedMainGroup={selectedMainGroup}
+                                        selectedSubGroup={selectedSubGroup}
+                                        onMainGroupChange={setSelectedMainGroup}
+                                        onSubGroupChange={setSelectedSubGroup}
+                                    />
                                 </div>
 
                                 {/* List */}

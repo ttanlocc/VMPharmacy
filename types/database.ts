@@ -13,16 +13,19 @@ export interface Database {
                 Row: {
                     id: string
                     name: string
+                    parent_id: string | null
                     created_at: string
                 }
                 Insert: {
                     id?: string
                     name: string
+                    parent_id?: string | null
                     created_at?: string
                 }
                 Update: {
                     id?: string
                     name?: string
+                    parent_id?: string | null
                     created_at?: string
                 }
             }

@@ -5,30 +5,32 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDrugs, Drug } from '@/hooks/useDrugs';
 import { useDrugGroups } from '@/hooks/useDrugGroups';
-import { Plus, Search, Image as ImageIcon, X, Trash2, FolderPlus, Copy, MoreVertical, Edit } from 'lucide-react';
+import { Plus, Search, Image as ImageIcon, X, Trash2, Copy, Edit } from 'lucide-react';
 import Container from '@/components/Container';
-import DrugCard from '@/components/DrugCard';
-import SwipeableItem from '@/components/SwipeableItem';
+import DrugListItem from '@/components/DrugListItem';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { DrugGroupManager } from '@/components/DrugGroupManager';
 import MultiIngredientInput from '@/components/MultiIngredientInput';
-import { useLongPress } from '@/components/useLongPress'; // Keeping this for now if needed, but actually we should remove it if unused. Wait, better to replace it with DrugListItem import.
-import DrugListItem from '@/components/DrugListItem';
+import DrugGroupFilter from '@/components/DrugGroupFilter';
 import { ActionMenu } from '@/components/ActionMenu';
 import { uploadDrugImage } from '@/lib/upload';
-import { cn, formatCurrency } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { DRUG_UNITS } from '@/lib/constants';
 
 export default function DrugsPage() {
     const { drugs, loading, addDrug, updateDrug, deleteDrug } = useDrugs();
-    const { groups } = useDrugGroups();
+    const { hierarchical, getGroupIdsUnderParent, getChildGroups } = useDrugGroups();
     const [search, setSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingDrug, setEditingDrug] = useState<Drug | null>(null);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
-    const [actionMenuDrug, setActionMenuDrug] = useState<Drug | null>(null); // For context menu
+    const [actionMenuDrug, setActionMenuDrug] = useState<Drug | null>(null);
     const [uploading, setUploading] = useState(false);
+
+    // Filter states
+    const [selectedMainGroup, setSelectedMainGroup] = useState<string | null>(null);
+    const [selectedSubGroup, setSelectedSubGroup] = useState<string | null>(null);
 
     // Form state
     const [name, setName] = useState('');
@@ -38,15 +40,29 @@ export default function DrugsPage() {
     const [activeIngredient, setActiveIngredient] = useState('');
     const [imageUrl, setImageUrl] = useState('');
 
-    const filteredDrugs = drugs.filter(d =>
-        d.name.toLowerCase().includes(search.toLowerCase())
-    );
+    // Form - selected parent group for cascading selector
+    const [formParentGroup, setFormParentGroup] = useState<string>('');
+
+    const filteredDrugs = drugs.filter(d => {
+        const matchesSearch = d.name.toLowerCase().includes(search.toLowerCase());
+
+        let matchesGroup = true;
+        if (selectedSubGroup) {
+            matchesGroup = d.group_id === selectedSubGroup;
+        } else if (selectedMainGroup) {
+            const groupIds = getGroupIdsUnderParent(selectedMainGroup);
+            matchesGroup = d.group_id !== null && groupIds.includes(d.group_id);
+        }
+
+        return matchesSearch && matchesGroup;
+    });
 
     const resetForm = () => {
         setName('');
         setPrice('');
         setUnit(DRUG_UNITS[0]);
         setGroupId('');
+        setFormParentGroup('');
         setActiveIngredient('');
         setImageUrl('');
         setEditingDrug(null);
@@ -65,6 +81,23 @@ export default function DrugsPage() {
         setGroupId(drug.group_id || '');
         setActiveIngredient(drug.active_ingredient || '');
         setImageUrl(drug.image_url || '');
+
+        // Find parent group for the drug's group
+        if (drug.group_id) {
+            const drugGroup = hierarchical.allGroups.find(g => g.id === drug.group_id);
+            if (drugGroup?.parent_id) {
+                setFormParentGroup(drugGroup.parent_id);
+            } else if (drugGroup && !drugGroup.parent_id) {
+                // The drug's group is a parent group itself
+                setFormParentGroup(drug.group_id);
+                setGroupId('');
+            } else {
+                setFormParentGroup('');
+            }
+        } else {
+            setFormParentGroup('');
+        }
+
         setIsModalOpen(true);
     };
 
@@ -87,11 +120,15 @@ export default function DrugsPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Use subgroup if selected, otherwise use parent group
+        const finalGroupId = groupId || formParentGroup || null;
+
         const payload = {
             name,
             unit,
             unit_price: parseFloat(price),
-            group_id: groupId || null,
+            group_id: finalGroupId,
             active_ingredient: activeIngredient || null,
             image_url: imageUrl,
         };
@@ -134,7 +171,8 @@ export default function DrugsPage() {
         setActionMenuDrug(drug);
     };
 
-
+    // Get child groups for form parent selection
+    const formChildGroups = formParentGroup ? getChildGroups(formParentGroup) : [];
 
     return (
         <Container className="bg-slate-50 min-h-screen">
@@ -168,6 +206,14 @@ export default function DrugsPage() {
                     />
                 </div>
 
+                {/* Hierarchical Filter */}
+                <DrugGroupFilter
+                    selectedMainGroup={selectedMainGroup}
+                    selectedSubGroup={selectedSubGroup}
+                    onMainGroupChange={setSelectedMainGroup}
+                    onSubGroupChange={setSelectedSubGroup}
+                />
+
                 {/* List */}
                 {loading ? (
                     <LoadingSpinner label="Đang tải danh sách thuốc..." className="mt-20" />
@@ -197,8 +243,8 @@ export default function DrugsPage() {
             {/* Modal Add/Edit */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-                    <div className="w-full max-w-md bg-white rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
-                        <div className="p-6 border-b border-slate-50 flex justify-between items-center">
+                    <div className="w-full max-w-md bg-white rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+                        <div className="p-6 border-b border-slate-50 flex justify-between items-center sticky top-0 bg-white z-10">
                             <h3 className="text-xl font-extrabold text-slate-900">
                                 {editingDrug ? 'Cập nhật thuốc' : 'Thêm thuốc mới'}
                             </h3>
@@ -261,20 +307,40 @@ export default function DrugsPage() {
                                     />
                                 </div>
 
-                                <div className="flex gap-4">
-                                    <div className="flex-1">
-                                        <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Nhóm thuốc</label>
+                                {/* Cascading Group Selector */}
+                                <div className="space-y-3">
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Nhóm thuốc chính</label>
                                         <select
-                                            value={groupId}
-                                            onChange={(e) => setGroupId(e.target.value)}
+                                            value={formParentGroup}
+                                            onChange={(e) => {
+                                                setFormParentGroup(e.target.value);
+                                                setGroupId(''); // Reset sub-group when parent changes
+                                            }}
                                             className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all appearance-none text-slate-900 font-bold"
                                         >
-                                            <option value="">Chọn nhóm...</option>
-                                            {groups.map(g => (
+                                            <option value="">Chọn nhóm chính...</option>
+                                            {hierarchical.parentGroups.map(g => (
                                                 <option key={g.id} value={g.id}>{g.name}</option>
                                             ))}
                                         </select>
                                     </div>
+
+                                    {formParentGroup && formChildGroups.length > 0 && (
+                                        <div>
+                                            <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Nhóm thuốc con</label>
+                                            <select
+                                                value={groupId}
+                                                onChange={(e) => setGroupId(e.target.value)}
+                                                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all appearance-none text-slate-900 font-bold"
+                                            >
+                                                <option value="">Không chọn nhóm con</option>
+                                                {formChildGroups.map(g => (
+                                                    <option key={g.id} value={g.id}>{g.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="flex gap-4">
