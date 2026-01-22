@@ -1,5 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-  <rect width="24" height="24" fill="#f8fafc" rx="12" />
-  <path d="M10.5 20.5l10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" fill="#e2e8f0" />
-  <path d="M8.5 8.5l7 7" />
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24" fill="none">
+  <defs>
+    <linearGradient id="pillGrad" x1="4" y1="4" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3b82f6" />
+      <stop offset="1" stop-color="#60a5fa" />
+    </linearGradient>
+    <filter id="shadow" x="-4" y="-4" width="32" height="32" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0.1" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="2"/>
+      <feGaussianBlur stdDeviation="3"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.231373 0 0 0 0 0.509804 0 0 0 0 0.960784 0 0 0 0.25 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+    </filter>
+  </defs>
+  
+  <rect width="24" height="24" rx="12" fill="#eff6ff" />
+  
+  <g filter="url(#shadow)">
+    <path d="M12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17H14.5C15.8807 17 17 15.8807 17 14.5V12C17 9.23858 14.7614 7 12 7Z" fill="url(#pillGrad)"/>
+    <path d="M12 7C9.23858 7 7 9.23858 7 12V14.5C7 15.8807 8.11929 17 9.5 17H12C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7Z" fill="white" fill-opacity="0.3"/>
+  </g>
+  
+  <path d="M7 12H17" stroke="white" stroke-width="0.5" stroke-opacity="0.5"/>
 </svg>
