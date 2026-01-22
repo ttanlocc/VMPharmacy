@@ -11,7 +11,7 @@ import DrugListItem from '@/components/DrugListItem';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { DrugGroupManager } from '@/components/DrugGroupManager';
-import MultiIngredientInput from '@/components/MultiIngredientInput';
+import { ActionMenu } from '@/components/ActionMenu';
 import DrugGroupFilter from '@/components/DrugGroupFilter';
 import { ActionMenu } from '@/components/ActionMenu';
 import { uploadDrugImage } from '@/lib/upload';
@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 import { DRUG_UNITS } from '@/lib/constants';
 
 export default function DrugsPage() {
-    const { drugs, loading, addDrug, updateDrug, deleteDrug } = useDrugs();
+    const { drugs, loading, addDrug, updateDrug, deleteDrug, addImportPrice, deleteImportPrice } = useDrugs();
     const { hierarchical, getGroupIdsUnderParent, getChildGroups } = useDrugGroups();
     const [search, setSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,6 +42,11 @@ export default function DrugsPage() {
 
     // Form - selected parent group for cascading selector
     const [formParentGroup, setFormParentGroup] = useState<string>('');
+
+    // Import Prices State
+    const [tempImportPrices, setTempImportPrices] = useState<{ id?: string, supplier_name: string, price: number }[]>([]);
+    const [newSupplier, setNewSupplier] = useState('');
+    const [newImportPrice, setNewImportPrice] = useState('');
 
     const filteredDrugs = drugs.filter(d => {
         const matchesSearch = d.name.toLowerCase().includes(search.toLowerCase());
@@ -66,6 +71,9 @@ export default function DrugsPage() {
         setActiveIngredient('');
         setImageUrl('');
         setEditingDrug(null);
+        setTempImportPrices([]);
+        setNewSupplier('');
+        setNewImportPrice('');
     };
 
     const openAddModal = () => {
@@ -138,7 +146,17 @@ export default function DrugsPage() {
                 await updateDrug(editingDrug.id, payload);
                 toast.success('Cập nhật thuốc thành công');
             } else {
-                await addDrug(payload);
+                const newDrug = await addDrug(payload);
+                // Save import prices for new drug
+                if (tempImportPrices.length > 0) {
+                    await Promise.all(tempImportPrices.map(p =>
+                        addImportPrice({
+                            drug_id: newDrug.id,
+                            supplier_name: p.supplier_name,
+                            price: p.price
+                        })
+                    ));
+                }
                 toast.success('Thêm thuốc thành công');
             }
             setIsModalOpen(false);
@@ -302,9 +320,12 @@ export default function DrugsPage() {
 
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-1.5 ml-1">Hoạt chất</label>
-                                    <MultiIngredientInput
+                                    <textarea
                                         value={activeIngredient}
-                                        onChange={setActiveIngredient}
+                                        onChange={(e) => setActiveIngredient(e.target.value)}
+                                        placeholder="VD: Paracetamol 500mg, Caffeine 65mg"
+                                        rows={2}
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all text-slate-900 font-bold placeholder:text-slate-400 resize-none"
                                     />
                                 </div>
 
@@ -365,6 +386,87 @@ export default function DrugsPage() {
                                         >
                                             {DRUG_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
                                         </select>
+                                    </div>
+                                </div>
+
+                                {/* Import Prices Section */}
+                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                    <label className="block text-sm font-bold text-slate-700 mb-3 ml-1">Giá nhập từ nhà cung cấp</label>
+
+                                    <div className="space-y-2 mb-3">
+                                        {/* List existing prices */}
+                                        {(editingDrug ? (editingDrug.drug_import_prices || []) : tempImportPrices).map((ip, idx) => (
+                                            <div key={ip.id || idx} className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-slate-900">{ip.supplier_name}</span>
+                                                    <span className="text-sm text-slate-500">{ip.price.toLocaleString()}đ</span>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={async () => {
+                                                        if (editingDrug && ip.id) {
+                                                            if (confirm('Xóa giá nhập này?')) {
+                                                                await deleteImportPrice(ip.id, editingDrug.id);
+                                                            }
+                                                        } else {
+                                                            setTempImportPrices(tempImportPrices.filter((_, i) => i !== idx));
+                                                        }
+                                                    }}
+                                                    className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Add new price input */}
+                                    <div className="flex gap-2 items-start">
+                                        <input
+                                            value={newSupplier}
+                                            onChange={(e) => setNewSupplier(e.target.value)}
+                                            placeholder="Tên NCC"
+                                            className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-primary"
+                                        />
+                                        <input
+                                            type="number"
+                                            value={newImportPrice}
+                                            onChange={(e) => setNewImportPrice(e.target.value)}
+                                            placeholder="Giá"
+                                            className="w-24 px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-primary"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={async () => {
+                                                if (!newSupplier || !newImportPrice) return;
+                                                const priceVal = parseFloat(newImportPrice);
+
+                                                if (editingDrug) {
+                                                    try {
+                                                        await addImportPrice({
+                                                            drug_id: editingDrug.id,
+                                                            supplier_name: newSupplier,
+                                                            price: priceVal
+                                                        });
+                                                        setNewSupplier('');
+                                                        setNewImportPrice('');
+                                                        toast.success('Đã thêm giá nhập');
+                                                    } catch (e) {
+                                                        toast.error('Lỗi thêm giá nhập');
+                                                    }
+                                                } else {
+                                                    setTempImportPrices([...tempImportPrices, {
+                                                        supplier_name: newSupplier,
+                                                        price: priceVal
+                                                    }]);
+                                                    setNewSupplier('');
+                                                    setNewImportPrice('');
+                                                }
+                                            }}
+                                            className="p-2 bg-primary text-white rounded-xl shadow-md hover:bg-sky-600 transition-colors"
+                                        >
+                                            <Plus size={20} />
+                                        </button>
                                     </div>
                                 </div>
                             </div>

@@ -4,8 +4,17 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Database } from '@/types/database';
 
+export type DrugImportPrice = {
+    id: string;
+    drug_id: string;
+    supplier_name: string;
+    price: number;
+    created_at: string;
+};
+
 export type Drug = Database['public']['Tables']['drugs']['Row'] & {
     drug_groups?: { name: string } | null;
+    drug_import_prices?: DrugImportPrice[];
 };
 
 export function useDrugs() {
@@ -18,7 +27,7 @@ export function useDrugs() {
         try {
             const { data, error } = await supabase
                 .from('drugs')
-                .select('*, drug_groups(name)')
+                .select('*, drug_groups(name), drug_import_prices(*)')
                 .order('name');
 
             if (error) throw error;
@@ -37,14 +46,25 @@ export function useDrugs() {
     const addDrug = async (drug: Database['public']['Tables']['drugs']['Insert']) => {
         const { data, error } = await (supabase.from('drugs') as any).insert(drug).select();
         if (error) throw error;
-        setDrugs([...drugs, (data as any)[0]]);
-        return (data as any)[0];
+        // Fetch fresh data to get relations if needed, or just append basic data
+        // For simplicity, we can reload or just append. 
+        // To get full relations like import prices (empty initially), we might want to just append.
+        const newDrug = (data as any)[0];
+        setDrugs([...drugs, { ...newDrug, drug_import_prices: [] }]);
+        return newDrug;
     };
 
     const updateDrug = async (id: string, updates: Database['public']['Tables']['drugs']['Update']) => {
         const { data, error } = await (supabase.from('drugs') as any).update(updates).eq('id', id).select();
         if (error) throw error;
-        setDrugs(drugs.map(d => d.id === id ? (data as any)[0] : d));
+
+        // optimistic update preservation of relations
+        setDrugs(drugs.map(d => {
+            if (d.id === id) {
+                return { ...d, ...((data as any)[0]) };
+            }
+            return d;
+        }));
         return (data as any)[0];
     };
 
@@ -54,5 +74,47 @@ export function useDrugs() {
         setDrugs(drugs.filter(d => d.id !== id));
     };
 
-    return { drugs, loading, error, refresh: fetchDrugs, addDrug, updateDrug, deleteDrug };
+    const addImportPrice = async (priceData: { drug_id: string, supplier_name: string, price: number }) => {
+        const { data, error } = await supabase.from('drug_import_prices').insert(priceData).select();
+        if (error) throw error;
+
+        const newPrice = (data as any)[0];
+        setDrugs(drugs.map(d => {
+            if (d.id === priceData.drug_id) {
+                return {
+                    ...d,
+                    drug_import_prices: [...(d.drug_import_prices || []), newPrice]
+                };
+            }
+            return d;
+        }));
+        return newPrice;
+    };
+
+    const deleteImportPrice = async (priceId: string, drugId: string) => {
+        const { error } = await supabase.from('drug_import_prices').delete().eq('id', priceId);
+        if (error) throw error;
+
+        setDrugs(drugs.map(d => {
+            if (d.id === drugId) {
+                return {
+                    ...d,
+                    drug_import_prices: (d.drug_import_prices || []).filter(p => p.id !== priceId)
+                };
+            }
+            return d;
+        }));
+    };
+
+    return {
+        drugs,
+        loading,
+        error,
+        refresh: fetchDrugs,
+        addDrug,
+        updateDrug,
+        deleteDrug,
+        addImportPrice,
+        deleteImportPrice
+    };
 }
