@@ -58,20 +58,50 @@ function CheckoutContent() {
     // Legacy loading logic for direct URL access
     useEffect(() => {
         const loadInitialState = async () => {
-            // Only load if context is empty and we have params
-            if (items.length === 0 && !customer && (templateIdParam || customerIdParam)) {
-                // ... (existing loading logic)
+            // 1. Handle Customer ID from URL (Priority: High)
+            // If we have a customerId in URL and it's different from current context, load it.
+            // This ensures "Khách Quen" selection persists even if there are items in cart.
+            if (customerIdParam && (!customer || customer.id !== customerIdParam)) {
+                try {
+                    const { data: customerData } = await supabase
+                        .from('customers')
+                        .select('*')
+                        .eq('id', customerIdParam)
+                        .single();
+
+                    if (customerData) {
+                        setCustomer(customerData);
+                    }
+                } catch (error) {
+                    console.error('Error loading customer:', error);
+                }
             }
 
-            // New Guest Flow: If coming from Home as guest, ensure fresh state and open picker
-            if (isGuestParam && items.length === 0) {
-                clearCheckout();
-                setCustomer(null);
-                setIsAddItemModalOpen(true);
+            // 2. Handle Template ID (Legacy/Direct Link)
+            // Only load template items if cart is empty to avoid overwriting user's current selection
+            if (items.length === 0 && templateIdParam) {
+                // Logic to load template would go here if needed, 
+                // currently assuming context might handle it or it was removed. 
+                // Keeping this block structure if we need to re-implement template loading.
+            }
+
+            // 3. New Guest Flow: If coming from Home as guest, ensure fresh state and open picker
+            if (isGuestParam) {
+                // Only clear if we explicitly asked for guest and we usually expect a fresh start,
+                // but if there are items, we might want to keep them? 
+                // The requirement says "chọn khách quen... đổi thành khách lẻ".
+                // If isGuestParam is present, it means user clicked "Khách Lẻ".
+                if (customer) {
+                    setCustomer(null);
+                }
+
+                if (items.length === 0) {
+                    setIsAddItemModalOpen(true);
+                }
             }
         };
         loadInitialState();
-    }, [templateIdParam, customerIdParam, isGuestParam]); // Added isGuestParam to dependencies
+    }, [templateIdParam, customerIdParam, isGuestParam, customer, items.length]); // Added dependencies
 
     // Fetch order history when customer is set (for Quick Reorder)
     useEffect(() => {

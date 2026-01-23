@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useDrugGroups, DrugGroup } from '@/hooks/useDrugGroups';
-import { X, Pencil, Trash2, FolderPlus, ChevronRight, Plus } from 'lucide-react';
+import { X, Pencil, Trash2, FolderPlus, ChevronDown, Plus, Check } from 'lucide-react';
 import ConfirmDialog from './ConfirmDialog';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -10,9 +10,16 @@ import { cn } from '@/lib/utils';
 export function DrugGroupManager() {
     const { hierarchical, createGroup, updateGroup, deleteGroup, isLoading, getChildGroups } = useDrugGroups();
     const [isOpen, setIsOpen] = useState(false);
-    const [newGroupName, setNewGroupName] = useState('');
-    const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
-    const [editingGroup, setEditingGroup] = useState<DrugGroup | null>(null);
+
+    // Editing state
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editingName, setEditingName] = useState('');
+
+    // Adding state
+    const [addingParentId, setAddingParentId] = useState<string | null>(null); // null = adding main group, string = adding child
+    const [newName, setNewName] = useState('');
+    const [isAddingMainGroup, setIsAddingMainGroup] = useState(false);
+
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [expandedParents, setExpandedParents] = useState<string[]>([]);
 
@@ -24,40 +31,55 @@ export function DrugGroupManager() {
         );
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newGroupName.trim()) return;
-
-        if (editingGroup) {
-            await updateGroup(editingGroup.id, newGroupName, editingGroup.parent_id);
-            setEditingGroup(null);
-        } else {
-            await createGroup(newGroupName, selectedParentId);
-        }
-        setNewGroupName('');
-        setSelectedParentId(null);
-    };
-
+    // --- Editing ---
     const startEdit = (group: DrugGroup) => {
-        setEditingGroup(group);
-        setNewGroupName(group.name);
-        setSelectedParentId(group.parent_id);
+        setEditingId(group.id);
+        setEditingName(group.name);
+        // Cancel any add mode
+        setIsAddingMainGroup(false);
+        setAddingParentId(null);
     };
 
     const cancelEdit = () => {
-        setEditingGroup(null);
-        setNewGroupName('');
-        setSelectedParentId(null);
+        setEditingId(null);
+        setEditingName('');
+    };
+
+    const saveEdit = async (group: DrugGroup) => {
+        if (!editingName.trim()) return;
+        await updateGroup(group.id, editingName, group.parent_id);
+        cancelEdit();
+    };
+
+    // --- Adding ---
+    const startAddMainGroup = () => {
+        setIsAddingMainGroup(true);
+        setAddingParentId(null);
+        setNewName('');
+        cancelEdit();
     };
 
     const startAddSubGroup = (parentId: string) => {
-        setSelectedParentId(parentId);
-        setEditingGroup(null);
-        setNewGroupName('');
-        // Expand the parent if not already
+        setAddingParentId(parentId);
+        setIsAddingMainGroup(false);
+        setNewName('');
+        cancelEdit();
+        // Expand the parent
         if (!expandedParents.includes(parentId)) {
             setExpandedParents([...expandedParents, parentId]);
         }
+    };
+
+    const cancelAdd = () => {
+        setIsAddingMainGroup(false);
+        setAddingParentId(null);
+        setNewName('');
+    };
+
+    const saveAdd = async () => {
+        if (!newName.trim()) return;
+        await createGroup(newName, isAddingMainGroup ? null : addingParentId);
+        cancelAdd();
     };
 
     return (
@@ -79,96 +101,124 @@ export function DrugGroupManager() {
                             exit={{ opacity: 0, scale: 0.95 }}
                             className="w-full max-w-lg bg-white rounded-3xl overflow-hidden shadow-2xl max-h-[85vh] flex flex-col"
                         >
-                            <div className="p-6 border-b border-slate-50 flex justify-between items-center shrink-0">
-                                <h3 className="text-xl font-bold text-slate-900">Quản lý nhóm thuốc</h3>
+                            {/* Header */}
+                            <div className="p-5 border-b border-slate-100 flex justify-between items-center shrink-0">
+                                <h3 className="text-xl font-bold text-slate-800">Quản lý nhóm thuốc</h3>
                                 <button
                                     onClick={() => setIsOpen(false)}
-                                    className="p-2 text-slate-700 hover:text-slate-600 rounded-full hover:bg-slate-50 transition-colors"
+                                    className="p-2 text-slate-500 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors"
                                 >
-                                    <X size={24} />
+                                    <X size={22} />
                                 </button>
                             </div>
 
-                            <div className="p-6 space-y-6 overflow-y-auto flex-1">
-                                {/* Add/Edit Form */}
-                                <form onSubmit={handleSubmit} className="space-y-3">
-                                    <div className="flex gap-2">
+                            {/* Body */}
+                            <div className="p-5 space-y-4 overflow-y-auto flex-1">
+                                {/* Add Main Group Button / Input */}
+                                {isAddingMainGroup ? (
+                                    <div className="flex items-center gap-2 p-3 bg-sky-50 border border-sky-200 rounded-xl">
                                         <input
-                                            placeholder={selectedParentId ? "Tên nhóm con..." : "Tên nhóm chính..."}
-                                            value={newGroupName}
-                                            onChange={(e) => setNewGroupName(e.target.value)}
-                                            className="flex-1 px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all"
+                                            autoFocus
+                                            placeholder="Tên nhóm chính mới..."
+                                            value={newName}
+                                            onChange={(e) => setNewName(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && saveAdd()}
+                                            className="flex-1 px-3 py-2 bg-white border border-sky-200 rounded-lg outline-none focus:ring-2 focus:ring-sky-400 text-sm"
                                         />
                                         <button
-                                            type="submit"
-                                            disabled={!newGroupName.trim() || isLoading}
-                                            className="px-4 py-2 bg-primary text-white font-medium rounded-xl hover:bg-sky-600 disabled:opacity-50 transition-colors whitespace-nowrap"
+                                            onClick={saveAdd}
+                                            disabled={!newName.trim() || isLoading}
+                                            className="p-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 disabled:opacity-50 transition-colors"
                                         >
-                                            {editingGroup ? 'Sửa' : 'Thêm'}
+                                            <Check size={18} />
                                         </button>
-                                        {(editingGroup || selectedParentId) && (
-                                            <button
-                                                type="button"
-                                                onClick={cancelEdit}
-                                                className="p-2 text-slate-700 hover:text-slate-600 rounded-xl hover:bg-slate-50"
-                                            >
-                                                <X size={20} />
-                                            </button>
-                                        )}
+                                        <button
+                                            onClick={cancelAdd}
+                                            className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
+                                        >
+                                            <X size={18} />
+                                        </button>
                                     </div>
+                                ) : (
+                                    <button
+                                        onClick={startAddMainGroup}
+                                        className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 hover:border-sky-400 hover:text-sky-500 hover:bg-sky-50/50 transition-all"
+                                    >
+                                        <Plus size={18} />
+                                        <span className="font-medium">Thêm nhóm chính</span>
+                                    </button>
+                                )}
 
-                                    {selectedParentId && !editingGroup && (
-                                        <div className="text-xs text-sky-600 bg-sky-50 px-3 py-2 rounded-lg">
-                                            Đang thêm nhóm con cho: <strong>{hierarchical.parentGroups.find(g => g.id === selectedParentId)?.name}</strong>
-                                        </div>
-                                    )}
-                                </form>
-
-                                {/* Hierarchical Group List */}
-                                <div className="space-y-2">
+                                {/* Group List */}
+                                <div className="space-y-3">
                                     {hierarchical.parentGroups.map((parent) => {
                                         const children = getChildGroups(parent.id);
                                         const isExpanded = expandedParents.includes(parent.id);
+                                        const isEditingThis = editingId === parent.id;
 
                                         return (
-                                            <div key={parent.id} className="border border-slate-100 rounded-xl overflow-hidden">
-                                                {/* Parent Group */}
-                                                <div className="flex items-center justify-between p-3 bg-slate-50/50">
-                                                    <div
-                                                        className="flex items-center gap-2 flex-1 cursor-pointer"
-                                                        onClick={() => children.length > 0 && toggleExpand(parent.id)}
-                                                    >
-                                                        {children.length > 0 && (
-                                                            <ChevronRight
-                                                                size={16}
-                                                                className={cn(
-                                                                    "text-slate-400 transition-transform",
-                                                                    isExpanded && "rotate-90"
-                                                                )}
-                                                            />
+                                            <div key={parent.id} className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm">
+                                                {/* Parent Group Header */}
+                                                <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-slate-50 to-white">
+                                                    {/* Expand/Collapse Toggle */}
+                                                    <button
+                                                        onClick={() => toggleExpand(parent.id)}
+                                                        className={cn(
+                                                            "p-1.5 rounded-lg transition-colors",
+                                                            children.length > 0 ? "hover:bg-slate-200 text-slate-500" : "text-slate-300 cursor-default"
                                                         )}
-                                                        <span className="font-bold text-slate-800">{parent.name}</span>
-                                                        <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
-                                                            {children.length} nhóm con
+                                                        disabled={children.length === 0}
+                                                    >
+                                                        <ChevronDown
+                                                            size={18}
+                                                            className={cn(
+                                                                "transition-transform",
+                                                                isExpanded ? "rotate-0" : "-rotate-90"
+                                                            )}
+                                                        />
+                                                    </button>
+
+                                                    {/* Name or Edit Input */}
+                                                    {isEditingThis ? (
+                                                        <input
+                                                            autoFocus
+                                                            value={editingName}
+                                                            onChange={(e) => setEditingName(e.target.value)}
+                                                            onKeyDown={(e) => e.key === 'Enter' && saveEdit(parent)}
+                                                            onBlur={() => saveEdit(parent)}
+                                                            className="flex-1 px-3 py-1.5 border border-sky-300 rounded-lg outline-none focus:ring-2 focus:ring-sky-400 text-sm font-semibold"
+                                                        />
+                                                    ) : (
+                                                        <span className="flex-1 font-semibold text-slate-800">{parent.name}</span>
+                                                    )}
+
+                                                    {/* Child Count Badge */}
+                                                    {children.length > 0 && (
+                                                        <span className="text-xs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
+                                                            {children.length}
                                                         </span>
-                                                    </div>
-                                                    <div className="flex gap-1">
+                                                    )}
+
+                                                    {/* Actions */}
+                                                    <div className="flex items-center gap-0.5">
                                                         <button
                                                             onClick={() => startAddSubGroup(parent.id)}
-                                                            className="p-2 text-green-500 hover:bg-green-50 rounded-lg transition-colors"
+                                                            className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-lg transition-colors"
                                                             title="Thêm nhóm con"
                                                         >
                                                             <Plus size={16} />
                                                         </button>
                                                         <button
                                                             onClick={() => startEdit(parent)}
-                                                            className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                                                            className="p-2 text-sky-500 hover:bg-sky-50 rounded-lg transition-colors"
+                                                            title="Sửa"
                                                         >
                                                             <Pencil size={16} />
                                                         </button>
                                                         <button
                                                             onClick={() => setDeleteId(parent.id)}
-                                                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                            className="p-2 text-red-400 hover:bg-red-50 rounded-lg transition-colors"
+                                                            title="Xóa"
                                                         >
                                                             <Trash2 size={16} />
                                                         </button>
@@ -177,35 +227,85 @@ export function DrugGroupManager() {
 
                                                 {/* Child Groups */}
                                                 <AnimatePresence>
-                                                    {isExpanded && children.length > 0 && (
+                                                    {isExpanded && (
                                                         <motion.div
                                                             initial={{ height: 0, opacity: 0 }}
                                                             animate={{ height: 'auto', opacity: 1 }}
                                                             exit={{ height: 0, opacity: 0 }}
-                                                            className="border-t border-slate-100"
+                                                            transition={{ duration: 0.2 }}
+                                                            className="border-t border-slate-100 bg-slate-50/30"
                                                         >
-                                                            {children.map((child) => (
-                                                                <div
-                                                                    key={child.id}
-                                                                    className="flex items-center justify-between p-3 pl-10 bg-white border-b border-slate-50 last:border-0"
-                                                                >
-                                                                    <span className="font-medium text-slate-700">{child.name}</span>
-                                                                    <div className="flex gap-1">
-                                                                        <button
-                                                                            onClick={() => startEdit(child)}
-                                                                            className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                                                            <div className="py-2 px-3 space-y-1">
+                                                                {children.map((child) => {
+                                                                    const isEditingChild = editingId === child.id;
+                                                                    return (
+                                                                        <div
+                                                                            key={child.id}
+                                                                            className="flex items-center gap-2 p-2 ml-6 bg-white rounded-xl border border-slate-100"
                                                                         >
-                                                                            <Pencil size={14} />
+                                                                            {isEditingChild ? (
+                                                                                <input
+                                                                                    autoFocus
+                                                                                    value={editingName}
+                                                                                    onChange={(e) => setEditingName(e.target.value)}
+                                                                                    onKeyDown={(e) => e.key === 'Enter' && saveEdit(child)}
+                                                                                    onBlur={() => saveEdit(child)}
+                                                                                    className="flex-1 px-3 py-1 border border-sky-300 rounded-lg outline-none focus:ring-2 focus:ring-sky-400 text-sm"
+                                                                                />
+                                                                            ) : (
+                                                                                <span className="flex-1 text-slate-700 text-sm">{child.name}</span>
+                                                                            )}
+                                                                            <button
+                                                                                onClick={() => startEdit(child)}
+                                                                                className="p-1.5 text-sky-500 hover:bg-sky-50 rounded-lg transition-colors"
+                                                                            >
+                                                                                <Pencil size={14} />
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => setDeleteId(child.id)}
+                                                                                className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition-colors"
+                                                                            >
+                                                                                <Trash2 size={14} />
+                                                                            </button>
+                                                                        </div>
+                                                                    );
+                                                                })}
+
+                                                                {/* Add Sub-group Input (inside parent) */}
+                                                                {addingParentId === parent.id ? (
+                                                                    <div className="flex items-center gap-2 p-2 ml-6 bg-emerald-50 rounded-xl border border-emerald-200">
+                                                                        <input
+                                                                            autoFocus
+                                                                            placeholder="Tên nhóm con..."
+                                                                            value={newName}
+                                                                            onChange={(e) => setNewName(e.target.value)}
+                                                                            onKeyDown={(e) => e.key === 'Enter' && saveAdd()}
+                                                                            className="flex-1 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-400 text-sm"
+                                                                        />
+                                                                        <button
+                                                                            onClick={saveAdd}
+                                                                            disabled={!newName.trim() || isLoading}
+                                                                            className="p-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:opacity-50 transition-colors"
+                                                                        >
+                                                                            <Check size={16} />
                                                                         </button>
                                                                         <button
-                                                                            onClick={() => setDeleteId(child.id)}
-                                                                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                                            onClick={cancelAdd}
+                                                                            className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
                                                                         >
-                                                                            <Trash2 size={14} />
+                                                                            <X size={16} />
                                                                         </button>
                                                                     </div>
-                                                                </div>
-                                                            ))}
+                                                                ) : (
+                                                                    <button
+                                                                        onClick={() => startAddSubGroup(parent.id)}
+                                                                        className="flex items-center gap-1.5 ml-6 p-2 text-sm text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                                                    >
+                                                                        <Plus size={14} />
+                                                                        <span>Thêm nhóm con</span>
+                                                                    </button>
+                                                                )}
+                                                            </div>
                                                         </motion.div>
                                                     )}
                                                 </AnimatePresence>
@@ -213,9 +313,9 @@ export function DrugGroupManager() {
                                         );
                                     })}
 
-                                    {hierarchical.parentGroups.length === 0 && (
-                                        <div className="text-center text-slate-700 py-8 text-sm">
-                                            Chưa có nhóm thuốc nào.
+                                    {hierarchical.parentGroups.length === 0 && !isAddingMainGroup && (
+                                        <div className="text-center text-slate-400 py-12 text-sm">
+                                            Chưa có nhóm thuốc nào. Bấm "Thêm nhóm chính" để bắt đầu.
                                         </div>
                                     )}
                                 </div>
