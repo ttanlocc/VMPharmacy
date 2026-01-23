@@ -225,6 +225,29 @@ export interface Database {
                     note?: string | null
                     created_at?: string
                 }
+            },
+            drug_import_prices: {
+                Row: {
+                    id: string
+                    drug_id: string
+                    supplier_name: string
+                    price: number
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    drug_id: string
+                    supplier_name: string
+                    price?: number
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    drug_id?: string
+                    supplier_name?: string
+                    price?: number
+                    created_at?: string
+                }
             }
         }
     }

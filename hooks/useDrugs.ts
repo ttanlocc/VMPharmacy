@@ -75,7 +75,7 @@ export function useDrugs() {
     };
 
     const addImportPrice = async (priceData: { drug_id: string, supplier_name: string, price: number }) => {
-        const { data, error } = await supabase.from('drug_import_prices').insert(priceData).select();
+        const { data, error } = await (supabase.from('drug_import_prices') as any).insert(priceData).select();
         if (error) throw error;
 
         const newPrice = (data as any)[0];

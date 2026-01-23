@@ -13,7 +13,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import { DrugGroupManager } from '@/components/DrugGroupManager';
 import { ActionMenu } from '@/components/ActionMenu';
 import DrugGroupFilter from '@/components/DrugGroupFilter';
-import { ActionMenu } from '@/components/ActionMenu';
+
 import { uploadDrugImage } from '@/lib/upload';
 import { cn } from '@/lib/utils';
 import { DRUG_UNITS } from '@/lib/constants';
