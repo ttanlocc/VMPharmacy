@@ -197,42 +197,25 @@ export async function POST(request: Request) {
 
 
 
-    // 1. Create Order
-    const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert([{
-            user_id: user.id,
-            total_price: finalTotalPrice,
-            status: 'completed',
-            customer_id: customer_id || null,
-            template_id: template_id || null
-        }])
-        .select()
-        .single();
+    // Create order + items atomically via RPC.
+    // If the order_items insert fails, the entire transaction rolls back — no orphaned orders.
+    const { data: order, error: orderError } = await supabase.rpc('create_order_atomic', {
+        p_user_id: user.id,
+        p_total_price: finalTotalPrice,
+        p_customer_id: customer_id || null,
+        p_template_id: template_id || null,
+        p_items: finalItems.map((item: any) => ({
+            drug_id: item.drug_id,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+            note: item.note || null,
+            template_id: template_id || null,
+        })),
+    });
 
     if (orderError) {
-        console.error("API POST /api/orders (create order) Error:", orderError);
+        console.error("API POST /api/orders (create_order_atomic) Error:", orderError);
         return NextResponse.json({ error: orderError.message }, { status: 500 });
-    }
-
-    // 2. Create Order Items
-    const orderItems = finalItems.map((item: any) => ({
-        order_id: order.id,
-        drug_id: item.drug_id,
-        quantity: item.quantity,
-        unit_price: item.unit_price, // Saved as snapshot (distributed if template)
-        note: item.note,
-        template_id: template_id || null // Store template_id on items too per plan
-    }));
-
-    const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-
-    if (itemsError) {
-        // In a real app we might want to rollback the order here
-        console.error("API POST /api/orders (create items) Error:", itemsError);
-        return NextResponse.json({ error: itemsError.message }, { status: 500 });
     }
 
     return NextResponse.json(order);
