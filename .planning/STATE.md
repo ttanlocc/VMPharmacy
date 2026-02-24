@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 1 of 3 (Transaction Safety)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-02-24 — Roadmap created
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-02-24 — Completed 01-01 (atomic order creation)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 11%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 7 min
+- Total execution time: 0.12 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01-transaction-safety | 1 | 7 min | 7 min |
 
 **Recent Trend:**
-- Last 5 plans: -
-- Trend: N/A (no data yet)
+- Last 5 plans: 7 min
+- Trend: N/A (only 1 data point)
 
 *Updated after each plan completion*
 
@@ -42,7 +42,8 @@ Progress: [░░░░░░░░░░] 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- None yet (first milestone)
+- Used SECURITY DEFINER on create_order_atomic RPC function; auth checked in API route before RPC call — standard Supabase pattern for atomic writes bypassing RLS safely
+- Created supabase/migrations/ directory for SQL migration files (previously loose files at project root)
 
 ### Pending Todos
 
@@ -50,10 +51,10 @@ None yet.
 
 ### Blockers/Concerns
 
-None yet.
+- create_order_atomic SQL function must be applied manually in Supabase SQL Editor before deploying the updated /api/orders route. See 01-01-SUMMARY.md "User Setup Required" section.
 
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Roadmap created, ready to plan Phase 1
+Stopped at: Completed 01-01 (atomic order creation via RPC), ready for 01-02
 Resume file: None
