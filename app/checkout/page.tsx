@@ -56,12 +56,26 @@ function CheckoutContent() {
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
     // Legacy loading logic for direct URL access
+    // Runs once per URL param set (on mount or when URL params change).
+    // Reads localStorage directly for current state instead of depending on React state,
+    // preventing re-run loops caused by customer/items.length as dependencies.
     useEffect(() => {
         const loadInitialState = async () => {
+            // Read current persisted state from localStorage to avoid stale closure issues
+            let persistedCustomerId: string | null = null;
+            try {
+                const saved = localStorage.getItem('vmp_checkout_state');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    persistedCustomerId = parsed.customer?.id || null;
+                }
+            } catch {
+                // Ignore parse errors
+            }
+
             // 1. Handle Customer ID from URL (Priority: High)
-            // If we have a customerId in URL and it's different from current context, load it.
-            // This ensures "Khách Quen" selection persists even if there are items in cart.
-            if (customerIdParam && (!customer || customer.id !== customerIdParam)) {
+            // If we have a customerId in URL and it's different from persisted customer, load it.
+            if (customerIdParam && persistedCustomerId !== customerIdParam) {
                 try {
                     const { data: customerData } = await supabase
                         .from('customers')
@@ -79,29 +93,36 @@ function CheckoutContent() {
 
             // 2. Handle Template ID (Legacy/Direct Link)
             // Only load template items if cart is empty to avoid overwriting user's current selection
-            if (items.length === 0 && templateIdParam) {
-                // Logic to load template would go here if needed, 
-                // currently assuming context might handle it or it was removed. 
+            if (templateIdParam) {
+                // Logic to load template would go here if needed,
+                // currently assuming context might handle it or it was removed.
                 // Keeping this block structure if we need to re-implement template loading.
             }
 
             // 3. New Guest Flow: If coming from Home as guest, ensure fresh state and open picker
             if (isGuestParam) {
-                // Only clear if we explicitly asked for guest and we usually expect a fresh start,
-                // but if there are items, we might want to keep them? 
-                // The requirement says "chọn khách quen... đổi thành khách lẻ".
-                // If isGuestParam is present, it means user clicked "Khách Lẻ".
-                if (customer) {
+                // Only clear customer if one is persisted — guest flow means no named customer.
+                if (persistedCustomerId) {
                     setCustomer(null);
                 }
 
-                if (items.length === 0) {
+                // Open add item modal immediately for guest flow (reads from localStorage, not state)
+                const savedItems = (() => {
+                    try {
+                        const s = localStorage.getItem('vmp_checkout_state');
+                        return s ? JSON.parse(s).items || [] : [];
+                    } catch { return []; }
+                })();
+                if (savedItems.length === 0) {
                     setIsAddItemModalOpen(true);
                 }
             }
         };
         loadInitialState();
-    }, [templateIdParam, customerIdParam, isGuestParam, customer, items.length]); // Added dependencies
+    // Only URL-derived params — these do not change during the component lifecycle,
+    // so this effect runs once on mount (or if user navigates to a different URL).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [templateIdParam, customerIdParam, isGuestParam]);
 
     // Fetch order history when customer is set (for Quick Reorder)
     useEffect(() => {

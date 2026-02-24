@@ -50,12 +50,14 @@ function TemplateSelectionContent() {
     const subtitle = type === 'guest' ? 'Bán nhanh cho khách vãng lai' : (customer ? `SĐT: ${customer.phone}` : 'Đang tải thông tin...');
 
     const handleSelectEmpty = () => {
+        // React 19 batches these updates — customer is restored before the save effect runs
         clearCheckout();
         if (customer) setCustomer(customer);
         router.push('/checkout');
     };
 
     const handleSelectTemplate = (template: any) => {
+        // React 19 batches these updates — customer is restored before the save effect runs
         clearCheckout();
         if (customer) setCustomer(customer);
 
