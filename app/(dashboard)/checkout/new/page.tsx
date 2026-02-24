@@ -93,6 +93,7 @@ function TemplateSelectionContent() {
             <div className="flex items-center gap-4 mb-8">
                 <button
                     onClick={() => router.back()}
+                    aria-label="Quay lại"
                     className="p-3 bg-white shadow-sm border border-slate-100 rounded-2xl text-slate-600 active:scale-90 transition-transform"
                 >
                     <ArrowLeft size={20} />
@@ -163,7 +164,7 @@ function TemplateSelectionContent() {
                                             {template.items?.slice(0, 3).map((item, i) => (
                                                 <div key={i} className="h-8 w-8 rounded-full border-2 border-white bg-slate-100 overflow-hidden shadow-sm">
                                                     {item.drugs?.image_url ? (
-                                                        <img src={item.drugs.image_url} className="h-full w-full object-cover" />
+                                                        <img src={item.drugs.image_url} alt={item.drugs?.name || 'Thuốc'} className="h-full w-full object-cover" />
                                                     ) : (
                                                         <div className="h-full w-full flex items-center justify-center bg-slate-50">
                                                             <Pill size={12} className="text-slate-600" />

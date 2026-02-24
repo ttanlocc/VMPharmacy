@@ -27,6 +27,7 @@ export default function DrugsPage() {
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
     const [actionMenuDrug, setActionMenuDrug] = useState<Drug | null>(null);
     const [uploading, setUploading] = useState(false);
+    const [deletingImportPrice, setDeletingImportPrice] = useState<{ id: string; drugId: string } | null>(null);
 
     // Filter states
     const [selectedMainGroup, setSelectedMainGroup] = useState<string | null>(null);
@@ -205,6 +206,7 @@ export default function DrugsPage() {
                         <DrugGroupManager />
                         <button
                             onClick={openAddModal}
+                            aria-label="Thêm thuốc mới"
                             className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg active:scale-95 transition-transform"
                         >
                             <Plus size={24} />
@@ -269,6 +271,7 @@ export default function DrugsPage() {
                             </h3>
                             <button
                                 onClick={() => setIsModalOpen(false)}
+                                aria-label="Đóng"
                                 className="p-2 text-slate-700 hover:text-slate-600 rounded-full hover:bg-slate-50 transition-colors"
                             >
                                 <X size={24} />
@@ -279,8 +282,17 @@ export default function DrugsPage() {
                             {/* Image Upload */}
                             <div className="flex justify-center">
                                 <div
-                                    className="relative h-32 w-32 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors overflow-hidden"
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-label="Chọn ảnh thuốc"
+                                    className="relative h-32 w-32 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center cursor-pointer hover:border-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors overflow-hidden"
                                     onClick={() => document.getElementById('imageInput')?.click()}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            document.getElementById('imageInput')?.click();
+                                        }
+                                    }}
                                 >
                                     {imageUrl ? (
                                         <img src={imageUrl} alt="Preview" className="h-full w-full object-cover" />
@@ -403,11 +415,10 @@ export default function DrugsPage() {
                                                 </div>
                                                 <button
                                                     type="button"
-                                                    onClick={async () => {
+                                                    aria-label="Xóa giá nhập"
+                                                    onClick={() => {
                                                         if (editingDrug && ip.id) {
-                                                            if (confirm('Xóa giá nhập này?')) {
-                                                                await deleteImportPrice(ip.id, editingDrug.id);
-                                                            }
+                                                            setDeletingImportPrice({ id: ip.id, drugId: editingDrug.id });
                                                         } else {
                                                             setTempImportPrices(tempImportPrices.filter((_, i) => i !== idx));
                                                         }
@@ -437,6 +448,7 @@ export default function DrugsPage() {
                                         />
                                         <button
                                             type="button"
+                                            aria-label="Thêm giá nhập"
                                             onClick={async () => {
                                                 if (!newSupplier || !newImportPrice) return;
                                                 const priceVal = parseFloat(newImportPrice);
@@ -483,13 +495,26 @@ export default function DrugsPage() {
                 </div>
             )}
 
-            {/* Delete Confirm */}
+            {/* Delete Drug Confirm */}
             <ConfirmDialog
                 isOpen={!!isDeleting}
                 onClose={() => setIsDeleting(null)}
                 onConfirm={() => isDeleting && deleteDrug(isDeleting)}
                 title="Xóa thuốc?"
                 description="Hành động này không thể hoàn tác. Mọi đơn mẫu chứa thuốc này sẽ bị ảnh hưởng."
+            />
+            {/* Delete Import Price Confirm */}
+            <ConfirmDialog
+                isOpen={!!deletingImportPrice}
+                onClose={() => setDeletingImportPrice(null)}
+                onConfirm={async () => {
+                    if (deletingImportPrice) {
+                        await deleteImportPrice(deletingImportPrice.id, deletingImportPrice.drugId);
+                        setDeletingImportPrice(null);
+                    }
+                }}
+                title="Xóa giá nhập?"
+                description="Bạn có chắc muốn xóa giá nhập từ nhà cung cấp này?"
             />
             {/* Action Menu / Preview Popup */}
             {actionMenuDrug && (
