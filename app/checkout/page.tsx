@@ -210,9 +210,27 @@ function CheckoutContent() {
                 }
             });
 
+            // Merge duplicate drug_ids: sum quantities, concatenate notes
+            const mergedMap = new Map<string, { drug_id: string | undefined; quantity: number; note: string | undefined }>();
+            flattenedItems.forEach(item => {
+                if (!item.drug_id) return;
+                const existing = mergedMap.get(item.drug_id);
+                if (existing) {
+                    existing.quantity += item.quantity;
+                    if (item.note) {
+                        existing.note = [existing.note, item.note].filter(Boolean).join('; ');
+                    }
+                } else {
+                    mergedMap.set(item.drug_id, { ...item });
+                }
+            });
+            // Preserve items with no drug_id so they are counted in invalidCount below
+            const itemsWithoutDrugId = flattenedItems.filter(item => !item.drug_id);
+            const mergedItems = [...Array.from(mergedMap.values()), ...itemsWithoutDrugId];
+
             // Filter out items with missing drug_id (e.g., deleted drugs still in localStorage)
-            const validItems = flattenedItems.filter(item => item.drug_id);
-            const invalidCount = flattenedItems.length - validItems.length;
+            const validItems = mergedItems.filter(item => item.drug_id);
+            const invalidCount = mergedItems.length - validItems.length;
 
             if (invalidCount > 0) {
                 toast.error(`${invalidCount} sản phẩm không hợp lệ đã bị bỏ qua (có thể đã bị xóa)`);
