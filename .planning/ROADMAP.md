@@ -11,7 +11,7 @@ This roadmap hardens the existing VMPharmacy MVP for production use. We fix data
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Transaction Safety** - Atomic orders and soft delete for data integrity ✓
-- [ ] **Phase 2: Checkout Reliability** - Template flattening and customer persistence fixes
+- [x] **Phase 2: Checkout Reliability** - Template flattening and customer persistence fixes ✓
 - [ ] **Phase 3: Polish & Performance** - Visible errors, caching, and pagination
 
 ## Phase Details
@@ -42,7 +42,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 02-01-PLAN.md — Fix template flattening (merge duplicate drugs) and harden customer persistence
+- [x] 02-01-PLAN.md — Fix template flattening (merge duplicate drugs) and harden customer persistence ✓
 
 ### Phase 3: Polish & Performance
 **Goal**: App is fast and errors are visible to users
@@ -67,5 +67,5 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Transaction Safety | 2/2 | ✓ Complete | 2026-02-24 |
-| 2. Checkout Reliability | 0/1 | Not started | - |
+| 2. Checkout Reliability | 1/1 | ✓ Complete | 2026-02-24 |
 | 3. Polish & Performance | 0/TBD | Not started | - |
