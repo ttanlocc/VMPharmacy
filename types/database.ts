@@ -55,6 +55,7 @@ export interface Database {
                     image_url: string | null
                     group_id: string | null
                     active_ingredient: string | null
+                    deleted_at: string | null
                     created_at: string
                 }
                 Insert: {
@@ -65,6 +66,7 @@ export interface Database {
                     image_url?: string | null
                     group_id?: string | null
                     active_ingredient?: string | null
+                    deleted_at?: string | null
                     created_at?: string
                 }
                 Update: {
@@ -75,6 +77,7 @@ export interface Database {
                     image_url?: string | null
                     group_id?: string | null
                     active_ingredient?: string | null
+                    deleted_at?: string | null
                     created_at?: string
                 }
             }
