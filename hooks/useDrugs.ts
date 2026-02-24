@@ -70,8 +70,7 @@ export function useDrugs() {
     };
 
     const deleteDrug = async (id: string) => {
-        const { error } = await supabase
-            .from('drugs')
+        const { error } = await (supabase.from('drugs') as any)
             .update({ deleted_at: new Date().toISOString() })
             .eq('id', id);
         if (error) throw error;
