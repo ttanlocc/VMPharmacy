@@ -10,24 +10,24 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 1 of 3 (Transaction Safety)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-24 — Completed 01-01 (atomic order creation)
+Last activity: 2026-02-24 — Completed 01-02 (soft delete drugs)
 
-Progress: [██░░░░░░░░] 11%
+Progress: [███░░░░░░░] 22%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 7 min
-- Total execution time: 0.12 hours
+- Total plans completed: 2
+- Average duration: 8 min
+- Total execution time: 0.25 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-transaction-safety | 1 | 7 min | 7 min |
+| 01-transaction-safety | 2 | 15 min | 8 min |
 
 **Recent Trend:**
 - Last 5 plans: 7 min
@@ -44,6 +44,8 @@ Recent decisions affecting current work:
 
 - Used SECURITY DEFINER on create_order_atomic RPC function; auth checked in API route before RPC call — standard Supabase pattern for atomic writes bypassing RLS safely
 - Created supabase/migrations/ directory for SQL migration files (previously loose files at project root)
+- Soft delete via deleted_at TIMESTAMPTZ column — row preserved so order history JOIN still returns drug name
+- Order GET handler intentionally left unchanged — historical orders JOIN deleted drugs by design
 
 ### Pending Todos
 
@@ -52,9 +54,10 @@ None yet.
 ### Blockers/Concerns
 
 - create_order_atomic SQL function must be applied manually in Supabase SQL Editor before deploying the updated /api/orders route. See 01-01-SUMMARY.md "User Setup Required" section.
+- soft_delete_drugs.sql migration must be applied manually in Supabase SQL Editor before deploying updated routes. See 01-02-SUMMARY.md "User Setup Required" section.
 
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 01-01 (atomic order creation via RPC), ready for 01-02
+Stopped at: Completed 01-02 (soft delete drugs), ready for 01-03
 Resume file: None
