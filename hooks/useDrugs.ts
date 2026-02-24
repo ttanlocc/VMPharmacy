@@ -28,6 +28,7 @@ export function useDrugs() {
             const { data, error } = await supabase
                 .from('drugs')
                 .select('*, drug_groups(name), drug_import_prices(*)')
+                .is('deleted_at', null)
                 .order('name');
 
             if (error) throw error;
@@ -69,7 +70,10 @@ export function useDrugs() {
     };
 
     const deleteDrug = async (id: string) => {
-        const { error } = await supabase.from('drugs').delete().eq('id', id);
+        const { error } = await supabase
+            .from('drugs')
+            .update({ deleted_at: new Date().toISOString() })
+            .eq('id', id);
         if (error) throw error;
         setDrugs(drugs.filter(d => d.id !== id));
     };

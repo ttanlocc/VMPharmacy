@@ -6,7 +6,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const groupId = searchParams.get('group_id');
 
-    let query = supabase.from('drugs').select('*');
+    let query = supabase.from('drugs').select('*').is('deleted_at', null);
 
     if (groupId) {
         query = query.eq('group_id', groupId);
