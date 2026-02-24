@@ -8,6 +8,19 @@ A pharmacy management system for pharmacy staff to process sales orders, manage 
 
 Pharmacy staff can complete a sale reliably — from selecting drugs to submitting an order — without data loss, errors, or crashes.
 
+## Current Milestone: v1.0 Production Hardening
+
+**Goal:** Fix critical bugs and performance issues so staff can use the app reliably in production.
+
+**Target features:**
+- Atomic order creation (no orphaned orders)
+- Customer selection persistence
+- Visible error handling
+- Soft delete for drugs
+- Drug/template caching
+- Order history pagination
+- Template flattening edge cases
+
 ## Requirements
 
 ### Validated
@@ -27,18 +40,15 @@ Pharmacy staff can complete a sale reliably — from selecting drugs to submitti
 
 ### Active
 
-<!-- Production readiness gaps to fix before real staff use. -->
+<!-- v1.0 Production Hardening scope -->
 
 - [ ] Order creation is atomic — no orphaned orders if items insert fails
-- [ ] Template items flatten correctly for all quantity/mix edge cases
 - [ ] Customer selection persists reliably through page refresh and navigation
-- [ ] Deleted drugs are soft-deleted — historical orders show original drug names
 - [ ] Core flow errors are visible to users — no silent failures in checkout or order creation
-- [ ] API routes return consistent, typed error responses
-- [ ] Checkout state is stable under high item counts and multi-tab usage
-- [ ] Order history load is fast even for customers with many past orders
+- [ ] Deleted drugs are soft-deleted — historical orders show original drug names
 - [ ] Drug list and template list don't trigger full refetch on every mutation
-- [ ] Checkout page complexity is manageable — no state coupling bugs
+- [ ] Order history load is fast even for customers with many past orders
+- [ ] Template items flatten correctly for all quantity/mix edge cases
 
 ### Out of Scope
 
@@ -48,6 +58,9 @@ Pharmacy staff can complete a sale reliably — from selecting drugs to submitti
 - Full unit/integration/E2E test suite — too broad; cover critical paths only
 - Full TypeScript `any` cleanup — 38+ occurrences, defer to post-launch refactor
 - Rate limiting — Supabase tier handles this for current scale
+- Checkout page refactor (618-line complexity) — defer to v1.1
+- Consistent typed API error responses — defer to v1.1
+- Checkout state stability (multi-tab, high item counts) — defer to v1.1
 
 ## Context
 
@@ -73,4 +86,4 @@ Pharmacy staff can complete a sale reliably — from selecting drugs to submitti
 | Paginate/limit order history fetches | Prevents slow customer-switching in checkout | — Pending |
 
 ---
-*Last updated: 2026-02-19 after initialization*
+*Last updated: 2026-02-24 after v1.0 milestone start*
