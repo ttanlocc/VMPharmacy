@@ -39,10 +39,10 @@ Plans:
   2. Staff can apply a template where one drug appears multiple times and see properly merged quantities
   3. Staff can select a customer, navigate away, return to checkout, and still see the same customer selected
   4. Staff can refresh the checkout page and customer selection persists
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — Fix template flattening (merge duplicate drugs) and harden customer persistence
 
 ### Phase 3: Polish & Performance
 **Goal**: App is fast and errors are visible to users
@@ -67,5 +67,5 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Transaction Safety | 2/2 | ✓ Complete | 2026-02-24 |
-| 2. Checkout Reliability | 0/TBD | Not started | - |
+| 2. Checkout Reliability | 0/1 | Not started | - |
 | 3. Polish & Performance | 0/TBD | Not started | - |
