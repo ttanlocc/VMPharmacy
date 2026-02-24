@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Pharmacy staff can complete a sale reliably — from selecting drugs to submitting an order — without data loss, errors, or crashes.
-**Current focus:** v1.0 Production Hardening — Phase 1: Transaction Safety
+**Current focus:** v1.0 Production Hardening — Phase 2: Checkout Reliability
 
 ## Current Position
 
-Phase: 1 of 3 (Transaction Safety)
-Plan: 2 of 3 in current phase
-Status: In progress
-Last activity: 2026-02-24 — Completed 01-02 (soft delete drugs)
+Phase: 2 of 3 (Checkout Reliability)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-02-24 — Phase 1 complete, verified
 
-Progress: [███░░░░░░░] 22%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
@@ -59,5 +59,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 01-02 (soft delete drugs), ready for 01-03
+Stopped at: Phase 1 complete, ready for Phase 2
 Resume file: None

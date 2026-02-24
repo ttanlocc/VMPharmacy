@@ -9,8 +9,8 @@ Requirements for production hardening. Each maps to roadmap phases.
 
 ### Transaction Safety
 
-- [ ] **SAFE-01**: Order creation is atomic — no orphaned orders if items insert fails
-- [ ] **SAFE-02**: Deleted drugs are soft-deleted — historical orders show original drug names
+- [x] **SAFE-01**: Order creation is atomic — no orphaned orders if items insert fails ✓
+- [x] **SAFE-02**: Deleted drugs are soft-deleted — historical orders show original drug names ✓
 
 ### User Experience
 
@@ -55,8 +55,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SAFE-01 | Phase 1: Transaction Safety | Pending |
-| SAFE-02 | Phase 1: Transaction Safety | Pending |
+| SAFE-01 | Phase 1: Transaction Safety | ✓ Complete |
+| SAFE-02 | Phase 1: Transaction Safety | ✓ Complete |
 | UX-01 | Phase 2: Checkout Reliability | Pending |
 | UX-02 | Phase 3: Polish & Performance | Pending |
 | PERF-01 | Phase 3: Polish & Performance | Pending |
@@ -70,4 +70,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 — Traceability updated after roadmap creation*
+*Last updated: 2026-02-24 — Phase 1 complete*

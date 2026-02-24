@@ -10,7 +10,7 @@ This roadmap hardens the existing VMPharmacy MVP for production use. We fix data
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Transaction Safety** - Atomic orders and soft delete for data integrity
+- [x] **Phase 1: Transaction Safety** - Atomic orders and soft delete for data integrity ✓
 - [ ] **Phase 2: Checkout Reliability** - Template flattening and customer persistence fixes
 - [ ] **Phase 3: Polish & Performance** - Visible errors, caching, and pagination
 
@@ -27,8 +27,8 @@ This roadmap hardens the existing VMPharmacy MVP for production use. We fix data
 **Plans:** 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Atomic order creation via PostgreSQL RPC function
-- [ ] 01-02-PLAN.md — Soft delete for drugs (preserves historical order data)
+- [x] 01-01-PLAN.md — Atomic order creation via PostgreSQL RPC function ✓
+- [x] 01-02-PLAN.md — Soft delete for drugs (preserves historical order data) ✓
 
 ### Phase 2: Checkout Reliability
 **Goal**: Checkout flow works correctly without data loss or state issues
@@ -66,6 +66,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Transaction Safety | 0/2 | Planned | - |
+| 1. Transaction Safety | 2/2 | ✓ Complete | 2026-02-24 |
 | 2. Checkout Reliability | 0/TBD | Not started | - |
 | 3. Polish & Performance | 0/TBD | Not started | - |
