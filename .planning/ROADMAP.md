@@ -24,10 +24,11 @@ This roadmap hardens the existing VMPharmacy MVP for production use. We fix data
   1. Staff can submit an order and either all items save or nothing saves (no orphaned orders)
   2. Staff can delete a drug from the catalog without losing drug names in historical orders
   3. Deleted drugs no longer appear in drug search/selection but remain visible in past order details
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md — Atomic order creation via PostgreSQL RPC function
+- [ ] 01-02-PLAN.md — Soft delete for drugs (preserves historical order data)
 
 ### Phase 2: Checkout Reliability
 **Goal**: Checkout flow works correctly without data loss or state issues
@@ -65,6 +66,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Transaction Safety | 0/TBD | Not started | - |
+| 1. Transaction Safety | 0/2 | Planned | - |
 | 2. Checkout Reliability | 0/TBD | Not started | - |
 | 3. Polish & Performance | 0/TBD | Not started | - |
