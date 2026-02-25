@@ -28,7 +28,6 @@ export function useDrugs() {
             const { data, error } = await supabase
                 .from('drugs')
                 .select('*, drug_groups(name), drug_import_prices(*)')
-                .is('deleted_at', null)
                 .order('name');
 
             if (error) throw error;

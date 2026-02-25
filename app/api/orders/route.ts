@@ -124,8 +124,7 @@ export async function POST(request: Request) {
     const { data: existingDrugs } = await supabase
         .from('drugs')
         .select('id')
-        .in('id', drugIds)
-        .is('deleted_at', null);
+        .in('id', drugIds);
 
     const existingDrugIds = new Set(existingDrugs?.map(d => d.id) || []);
     const finalValidItems = validItems.filter((item: any) => existingDrugIds.has(item.drug_id));
